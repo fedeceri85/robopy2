@@ -1,5 +1,9 @@
 from PyQt4.QtGui import QImage
-import numpy
+import numpy as np
+import colorconv
+from scipy.misc import imresize
+from matplotlib import cm
+
 '''
 A module to hold 
 
@@ -15,13 +19,87 @@ def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 	img[img>vmax]=vmax
 	
 	im = img - vmin
-	im = numpy.dot(im, 255.0 / (vmax - vmin) )
+	im = np.dot(im, 255.0 / (vmax - vmin) )
 	
 	
-	im2 = im.astype(numpy.uint8)
+	im2 = im.astype(np.uint8)
 	if not returnQimage:
 		return im2
 	else:
 		h,w = img.shape
 		return QImage(im2.data,w,h,QImage.Format_Indexed8)
 		
+def returnHSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=False):
+	'''
+	Given a numpy image and background returns (classic) HSVImage
+	'''
+
+	bckgrn2=imresize(background,(image.shape[0],image.shape[1]))
+	value = (bckgrn2-bckgrn2.min())/(bckgrn2.max()*1.0-bckgrn2.min()*1.0)
+
+	d=image.copy() #Determine if image is passed by reference or by value
+	if vmin == None:
+		dmin = image.min()
+		if dmin<0:
+			dmin = 0
+		
+	else:
+		dmin = vmin
+	if vmax == None:		
+		dmax = image.max()
+	else:
+		dmax = vmax
+	
+	d[d<dmin] = dmin
+	d[d>dmax] = dmax
+	hue =  1-((d*1.0 - dmin)/(dmax -  dmin)*(1-hsvcutoff)+hsvcutoff)
+	saturation = np.ones(hue.shape)
+	hsvMat = np.array([hue,saturation,value]).transpose(1,2,0)
+
+	rgbMat = colorconv.convert_colorspace(hsvMat,'HSV','RGB')
+	if not returnQimage:
+		return rgbMat
+	else:
+		return rgbToQimage(rgbMat)
+		
+		
+def returnJet(image,vmin=None,vmax=None,returnQimage=False):
+	d=image.copy() #Determine if image is passed by reference or by value
+
+	if vmin == None:
+		dmin = image.min()
+		if dmin<0:
+			dmin = 0
+		
+	else:
+		dmin = vmin
+	if vmax == None:		
+		dmax = image.max()
+	else:
+		dmax = vmax
+	
+	d[d<dmin] = dmin
+	d[d>dmax] = dmax
+	
+	rgbMat =  cm.jet((d*1.0-dmin)/(dmax-dmin))*255
+
+	if not returnQimage:
+		return rgbMat
+	else:
+		return rgbToQimage(rgbMat)
+		
+		
+def rgbToQimage(rgbMat):
+	'''
+	Convert an RGB image to a QImage (ignoring alpha channel if present)
+	'''
+	rgbMat2 = (255 << 24 | rgbMat.astype(np.uint32)[:,:,0] << 16 | rgbMat.astype(np.uint32)[:,:,1] << 8 | rgbMat.astype(np.uint32)[:,:,2]).flatten() 
+	h,w,col = rgbMat.shape
+	return QImage(rgbMat2,w,h,QImage.Format_RGB32)
+		
+
+def mean_filter():
+	pass
+
+def gaussian_filter():
+	pass

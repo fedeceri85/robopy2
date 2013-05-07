@@ -88,7 +88,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))
 		
-		return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), True)
+		#return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), True)
+		return SequenceProcessor.returnJet(im,returnQimage=True)
 		
 	def getNextSequenceFrame(self):
 		self.CurrentShownFrame = self.CurrentShownFrame + 1
