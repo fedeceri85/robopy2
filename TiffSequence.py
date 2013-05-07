@@ -1,5 +1,5 @@
 from libtiff import TIFF
-
+#Prova
 class TiffSequence:
 	def __init__(self, fName):
 		self.fileName = fName
