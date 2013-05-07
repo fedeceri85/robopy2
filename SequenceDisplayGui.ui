@@ -28,10 +28,55 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QSpinBox" name="CurrentFrameSpinBox"/>
+       <widget class="QSpinBox" name="CurrentFrameSpinBox">
+        <property name="maximum">
+         <number>100000</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="FirstFrameButton">
+        <property name="text">
+         <string>&lt;&lt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BackFrameButton">
+        <property name="text">
+         <string>&lt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="PlayButton">
+        <property name="text">
+         <string>P</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ForwardFrameButton">
+        <property name="text">
+         <string>&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="LastFrameButton">
+        <property name="text">
+         <string>&gt;&gt;</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QSlider" name="CurrentFrameSlider">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>7</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -60,7 +105,7 @@
      <x>0</x>
      <y>0</y>
      <width>640</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
