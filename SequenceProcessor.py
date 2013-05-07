@@ -64,7 +64,7 @@ def returnHSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQim
 		
 		
 def returnJet(image,vmin=None,vmax=None,returnQimage=False):
-	d=image.copy() #Determine if image is passed by reference or by value
+	#d=image.copy() #Determine if image is passed by reference or by value
 
 	if vmin == None:
 		dmin = image.min()
@@ -78,10 +78,10 @@ def returnJet(image,vmin=None,vmax=None,returnQimage=False):
 	else:
 		dmax = vmax
 	
-	d[d<dmin] = dmin
-	d[d>dmax] = dmax
+	image[image<dmin] = dmin
+	image[image>dmax] = dmax
 	
-	rgbMat =  cm.jet((d*1.0-dmin)/(dmax-dmin))*255
+	rgbMat =  cm.jet((image*1.0-dmin)/(dmax-dmin))*255
 
 	if not returnQimage:
 		return rgbMat
@@ -93,7 +93,8 @@ def rgbToQimage(rgbMat):
 	'''
 	Convert an RGB image to a QImage (ignoring alpha channel if present)
 	'''
-	rgbMat2 = (255 << 24 | rgbMat.astype(np.uint32)[:,:,0] << 16 | rgbMat.astype(np.uint32)[:,:,1] << 8 | rgbMat.astype(np.uint32)[:,:,2]).flatten() 
+	rgbMat=rgbMat.astype(np.uint32)
+	rgbMat2 = (255 << 24 | rgbMat[:,:,0] << 16 | rgbMat[:,:,1] << 8 | rgbMat[:,:,2]).flatten() 
 	h,w,col = rgbMat.shape
 	return QImage(rgbMat2,w,h,QImage.Format_RGB32)
 		
