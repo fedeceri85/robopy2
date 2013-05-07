@@ -11,13 +11,13 @@ class ImageDisplayWidget(QGLWidget):
 		#QGLWidget.__init__(self, parent=parent)
 		super(ImageDisplayWidget, self).__init__(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers), parent=parent)
 		
-		#self.makeCurrent()
-		
-		#self.setFormat(QGLFormat()) #QGL.SampleBuffers))
-		
 		self.gradient = QRadialGradient()
 		self.createGradient()
-		self.doneCurrent()
+		
+		self.SequenceDisplay = parent
+		self.ImagePositionX = 0
+		self.ImagePositionY = 0
+		self.ImageZoom = 1.0
 		
 	def createGradient(self):
 		self.gradient.setCoordinateMode(QGradient.ObjectBoundingMode);
@@ -35,4 +35,13 @@ class ImageDisplayWidget(QGLWidget):
 		painter.setBrush(self.gradient)
 		painter.drawRect(self.rect())
 		
+		#draw image if it exists
+		self.drawSequenceImage(painter)
+		
 		painter.end()
+		
+	def drawSequenceImage(self, painter):
+		p = self.SequenceDisplay
+		
+		if p.FrameImage != None:
+			painter.drawImage(self.ImagePositionX, self.ImagePositionY, p.FrameImage)

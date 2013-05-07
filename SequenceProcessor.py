@@ -1,4 +1,5 @@
 from PyQt4.QtGui import QImage
+import numpy
 '''
 A module to hold 
 
@@ -12,9 +13,15 @@ TODO:
 def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 	img[img<vmin]=vmin
 	img[img>vmax]=vmax
+	
+	im = img - vmin
+	im = numpy.dot(im, 255.0 / (vmax - vmin) )
+	
+	
+	im2 = im.astype(numpy.uint8)
 	if not returnQimage:
-		return img.astype.uint8
+		return im2
 	else:
 		h,w = img.shape
-		return QImage(img.data,w,h,QImage.Format_Indexed8)
+		return QImage(im2.data,w,h,QImage.Format_Indexed8)
 		

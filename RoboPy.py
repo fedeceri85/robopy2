@@ -39,11 +39,9 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def getFileNamesGui(self, caption, directory, filt):
 		fnames = QFileDialog.getOpenFileNames(self, caption, directory, filt)
 		
-		nFiles = fnames.size()
+		nFiles = fnames.count()
 		
-		files = [fnames.at(i).toStdString().c_str() for i in xrange(nFiles)]
-		#for i in xrange(1,nFiles):
-			#files.append(fnames.at(i).toStdString().c_str())
+		files = [fnames[i].toAscii().data() for i in xrange(nFiles)]
 			
 		return files
 
