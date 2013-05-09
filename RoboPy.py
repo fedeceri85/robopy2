@@ -5,6 +5,11 @@ import sys
 
 from RoboPyGui import Ui_RoboMainWnd
 from SequenceDisplay import SequenceDisplay
+'''
+Main window of Robopy project
+Launches various windows and tools
+
+'''
 
 class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None):

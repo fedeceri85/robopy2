@@ -1,6 +1,7 @@
 import PyQt4
 from PyQt4.QtCore import *
 import sys
+import numpy as np
 
 from OpenGL import GL
 
@@ -40,7 +41,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.show()
 		
 		self.countSequenceFrames()
-		self.FrameImage = self.getSequenceFrame(0)
+		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
 		
 	def imageWidgetSetup(self):
 		hlay = PyQt4.QtGui.QHBoxLayout(self.ImageFrameWidget)
@@ -58,6 +59,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
 		
+		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
+		
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
 		
@@ -72,7 +75,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				
 			self.updateFrameWidgetsRange()
 	
-	def getSequenceFrame(self, n):
+	def getSequenceFrame(self, n, needQImage = True):
 		(i,j) = self.getSequenceIndexes(n)
 		
 		if i == -1:
@@ -88,8 +91,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))
 		
-		#return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), True)
-		return SequenceProcessor.returnJet(im,returnQimage=True)
+		return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), needQImage), im
+		#return SequenceProcessor.returnJet(im,returnQimage=True)
 		
 	def getNextSequenceFrame(self):
 		self.CurrentShownFrame = self.CurrentShownFrame + 1
@@ -97,11 +100,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.showStatusMessage("Trying to show frame " + str(self.CurrentShownFrame) + " of " + str(self.MaxFrames) + ". Impossible!!")
 			self.CurrentShownFrame = self.CurrentShownFrame - 1
 			return
-		
 			
-		self.FrameImage = self.getSequenceFrame(self.CurrentShownFrame)
-		if self.FrameImage == None:
-			print("getFrame returned None")
+		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
+		
 		self.imWidget.repaint()
 		self.updateCurrentFrameWidgets()
 		
@@ -113,19 +114,19 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			return
 		
 		
-		self.FrameImage = self.getSequenceFrame(self.CurrentShownFrame)
+		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
 		self.imWidget.repaint()
 		self.updateCurrentFrameWidgets()
 		
 	def getFirstSequenceFrame(self):
 		self.CurrentShownFrame = 0
-		self.FrameImage = self.getSequenceFrame(self.CurrentShownFrame)
+		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
 		self.imWidget.repaint()
 		self.updateCurrentFrameWidgets()
 		
 	def getLastSequenceFrame(self):
 		self.CurrentShownFrame = self.MaxFrames - 1
-		self.FrameImage = self.getSequenceFrame(self.CurrentShownFrame)
+		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
 		self.imWidget.repaint()
 		self.updateCurrentFrameWidgets()
 		
@@ -178,6 +179,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if self.isLastFrame():
 				self.timer.stop()
 				self.IsPlaying = False
+				
+	def imageNewMousePosition(self, x, y):
+		if self.FrameData != None:
+			imy, imx = self.FrameData.shape
+			if imy > y and y >= 0 and imx > x and x >= 0:
+				self.showStatusMessage(str(x) + ":" + str(y) + "=" + str(self.FrameData[y][x]))
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

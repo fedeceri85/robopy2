@@ -3,9 +3,10 @@ from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4.QtCore import *
 import sys
-#Main Image display widget ontop of QGLWidget (to use opengl hardware)
-#computer running must be opengl es2.0 capable
-
+'''
+Main Image display widget ontop of QGLWidget (to use opengl hardware)
+computer running must be opengl es 2.0 capable
+'''
 class ImageDisplayWidget(QGLWidget):
 	def __init__(self, parent=None):
 		#QGLWidget.__init__(self, parent=parent)
@@ -13,11 +14,16 @@ class ImageDisplayWidget(QGLWidget):
 		
 		self.gradient = QRadialGradient()
 		self.createGradient()
+		self.setMouseTracking(True)
 		
 		self.SequenceDisplay = parent
 		self.ImagePositionX = 0
 		self.ImagePositionY = 0
+		
 		self.ImageZoom = 1.0
+		self.ImageZoomSteps = 1
+		
+		self.IsMouseDown = 0
 		
 	def createGradient(self):
 		self.gradient.setCoordinateMode(QGradient.ObjectBoundingMode);
@@ -36,6 +42,7 @@ class ImageDisplayWidget(QGLWidget):
 		painter.drawRect(self.rect())
 		
 		#draw image if it exists
+		painter.scale(self.ImageZoom, self.ImageZoom)
 		self.drawSequenceImage(painter)
 		
 		painter.end()
@@ -45,3 +52,22 @@ class ImageDisplayWidget(QGLWidget):
 		
 		if p.FrameImage != None:
 			painter.drawImage(self.ImagePositionX, self.ImagePositionY, p.FrameImage)
+			
+	def wheelEvent(self, event):
+		if event.delta() > 0:
+			self.ImageZoomSteps = self.ImageZoomSteps + 1
+		else:
+			self.ImageZoomSteps = self.ImageZoomSteps - 1
+			
+		self.ImageZoom = pow(1.25, self.ImageZoomSteps)
+		self.repaint()
+		
+	def mousePressEvent(self, event):
+		self.IsMouseDown = 1
+		
+	def mouseReleaseEvent(self, event):
+		self.IsMouseDown = 0
+		
+	def mouseMoveEvent(self, event):
+		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), event.x() / self.ImageZoom, event.y() / self.ImageZoom)
+		event.accept()

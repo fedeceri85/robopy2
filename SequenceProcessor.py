@@ -5,7 +5,7 @@ from scipy.misc import imresize
 from matplotlib import cm
 
 '''
-A module to hold 
+A module to hold computations on images or sequences
 
 TODO:
 1-generare average roi
@@ -15,14 +15,14 @@ TODO:
 '''
 
 def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
-	img[img<vmin]=vmin
-	img[img>vmax]=vmax
+	#img[img<vmin]=vmin
+	#img[img>vmax]=vmax
 	
-	im = img - vmin
-	im = np.dot(im, 255.0 / (vmax - vmin) )
+	img = img - vmin
+	img = img * (255.0 / (vmax - vmin) )
 	
 	
-	im2 = im.astype(np.uint8)
+	im2 = img.astype(np.uint8)
 	if not returnQimage:
 		return im2
 	else:
