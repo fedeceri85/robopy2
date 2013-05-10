@@ -26,12 +26,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.CurrentFrameSlider.setBuddy(self.CurrentFrameSpinBox)
 		
 		self.RoboMainWnd = parent
-		self.SequenceFiles = files
 		self.MaxFrames = 0
 		self.CurrentShownFrame = 0
-		self.FramesPerFile = list()
 		
-		self.Tiff = None
 		self.PlayInterframe = 10
 		self.IsPlaying = False
 		self.timer = QBasicTimer()
@@ -40,7 +37,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.show()
 		
-		self.countSequenceFrames()
+		
+		self.tiffSequence = TiffSequence(files)
+		self.MaxFrames = self.tiffSequence.getFrames()
+		self.updateFrameWidgetsRange()
+		self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")
 		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
 		
 	def imageWidgetSetup(self):
@@ -58,33 +59,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.FirstFrameButton, SIGNAL("clicked()"), self.getFirstSequenceFrame)
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
+		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
 		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
-		
-	def countSequenceFrames(self):
-		self.MaxFrames = 0
-		if self.SequenceFiles != None:
-			for s in self.SequenceFiles:
-				th = TiffSequence(s)
-				self.MaxFrames = self.MaxFrames + th.getFrames()
-				self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")
-				self.FramesPerFile.append(th.getFrames())	
-				
-			self.updateFrameWidgetsRange()
 	
 	def getSequenceFrame(self, n, needQImage = True):
-		(i,j) = self.getSequenceIndexes(n)
-		
-		if i == -1:
-			return None
 			
-		if self.Tiff == None or self.Tiff.getFileName() != self.SequenceFiles[i]:
-			self.Tiff = TiffSequence(self.SequenceFiles[i])
-			
-		im = self.Tiff.getFrame(j)
+		im = self.tiffSequence.getFrame(n)
 		
 		if im == None:
 			return None
@@ -147,17 +131,24 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.blockSignals(True)
 		self.CurrentFrameSpinBox.setRange(0, self.MaxFrames-1)
 		self.CurrentFrameSpinBox.blockSignals(False)
-	
-	def getSequenceIndexes(self, n):
-		if n > self.MaxFrames:
-			return (-1,-1)
 		
-		i = 0;
-		while n > self.FramesPerFile[i]:
-			n = n - self.FramesPerFile[i]
-			i = i + 1
+	def currentFrameSliderCb(self)
+		fr = self.CurrentFrameSlider.value()
+		if fr == self.CurrentShownFrame:
+			return
 			
-		return (i,n)
+		self.CurrentShownFrame = self.CurrentFrameSlider.value()
+		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
+		
+		self.imWidget.repaint()
+		self.updateCurrentFrameWidgets()
+		
+	def currentFrameSpinBoxCb(self):
+		self.CurrentShownFrame = self.CurrentFrameSpinBox.value()
+		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
+		
+		self.imWidget.repaint()
+		self.updateCurrentFrameWidgets()
 		
 	def playButtonCb(self):
 		if self.IsPlaying == False:

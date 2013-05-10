@@ -1,23 +1,41 @@
 from libtiff import TIFF
 #Prova
 class TiffSequence:
-	def __init__(self, fName):
-		self.fileName = fName
-		self.width = 0
-		self.height = 0
+	def __init__(self, fNames):
+		
+		self.fileName = None
+		self.width = -1
+		self.height = -1
 		self.frames = 0
 		
-		self.tifHandler = None
+		self.SequenceFiles = fNames
+		self.FramesPerFile = list()
+		
+		self.tifHandlers = list()
+		
 		self.open()
-		self.getTifInfo()
+		for i in self.tifHandlers:
+			width, height, frames = self.getTifInfo(i)
+			print(str(width) + " " + str(height) + " " + str(frames))
+			if self.width == -1:
+				self.width = width
+				self.height = height
+			else:
+				if width != self.width or height != self.height:
+					print("TiffSequence::Inconsistent width or height across the sequence files")
+					self.clearTifHandler()
+					break
+			self.FramesPerFile.append(frames)
+			self.frames = self.frames + frames
 		
 	def __del__(self):
 		self.clearTifHandler()
 	
 	def clearTifHandler(self):
-		if self.tifHandler != None:
-			TIFF.close(self.tifHandler)
-			self.tifHandler = None
+		if len(self.tifHandlers) > 0:
+			for f in self.tifHandlers:
+				TIFF.close(f)
+			self.tifHandlers = list()
 		
 	
 	def getFileName(self):
@@ -34,26 +52,47 @@ class TiffSequence:
 		
 	def open(self):
 		self.clearTifHandler()
-		self.tifHandler = TIFF.open(self.getFileName(), 'r')
 		
-	def getTifInfo(self):
+		for i in self.SequenceFiles:
+			self.tifHandlers.append(TIFF.open(i, 'r'))
 		
-		th = self.tifHandler
+	def getTifInfo(self, th):
+		
+		width = 0
+		height = 0
+		frames = 0
 		
 		if th != None:
-			self.width = th.GetField(256)
-			self.height = th.GetField(257)
+			width = th.GetField(256)
+			height = th.GetField(257)
 			cnt = 100000
 			while not th.SetDirectory(cnt):
 				cnt = cnt + 10000
 				
-			self.frames = th.CurrentDirectory().value
+			frames = th.CurrentDirectory().value
+			
+		return width, height, frames
+		
+	def getFileIndexes(self, n):
+		if n > self.frames:
+			return (-1,-1)
+		
+		i = 0;
+		while n > self.FramesPerFile[i]:
+			n = n - self.FramesPerFile[i]
+			i = i + 1
+			
+		return (i,n)
 		
 	def getFrame(self, n):
-		if self.tifHandler != None:
-			self.tifHandler.SetDirectory(n)
-			if n < 0 or n > self.frames - 1:
+		if self.tifHandlers[0] != None:
+			i,n = self.getFileIndexes(n)
+			
+			if i == -1:
 				return None
-			return self.tifHandler.read_image()
+			
+			self.tifHandlers[i].SetDirectory(n)
+			
+			return self.tifHandlers[i].read_image()
 		
 		return None

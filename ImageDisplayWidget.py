@@ -2,6 +2,7 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4.QtCore import *
+from Roi import Roi
 import sys
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
@@ -24,6 +25,9 @@ class ImageDisplayWidget(QGLWidget):
 		self.ImageZoomSteps = 1
 		
 		self.IsMouseDown = 0
+		self.RightMouseButtonClicked = 0
+		self.DrawRoiStatus = "idle"
+		self.rois = list()
 		
 	def createGradient(self):
 		self.gradient.setCoordinateMode(QGradient.ObjectBoundingMode);
@@ -64,10 +68,32 @@ class ImageDisplayWidget(QGLWidget):
 		
 	def mousePressEvent(self, event):
 		self.IsMouseDown = 1
+		if event.button() == Qt.RightButton:
+			self.RightMouseButtonClicked = 1
+		else:
+			self.RightMouseButtonClicked = 0
 		
 	def mouseReleaseEvent(self, event):
+		
+		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1:
+			
+			a,b = self.screenToImage(event.x(), event.y())
+			
+			if self.DrawRoiStatus == "idle":
+				self.DrawRoiStatus = "drawing"
+				self.rois.append(Roi())
+				
+			self.rois[-1].append(a,b)
+		
 		self.IsMouseDown = 0
 		
+	def screenToImage(x,y):
+		a = x / self.ImageZoom
+		b = y / self.ImageZoom
+		
+		return a,b
+		
 	def mouseMoveEvent(self, event):
-		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), event.x() / self.ImageZoom, event.y() / self.ImageZoom)
+		a,b = self.screenToImage(event.x(), event.y())
+		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
 		event.accept()
