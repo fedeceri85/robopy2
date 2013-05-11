@@ -87,7 +87,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		self.IsMouseDown = 0
 		
-	def screenToImage(x,y):
+	def screenToImage(self,x,y):
 		a = x / self.ImageZoom
 		b = y / self.ImageZoom
 		

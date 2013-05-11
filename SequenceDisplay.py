@@ -132,7 +132,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.setRange(0, self.MaxFrames-1)
 		self.CurrentFrameSpinBox.blockSignals(False)
 		
-	def currentFrameSliderCb(self)
+	def currentFrameSliderCb(self):
 		fr = self.CurrentFrameSlider.value()
 		if fr == self.CurrentShownFrame:
 			return
