@@ -1,5 +1,7 @@
 from libtiff import TIFF
-#Prova
+from numpy import zeros
+import Roi
+from pubTools import oneColumnFigure
 class TiffSequence:
 	def __init__(self, fNames):
 		
@@ -12,6 +14,7 @@ class TiffSequence:
 		self.FramesPerFile = list()
 		
 		self.tifHandlers = list()
+		self.rois = list()
 		
 		self.open()
 		for i in self.tifHandlers:
@@ -96,3 +99,21 @@ class TiffSequence:
 			return self.tifHandlers[i].read_image()
 		
 		return None
+	
+	def computeRois(self,firstIndex = None, lastIndex = None):
+		if firstIndex == None:
+			firstIndex = 0
+		if lastIndex == None:
+			lastIndex = self.getFrames()
+			
+		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)))
+		
+		for i,r in enumerate(self.rois):
+			for ind in xrange(firstIndex,lastIndex):
+				img = self.getFrame(ind)
+				roiProfile[ind,i] = r.computeAverage(img)
+		
+		#FOR TESTING PURPOSES ONLY
+		fig,ax = oneColumnFigure(addAxes=True)
+		ax.plot(roiProfile)
+		fig.show()

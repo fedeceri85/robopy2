@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>628</width>
     <height>480</height>
    </rect>
   </property>
@@ -104,12 +104,148 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
-     <height>20</height>
+     <width>628</width>
+     <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuRois">
+    <property name="title">
+     <string>Rois</string>
+    </property>
+    <addaction name="actionCompute_Rois"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_from_file"/>
+    <addaction name="actionSave_to_file"/>
+    <addaction name="separator"/>
+    <addaction name="actionDelete_Last"/>
+   </widget>
+   <widget class="QMenu" name="menuStacks">
+    <property name="title">
+     <string>Stack</string>
+    </property>
+    <widget class="QMenu" name="menuMath_2">
+     <property name="title">
+      <string>Math</string>
+     </property>
+     <addaction name="actionAdd"/>
+     <addaction name="actionSubtract"/>
+     <addaction name="actionDivide"/>
+     <addaction name="actionMultiply"/>
+     <addaction name="separator"/>
+     <addaction name="actionAdd_image"/>
+     <addaction name="actionSubtract_image"/>
+     <addaction name="actionDivide_by_image"/>
+     <addaction name="actionMultiply_by_image"/>
+    </widget>
+    <addaction name="actionBack_Projection"/>
+    <addaction name="actionAverage"/>
+    <addaction name="menuMath_2"/>
+   </widget>
+   <widget class="QMenu" name="menuDisplay">
+    <property name="title">
+     <string>Display</string>
+    </property>
+    <widget class="QMenu" name="menuFilters">
+     <property name="title">
+      <string>Filters</string>
+     </property>
+     <addaction name="actionMedian_filter"/>
+     <addaction name="actionGaussian_filter"/>
+     <addaction name="separator"/>
+     <addaction name="actionTemporal_Smoothing"/>
+    </widget>
+    <addaction name="menuFilters"/>
+   </widget>
+   <addaction name="menuRois"/>
+   <addaction name="menuStacks"/>
+   <addaction name="menuDisplay"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionCompute_Rois">
+   <property name="text">
+    <string>Compute Roi</string>
+   </property>
+  </action>
+  <action name="actionLoad_from_file">
+   <property name="text">
+    <string>Load from file...</string>
+   </property>
+  </action>
+  <action name="actionSave_to_file">
+   <property name="text">
+    <string>Save to file</string>
+   </property>
+  </action>
+  <action name="actionDelete_Last">
+   <property name="text">
+    <string>Delete Last</string>
+   </property>
+  </action>
+  <action name="actionBack_Projection">
+   <property name="text">
+    <string>Back Projection</string>
+   </property>
+  </action>
+  <action name="actionAverage">
+   <property name="text">
+    <string>Average</string>
+   </property>
+  </action>
+  <action name="actionAdd">
+   <property name="text">
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="actionSubtract">
+   <property name="text">
+    <string>Subtract</string>
+   </property>
+  </action>
+  <action name="actionDivide">
+   <property name="text">
+    <string>Divide</string>
+   </property>
+  </action>
+  <action name="actionMultiply">
+   <property name="text">
+    <string>Multiply</string>
+   </property>
+  </action>
+  <action name="actionAdd_image">
+   <property name="text">
+    <string>Add image</string>
+   </property>
+  </action>
+  <action name="actionSubtract_image">
+   <property name="text">
+    <string>Subtract image</string>
+   </property>
+  </action>
+  <action name="actionDivide_by_image">
+   <property name="text">
+    <string>Divide by image</string>
+   </property>
+  </action>
+  <action name="actionMultiply_by_image">
+   <property name="text">
+    <string>Multiply by image</string>
+   </property>
+  </action>
+  <action name="actionMedian_filter">
+   <property name="text">
+    <string>Median filter</string>
+   </property>
+  </action>
+  <action name="actionGaussian_filter">
+   <property name="text">
+    <string>Gaussian filter</string>
+   </property>
+  </action>
+  <action name="actionTemporal_Smoothing">
+   <property name="text">
+    <string>Temporal Smoothing</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

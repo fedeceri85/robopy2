@@ -63,11 +63,15 @@ class ImageDisplayWidget(QGLWidget):
 			
 	def drawRoi(self, painter, r):
 		pen = QPen(r.color)
+		pen2 = QPen(r.color,4)
 		painter.setPen(pen)
 		
 		painter.drawPolyline(r)
-		
+		painter.setPen(pen2)
+		painter.drawPoints(r)
+
 		if r.mapSize > 0:
+			painter.setPen(pen)
 			painter.drawLine(r.last(), r.first())
 		
 			
@@ -96,6 +100,7 @@ class ImageDisplayWidget(QGLWidget):
 			if self.DrawRoiStatus == "idle":
 				self.DrawRoiStatus = "drawing"
 				self.rois.append(Roi())
+
 				
 			self.rois[-1].addPoint(a,b)
 			self.repaint()
@@ -117,10 +122,11 @@ class ImageDisplayWidget(QGLWidget):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"
 			
-			a,b = self.screenToImage(event.x(), event.y())
-			self.rois[-1].addPoint(a,b)
+			#a,b = self.screenToImage(event.x(), event.y())
+			#self.rois[-1].addPoint(a,b)
 			
 			self.rois[-1].computePointMap()
+			self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 			self.repaint()
-			
+
 			

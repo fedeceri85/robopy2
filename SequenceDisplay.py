@@ -60,8 +60,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
 		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
-		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
+		#menus
+		##ROIS
+		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
+
 		
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
@@ -176,7 +179,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			imy, imx = self.FrameData.shape
 			if imy > y and y >= 0 and imx > x and x >= 0:
 				self.showStatusMessage(str(x) + ":" + str(y) + "=" + str(self.FrameData[y][x]))
-
+	
+	def computeRoisCb(self):
+		self.tiffSequence.computeRois()
+		
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()
