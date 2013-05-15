@@ -11,6 +11,8 @@ class Roi(QPolygon):
 	def __init__(self):
 		super(Roi, self).__init__()
 		
+		self.color = Qt.green
+		
 		self.clearPointMap()
 	
 	def clearPointMap(self):

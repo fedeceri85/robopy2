@@ -49,6 +49,10 @@ class ImageDisplayWidget(QGLWidget):
 		painter.scale(self.ImageZoom, self.ImageZoom)
 		self.drawSequenceImage(painter)
 		
+		if len(self.rois) > 0:
+			for i in self.rois:
+				self.drawRoi(painter, i)
+		
 		painter.end()
 		
 	def drawSequenceImage(self, painter):
@@ -56,6 +60,16 @@ class ImageDisplayWidget(QGLWidget):
 		
 		if p.FrameImage != None:
 			painter.drawImage(self.ImagePositionX, self.ImagePositionY, p.FrameImage)
+			
+	def drawRoi(self, painter, r):
+		pen = QPen(r.color)
+		painter.setPen(pen)
+		
+		painter.drawPolyline(r)
+		
+		if r.mapSize > 0:
+			painter.drawLine(r.last(), r.first())
+		
 			
 	def wheelEvent(self, event):
 		if event.delta() > 0:
@@ -83,7 +97,8 @@ class ImageDisplayWidget(QGLWidget):
 				self.DrawRoiStatus = "drawing"
 				self.rois.append(Roi())
 				
-			self.rois[-1].append(a,b)
+			self.rois[-1].addPoint(a,b)
+			self.repaint()
 		
 		self.IsMouseDown = 0
 		
@@ -97,3 +112,15 @@ class ImageDisplayWidget(QGLWidget):
 		a,b = self.screenToImage(event.x(), event.y())
 		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
 		event.accept()
+		
+	def mouseDoubleClickEvent(self, event):
+		if self.DrawRoiStatus == "drawing":
+			self.DrawRoiStatus = "idle"
+			
+			a,b = self.screenToImage(event.x(), event.y())
+			self.rois[-1].addPoint(a,b)
+			
+			self.rois[-1].computePointMap()
+			self.repaint()
+			
+			
