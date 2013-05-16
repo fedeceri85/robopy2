@@ -2,7 +2,7 @@ import PyQt4
 from PyQt4.QtCore import *
 import sys
 import numpy as np
-
+from pubTools import oneColumnFigure
 from OpenGL import GL
 
 from SequenceDisplayGui import Ui_SequenceDisplayWnd
@@ -20,10 +20,6 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#l = dir(self.CurrentFrameSlider)
 		#for i in l:
 		#	print(i)
-		
-		#meths = self.CurrentFrameSlider.?
-		#print(meths)
-		#self.CurrentFrameSlider.setBuddy(self.CurrentFrameSpinBox)
 		
 		self.RoboMainWnd = parent
 		self.MaxFrames = 0
@@ -181,7 +177,24 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.showStatusMessage(str(x) + ":" + str(y) + "=" + str(self.FrameData[y][x]))
 	
 	def computeRoisCb(self):
-		self.tiffSequence.computeRois()
+		ff = 0
+		lf = self.tiffSequence.getFrames()
+		
+		nrois = len(self.tiffSequence.rois)
+		roiProfile = np.zeros((lf, nrois))
+		
+		for i in xrange(ff, lf, 100):
+			tlf = i + 100
+			if tlf > lf:
+				tlf = lf
+			roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)
+			self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
+			self.update()
+			
+		#FOR TESTING PURPOSES ONLY
+		fig,ax = oneColumnFigure(addAxes=True)
+		ax.plot(roiProfile)
+		fig.show()
 		
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

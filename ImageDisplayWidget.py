@@ -116,7 +116,7 @@ class ImageDisplayWidget(QGLWidget):
 	def mouseMoveEvent(self, event):
 		a,b = self.screenToImage(event.x(), event.y())
 		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
-		event.accept()
+		#event.accept()
 		
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":

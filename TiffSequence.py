@@ -1,7 +1,7 @@
 from libtiff import TIFF
 from numpy import zeros
 import Roi
-from pubTools import oneColumnFigure
+#from pubTools import oneColumnFigure
 class TiffSequence:
 	def __init__(self, fNames):
 		
@@ -108,12 +108,10 @@ class TiffSequence:
 			
 		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)))
 		
-		for i,r in enumerate(self.rois):
-			for ind in xrange(firstIndex,lastIndex):
-				img = self.getFrame(ind)
-				roiProfile[ind,i] = r.computeAverage(img)
-		
-		#FOR TESTING PURPOSES ONLY
-		fig,ax = oneColumnFigure(addAxes=True)
-		ax.plot(roiProfile)
-		fig.show()
+		for ind in xrange(firstIndex,lastIndex):
+			img = self.getFrame(ind)
+			for i,r in enumerate(self.rois):
+				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+				
+		return roiProfile
