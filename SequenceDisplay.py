@@ -9,6 +9,7 @@ from SequenceDisplayGui import Ui_SequenceDisplayWnd
 from ImageDisplayWidget import ImageDisplayWidget
 from TiffSequence import TiffSequence
 import SequenceProcessor
+from mplot import MPlot
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None):
@@ -191,10 +192,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
 			self.update()
 			
-		#FOR TESTING PURPOSES ONLY
-		fig,ax = oneColumnFigure(addAxes=True)
-		ax.plot(roiProfile)
-		fig.show()
+		##FOR TESTING PURPOSES ONLY
+		#fig,ax = oneColumnFigure(addAxes=True)
+		#ax.plot(roiProfile)
+		#fig.show()
+		
+		#fig = MPlot()
+		#fig.show()
+		#fig.plot(roiProfile)
 		
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
