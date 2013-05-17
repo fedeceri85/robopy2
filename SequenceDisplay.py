@@ -197,9 +197,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#ax.plot(roiProfile)
 		#fig.show()
 		
-		#fig = MPlot()
-		#fig.show()
-		#fig.plot(roiProfile)
+		fig = MPlot(self)
+		
+		fig.plot(roiProfile)
+		fig.show()
+		
 		
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
