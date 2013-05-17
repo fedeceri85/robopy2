@@ -1,4 +1,6 @@
 from pylab import *
+from matplotlib.figure import Figure
+
 inchestocm=2.54
 micro=u'\u03bc'
 delta=u'\u0394'
@@ -27,7 +29,7 @@ def oneColumnFigure(figsize=(3.5,2.5),dpi=200,addAxes=True):
 	#rcParams['xtick.minor.size']=2
 	#rcParams['ytick.minor.size']=2
 	#rc('lines', linewidth=1.5) 
-	fig=figure(figsize=figsize,dpi=dpi)
+	fig=Figure(figsize=figsize,dpi=dpi)
 	if addAxes:
 		ax=fig.add_subplot(111)
 		ax.xaxis.set_ticks_position('bottom')

@@ -4,8 +4,8 @@ from PyQt4.QtGui import *
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-from matplotlib.figure import Figure
-
+#from matplotlib.figure import Figure
+from pubTools import oneColumnFigure as Figure
 class MPlot(QDialog):
 	def __init__(self, parent=None):
 		QDialog.__init__(self, parent)
@@ -35,7 +35,7 @@ class MPlot(QDialog):
 		hlay.addWidget(self.mainFrame)
 		
 		self.dpi = 200
-		self.fig = Figure(self.figSize, dpi = self.dpi)
+		self.fig = Figure(self.figSize, dpi = self.dpi,addAxes=False)
 		self.canvas = FigureCanvas(self.fig)
 		
 		hlay = QHBoxLayout(self.mainFrame)
