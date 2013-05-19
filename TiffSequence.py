@@ -15,7 +15,7 @@ class TiffSequence:
 		
 		self.tifHandlers = list()
 		self.rois = list()
-		
+		self.arraySequence = None
 		self.open()
 		for i in self.tifHandlers:
 			width, height, frames = self.getTifInfo(i)
@@ -30,6 +30,7 @@ class TiffSequence:
 					break
 			self.FramesPerFile.append(frames)
 			self.frames = self.frames + frames
+
 		
 	def __del__(self):
 		self.clearTifHandler()
@@ -86,19 +87,35 @@ class TiffSequence:
 			i = i + 1
 			
 		return (i,n)
+	
+	def loadWholeTiff(self):
+		self.arraySequence = zeros((self.height,self.width,self.frames))
+		for index in xrange(self.frames):
+			if self.tifHandlers[0] != None:
+				i,n = self.getFileIndexes(index)
+			
+				if i == -1:
+					pass
+				
+				self.tifHandlers[i].SetDirectory(n)
+				self.arraySequence[:,:,index]=self.tifHandlers[i].read_image()
+
 		
 	def getFrame(self, n):
-		if self.tifHandlers[0] != None:
-			i,n = self.getFileIndexes(n)
+		if self.arraySequence is not None:
+			return self.arraySequence[:,:,n]
+		else:
+			if self.tifHandlers[0] != None:
+				i,n = self.getFileIndexes(n)
+				
+				if i == -1:
+					return None
+				
+				self.tifHandlers[i].SetDirectory(n)
+				
+				return self.tifHandlers[i].read_image()
 			
-			if i == -1:
-				return None
-			
-			self.tifHandlers[i].SetDirectory(n)
-			
-			return self.tifHandlers[i].read_image()
-		
-		return None
+			return None
 	
 	def computeRois(self,firstIndex = None, lastIndex = None):
 		if firstIndex == None:

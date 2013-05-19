@@ -20,27 +20,44 @@
      <x>0</x>
      <y>0</y>
      <width>703</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="roboActionOpen"/>
+    <widget class="QMenu" name="menuLoad">
+     <property name="title">
+      <string>Load</string>
+     </property>
+     <addaction name="roboActionOpen"/>
+     <addaction name="roboActionLoadInRam"/>
+    </widget>
+    <addaction name="menuLoad"/>
     <addaction name="roboActionSave"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="roboActionOpen">
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </action>
   <action name="roboActionSave">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="roboActionOpen_2">
+   <property name="text">
+    <string>Read from disk</string>
+   </property>
+  </action>
+  <action name="roboActionLoadInRam">
+   <property name="text">
+    <string>Load in memory</string>
+   </property>
+  </action>
+  <action name="roboActionOpen">
+   <property name="text">
+    <string>Read from disk</string>
    </property>
   </action>
  </widget>

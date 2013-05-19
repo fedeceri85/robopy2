@@ -28,12 +28,22 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		
 	def makeConnections(self):
 		self.connect(self.roboActionOpen, SIGNAL("triggered()"), self.roboActionOpenCb)
+		self.connect(self.roboActionLoadInRam, SIGNAL("triggered()"), self.roboActionLoadInRamCb)
 		
 	def roboActionOpenCb(self):
 		
 		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
 		
 		sd = SequenceDisplay(self, files)
+		#self.sequences.append(sd)
+		
+		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
+
+	def roboActionLoadInRamCb(self):
+		
+		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
+		
+		sd = SequenceDisplay(self, files,loadInRam = True)
 		#self.sequences.append(sd)
 		
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))

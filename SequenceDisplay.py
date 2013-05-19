@@ -12,7 +12,7 @@ import SequenceProcessor
 from mplot import MPlot
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
-	def __init__(self, parent = None, files=None):
+	def __init__(self, parent = None, files=None,loadInRam=False):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
 		
 		self.setupUi(self)
@@ -36,6 +36,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		
 		self.tiffSequence = TiffSequence(files)
+		if loadInRam:
+			self.tiffSequence.loadWholeTiff()
 		self.MaxFrames = self.tiffSequence.getFrames()
 		self.updateFrameWidgetsRange()
 		self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'RoboPyGui.ui'
 #
-# Created: Tue May  7 09:29:24 2013
+# Created: Sun May 19 13:52:38 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,19 +31,27 @@ class Ui_RoboMainWnd(object):
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         RoboMainWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(RoboMainWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 703, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 703, 20))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
+        self.menuLoad = QtGui.QMenu(self.menuFile)
+        self.menuLoad.setObjectName(_fromUtf8("menuLoad"))
         RoboMainWnd.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(RoboMainWnd)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         RoboMainWnd.setStatusBar(self.statusbar)
-        self.roboActionOpen = QtGui.QAction(RoboMainWnd)
-        self.roboActionOpen.setObjectName(_fromUtf8("roboActionOpen"))
         self.roboActionSave = QtGui.QAction(RoboMainWnd)
         self.roboActionSave.setObjectName(_fromUtf8("roboActionSave"))
-        self.menuFile.addAction(self.roboActionOpen)
+        self.roboActionOpen_2 = QtGui.QAction(RoboMainWnd)
+        self.roboActionOpen_2.setObjectName(_fromUtf8("roboActionOpen_2"))
+        self.roboActionLoadInRam = QtGui.QAction(RoboMainWnd)
+        self.roboActionLoadInRam.setObjectName(_fromUtf8("roboActionLoadInRam"))
+        self.roboActionOpen = QtGui.QAction(RoboMainWnd)
+        self.roboActionOpen.setObjectName(_fromUtf8("roboActionOpen"))
+        self.menuLoad.addAction(self.roboActionOpen)
+        self.menuLoad.addAction(self.roboActionLoadInRam)
+        self.menuFile.addAction(self.menuLoad.menuAction())
         self.menuFile.addAction(self.roboActionSave)
         self.menubar.addAction(self.menuFile.menuAction())
 
@@ -53,6 +61,9 @@ class Ui_RoboMainWnd(object):
     def retranslateUi(self, RoboMainWnd):
         RoboMainWnd.setWindowTitle(_translate("RoboMainWnd", "RoboPy", None))
         self.menuFile.setTitle(_translate("RoboMainWnd", "File", None))
-        self.roboActionOpen.setText(_translate("RoboMainWnd", "Open", None))
+        self.menuLoad.setTitle(_translate("RoboMainWnd", "Load", None))
         self.roboActionSave.setText(_translate("RoboMainWnd", "Save", None))
+        self.roboActionOpen_2.setText(_translate("RoboMainWnd", "Read from disk", None))
+        self.roboActionLoadInRam.setText(_translate("RoboMainWnd", "Load in memory", None))
+        self.roboActionOpen.setText(_translate("RoboMainWnd", "Read from disk", None))
 
