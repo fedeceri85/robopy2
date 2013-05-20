@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Wed May 15 23:45:20 2013
+# Created: Mon May 20 11:29:40 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,14 +31,25 @@ class Ui_SequenceDisplayWnd(object):
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.ImageFrameWidget = QtGui.QWidget(self.centralwidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        self.ImageTabWidget = QtGui.QTabWidget(self.centralwidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(3)
-        sizePolicy.setHeightForWidth(self.ImageFrameWidget.sizePolicy().hasHeightForWidth())
-        self.ImageFrameWidget.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.ImageTabWidget.sizePolicy().hasHeightForWidth())
+        self.ImageTabWidget.setSizePolicy(sizePolicy)
+        self.ImageTabWidget.setObjectName(_fromUtf8("ImageTabWidget"))
+        self.RawTab = QtGui.QWidget()
+        self.RawTab.setObjectName(_fromUtf8("RawTab"))
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.RawTab)
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.ImageFrameWidget = QtGui.QWidget(self.RawTab)
         self.ImageFrameWidget.setObjectName(_fromUtf8("ImageFrameWidget"))
-        self.verticalLayout.addWidget(self.ImageFrameWidget)
+        self.verticalLayout_2.addWidget(self.ImageFrameWidget)
+        self.ImageTabWidget.addTab(self.RawTab, _fromUtf8(""))
+        self.ProcessedTab = QtGui.QWidget()
+        self.ProcessedTab.setObjectName(_fromUtf8("ProcessedTab"))
+        self.ImageTabWidget.addTab(self.ProcessedTab, _fromUtf8(""))
+        self.verticalLayout.addWidget(self.ImageTabWidget)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.CurrentFrameSpinBox = QtGui.QSpinBox(self.centralwidget)
@@ -74,7 +85,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
@@ -152,10 +163,13 @@ class Ui_SequenceDisplayWnd(object):
         self.menubar.addAction(self.menuDisplay.menuAction())
 
         self.retranslateUi(SequenceDisplayWnd)
+        self.ImageTabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(SequenceDisplayWnd)
 
     def retranslateUi(self, SequenceDisplayWnd):
         SequenceDisplayWnd.setWindowTitle(_translate("SequenceDisplayWnd", "SequenceDisplay", None))
+        self.ImageTabWidget.setTabText(self.ImageTabWidget.indexOf(self.RawTab), _translate("SequenceDisplayWnd", "Raw", None))
+        self.ImageTabWidget.setTabText(self.ImageTabWidget.indexOf(self.ProcessedTab), _translate("SequenceDisplayWnd", "Processed", None))
         self.FirstFrameButton.setText(_translate("SequenceDisplayWnd", "<<", None))
         self.BackFrameButton.setText(_translate("SequenceDisplayWnd", "<", None))
         self.PlayButton.setText(_translate("SequenceDisplayWnd", "P", None))

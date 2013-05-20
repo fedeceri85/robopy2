@@ -73,7 +73,11 @@ class ImageDisplayWidget(QGLWidget):
 		if r.mapSize > 0:
 			painter.setPen(pen)
 			painter.drawLine(r.last(), r.first())
-		
+			
+			x,y = r.computeMassCenter()
+			painter.drawText(QPoint(x,y), QString("%1").arg(r.ordinal + 1))
+			
+				
 			
 	def wheelEvent(self, event):
 		if event.delta() > 0:
@@ -126,6 +130,7 @@ class ImageDisplayWidget(QGLWidget):
 			#self.rois[-1].addPoint(a,b)
 			
 			self.rois[-1].computePointMap()
+			self.rois[-1].ordinal = len(self.rois) - 1
 			self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 			self.repaint()
 

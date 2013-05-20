@@ -1,6 +1,7 @@
 import sys, os, matplotlib
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import numpy as np
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
@@ -45,6 +46,7 @@ class MPlot(QDialog):
 		self.axes = self.fig.add_subplot(111)
 		self.axes.xaxis.set_ticks_position('bottom')
 		self.axes.yaxis.set_ticks_position('left')
+		
 		self.mplToolbar = NavigationToolbar(self.canvas, self.mainFrame)
 		
 	def plot(self, data):

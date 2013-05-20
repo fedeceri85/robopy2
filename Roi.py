@@ -12,6 +12,7 @@ class Roi(QPolygon):
 		super(Roi, self).__init__()
 		
 		self.color = Qt.green
+		self.ordinal = -1
 		
 		self.clearPointMap()
 	
@@ -46,3 +47,20 @@ class Roi(QPolygon):
 			avg = avg + im[i[1], i[0]].sum()
 			
 		return avg/self.mapSize
+		
+	def computeMassCenter(r):
+		x = 0.0
+		y = 0.0
+		
+		if r.size() < 1:
+			return x,y
+		
+		for i in xrange(0, r.size()):
+			p = r.point(i)
+			x = x + p.x()
+			y = y + p.y()
+			
+		x = x / r.size()
+		y = y / r.size()
+		
+		return x,y
