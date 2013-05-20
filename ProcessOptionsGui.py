@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Mon May 20 12:02:32 2013
+# Created: Mon May 20 15:46:45 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -90,7 +90,7 @@ class Ui_ProcessOptionsDlg(object):
         self.SecondWavelengthLabel.setObjectName(_fromUtf8("SecondWavelengthLabel"))
         self.gridLayout.addWidget(self.SecondWavelengthLabel, 3, 2, 1, 1)
         self.SecondWavelengthSpinBox = QtGui.QSpinBox(self.widget)
-        self.SecondWavelengthSpinBox.setMinimum(1)
+        self.SecondWavelengthSpinBox.setMinimum(0)
         self.SecondWavelengthSpinBox.setMaximum(99999)
         self.SecondWavelengthSpinBox.setObjectName(_fromUtf8("SecondWavelengthSpinBox"))
         self.gridLayout.addWidget(self.SecondWavelengthSpinBox, 3, 3, 1, 1)

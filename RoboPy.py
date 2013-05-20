@@ -5,7 +5,6 @@ import sys
 
 from RoboPyGui import Ui_RoboMainWnd
 from SequenceDisplay import SequenceDisplay
-from ProcessOptions import ProcessOptions
 '''
 Main window of Robopy project
 Launches various windows and tools
@@ -31,6 +30,9 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.roboActionOpen, SIGNAL("triggered()"), self.roboActionOpenCb)
 		self.connect(self.roboActionLoadInRam, SIGNAL("triggered()"), self.roboActionLoadInRamCb)
 		
+	def makeImageOptionsConnections(self, seqDisp, procOpt):
+		seqDisp.ImageTabWidget.currentChanged.connect(procOpt.sequenceChangedTab)
+		
 	def roboActionOpenCb(self):
 		
 		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
@@ -38,8 +40,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		sd = SequenceDisplay(self, files)
 		#self.sequences.append(sd)
 		
-		po = ProcessOptions(self)
-		po.show()
+		
 		
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
 

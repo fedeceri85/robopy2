@@ -11,6 +11,8 @@ from TiffSequence import TiffSequence
 import SequenceProcessor
 from mplot import MPlot
 
+from ProcessOptions import ProcessOptions
+
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -25,6 +27,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.RoboMainWnd = parent
 		self.MaxFrames = 0
 		self.CurrentShownFrame = 0
+		
+		self.roiProfile = None
 		
 		self.PlayInterframe = 10
 		self.IsPlaying = False
@@ -42,6 +46,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.updateFrameWidgetsRange()
 		self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")
 		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
+		
+		
+		self.optionsDlg = ProcessOptions(self)
+		rc = self.geometry()
+		dlgRc = self.optionsDlg.geometry()
+		dlgRc.moveTo(rc.right()+5, rc.top())
+		self.optionsDlg.setGeometry(dlgRc)
+		self.optionsDlg.show()
+		
+		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
 		
 	def imageWidgetSetup(self):
 		hlay = PyQt4.QtGui.QHBoxLayout(self.ImageFrameWidget)
@@ -63,6 +77,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
+		
 
 		
 	def showStatusMessage(self, msg):
@@ -90,6 +105,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
 		
 		self.imWidget.repaint()
+		#self.imWidget.updateGL()
 		self.updateCurrentFrameWidgets()
 		
 	def getPreviousSequenceFrame(self):
@@ -184,13 +200,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		lf = self.tiffSequence.getFrames()
 		
 		nrois = len(self.tiffSequence.rois)
-		roiProfile = np.zeros((lf, nrois))
+		self.roiProfile = np.zeros((lf, nrois))
 		
 		for i in xrange(ff, lf, 100):
 			tlf = i + 100
 			if tlf > lf:
 				tlf = lf
-			roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)
+			self.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)
 			self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
 			self.update()
 			
@@ -201,7 +217,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		fig = MPlot(self)
 		
-		fig.plot(roiProfile)
+		fo = self.optionsDlg.frameOptions
+		
+		fig.plot(self.roiProfile[fo.firstFrame-1:fo.lastFrame-1, 0:nrois])
 		fig.show()
 		
 		
