@@ -217,9 +217,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		fig = MPlot(self)
 		
-		fo = self.optionsDlg.frameOptions
+		rdata = SequenceProcessor.applyRoiComputationOptions(self.roiProfile, self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		
-		fig.plot(self.roiProfile[fo.firstFrame-1:fo.lastFrame-1, 0:nrois])
+		fig.plot(rdata)
 		fig.show()
 		
 		

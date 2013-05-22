@@ -105,3 +105,30 @@ def mean_filter():
 def gaussian_filter():
 	pass
 
+def applyRoiComputationOptions(rdata, fo, rois):
+	
+	nrois = len(rois)
+	
+	if fo.processType == 0:
+		#print("firstFrame " + str(fo.firstFrame) + " firstWawvelength " + str(fo.firstWavelength))
+		
+		outData = rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois]
+		
+		f0 = np.mean(outData[0:fo.referenceFrames])
+		
+		#print("outData " + str(outData))
+		
+		if fo.displayType == 1:
+			outData = outData - f0
+		elif fo.displayType == 2:
+			outData = (outData - f0) / f0
+	elif fo.processType == 1:
+		outData = np.divide(rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois], rdata[fo.firstFrame-2 + fo.secondWavelength:fo.lastFrame:fo.cycleSize, 0:nrois])
+		
+		r0 = np.mean(outData[0:fo.referenceFrames])
+		
+		if fo.displayType == 1:
+			outData = outData - r0
+		elif fo.displayType == 2:
+			outData = (outData - r0) / r0
+	return outData
