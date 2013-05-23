@@ -67,14 +67,15 @@ class TiffSequence:
 		frames = 0
 		
 		if th != None:
+			currDir = th.CurrentDirectory().value
 			width = th.GetField(256)
 			height = th.GetField(257)
 			cnt = 100000
-			while not th.SetDirectory(cnt):
+			while th.SetDirectory(cnt):
 				cnt = cnt + 10000
 				
 			frames = th.CurrentDirectory().value
-			
+			th.SetDirectory(currDir)
 		return width, height, frames
 		
 	def getFileIndexes(self, n):
