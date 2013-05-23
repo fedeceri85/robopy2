@@ -125,7 +125,20 @@ def applyRoiComputationOptions(rdata, fo, rois):
 		elif fo.displayType == 2:
 			outData = (outData - f0) / f0
 	elif fo.processType == 1:
-		outData = np.divide(rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois], rdata[fo.firstFrame-2 + fo.secondWavelength:fo.lastFrame:fo.cycleSize, 0:nrois])
+		
+		fwFrames = np.arange(fo.firstFrame-2 + fo.firstWavelength, fo.lastFrame, fo.cycleSize)
+		swFrames = np.arange(fo.firstFrame-2 + fo.secondWavelength, fo.lastFrame, fo.cycleSize)
+		
+		fwSize = len(fwFrames)
+		swSize = len(swFrames)
+		
+		if fwSize != swSize:
+			if fwSize > swSize:
+				fwFrames = fwFrames[0:swSize]
+			else:
+				swFrames = swFrames[0:fwSize]
+		
+		outData = np.divide(rdata[fwFrames, 0:nrois], rdata[swFrames, 0:nrois])
 		
 		r0 = np.mean(outData[0:fo.referenceFrames])
 		

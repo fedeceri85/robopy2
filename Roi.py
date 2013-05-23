@@ -1,6 +1,6 @@
 import PyQt4
 from PyQt4.QtCore import *
-from PyQt4.QtGui import QPolygon
+from PyQt4.QtGui import QPolygon, QColor
 import numpy as np
 #import pdb
 '''
@@ -11,7 +11,7 @@ class Roi(QPolygon):
 	def __init__(self):
 		super(Roi, self).__init__()
 		
-		self.color = Qt.green
+		self.color = QColor(Qt.green)
 		self.ordinal = -1
 		
 		self.clearPointMap()
@@ -64,3 +64,4 @@ class Roi(QPolygon):
 		y = y / r.size()
 		
 		return x,y
+		

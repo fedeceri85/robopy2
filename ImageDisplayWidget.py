@@ -4,6 +4,7 @@ from PyQt4.QtOpenGL import *
 from PyQt4.QtCore import *
 from Roi import Roi
 import sys
+import matplotlib
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
 computer running must be opengl es 2.0 capable
@@ -131,6 +132,16 @@ class ImageDisplayWidget(QGLWidget):
 			
 			self.rois[-1].computePointMap()
 			self.rois[-1].ordinal = len(self.rois) - 1
+			
+			colorCycle = matplotlib.rcParams["axes.color_cycle"]
+			
+			roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
+			
+			c = QColor()
+			c.setRgbF(roiCol[0], roiCol[1], roiCol[2])
+			self.rois[-1].color = c
+			
+			
 			self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 			self.repaint()
 
