@@ -29,7 +29,7 @@ def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 		h,w = img.shape
 		return QImage(im2.data,w,h,QImage.Format_Indexed8)
 		
-def returnHSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=False):
+def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=False):
 	'''
 	Given a numpy image and background returns (classic) HSVImage
 	'''
@@ -63,7 +63,7 @@ def returnHSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQim
 		return rgbToQimage(rgbMat)
 		
 		
-def returnJet(image,vmin=None,vmax=None,returnQimage=False):
+def applyColormap(image,vmin=None,vmax=None,returnQimage=False,cmap=cm.jet):
 	#d=image.copy() #Determine if image is passed by reference or by value
 
 	if vmin == None:
@@ -81,7 +81,7 @@ def returnJet(image,vmin=None,vmax=None,returnQimage=False):
 	image[image<dmin] = dmin
 	image[image>dmax] = dmax
 	
-	rgbMat =  cm.jet((image*1.0-dmin)/(dmax-dmin))*255
+	rgbMat =  cmap((image*1.0-dmin)/(dmax-dmin))*255
 
 	if not returnQimage:
 		return rgbMat
@@ -147,3 +147,23 @@ def applyRoiComputationOptions(rdata, fo, rois):
 		elif fo.displayType == 2:
 			outData = (outData - r0) / r0
 	return outData
+
+def singleWavelengthProcess(tiffSeq,frameNumber,fo,f0=None,returnQimage=True):
+	
+	if fo.displayType == 1 or fo.displayType==2:
+		if f0 == None:
+			f0Frames= tiffSeq.getFramesInterval(fo.firstFrame,fo.firstFrame+fo.referenceFrames*fo.cycleSize)
+			f0 = f0Frames[:,:,0:-1:fo.cycleSize].mean(2)
+
+	rawImg = tiffSeq.getFrame(frameNumber)
+	#TODO:filter processing here.
+	
+	if fo.displayType == 1:
+		rawImg = rawImg - f0
+	elif fo.displayType == 2:
+		rawImg = (rawImg -f0)/f0
+		
+	if fo.useLUT:
+		return applyColormap(rawImg,vmin=None,vmax=None,returnQimage=returnQimage) #TODO: add the type of colormap here, vmin and vmax
+	elif fo.useHSV:
+		return HSVImage(rawImg,fo.HSVbackground,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=returnQimage)#TODO: add the background and hsvcutoff to processoptions, vmin and vmax
