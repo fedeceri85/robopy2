@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Mon May 20 11:29:40 2013
+# Created: Thu May 23 15:08:20 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,8 +29,8 @@ class Ui_SequenceDisplayWnd(object):
         SequenceDisplayWnd.resize(628, 480)
         self.centralwidget = QtGui.QWidget(SequenceDisplayWnd)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.ImageTabWidget = QtGui.QTabWidget(self.centralwidget)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)
@@ -40,16 +40,21 @@ class Ui_SequenceDisplayWnd(object):
         self.ImageTabWidget.setObjectName(_fromUtf8("ImageTabWidget"))
         self.RawTab = QtGui.QWidget()
         self.RawTab.setObjectName(_fromUtf8("RawTab"))
-        self.verticalLayout_2 = QtGui.QVBoxLayout(self.RawTab)
-        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.horizontalLayout_2 = QtGui.QHBoxLayout(self.RawTab)
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.ImageFrameWidget = QtGui.QWidget(self.RawTab)
         self.ImageFrameWidget.setObjectName(_fromUtf8("ImageFrameWidget"))
-        self.verticalLayout_2.addWidget(self.ImageFrameWidget)
+        self.horizontalLayout_2.addWidget(self.ImageFrameWidget)
         self.ImageTabWidget.addTab(self.RawTab, _fromUtf8(""))
         self.ProcessedTab = QtGui.QWidget()
         self.ProcessedTab.setObjectName(_fromUtf8("ProcessedTab"))
+        self.verticalLayout = QtGui.QVBoxLayout(self.ProcessedTab)
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.ProcessedFrameWidget = QtGui.QWidget(self.ProcessedTab)
+        self.ProcessedFrameWidget.setObjectName(_fromUtf8("ProcessedFrameWidget"))
+        self.verticalLayout.addWidget(self.ProcessedFrameWidget)
         self.ImageTabWidget.addTab(self.ProcessedTab, _fromUtf8(""))
-        self.verticalLayout.addWidget(self.ImageTabWidget)
+        self.verticalLayout_2.addWidget(self.ImageTabWidget)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.CurrentFrameSpinBox = QtGui.QSpinBox(self.centralwidget)
@@ -82,7 +87,7 @@ class Ui_SequenceDisplayWnd(object):
         self.horizontalLayout.addWidget(self.CurrentFrameSlider)
         spacerItem = QtGui.QSpacerItem(178, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))

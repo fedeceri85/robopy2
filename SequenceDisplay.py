@@ -59,13 +59,21 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
 		
 	def imageWidgetSetup(self):
+		#raw sequence display widget
 		hlay = PyQt4.QtGui.QHBoxLayout(self.ImageFrameWidget)
 		imWidget = ImageDisplayWidget()
 		imWidget.SequenceDisplay = self
 		
 		self.imWidget = imWidget
-		
 		hlay.addWidget(imWidget)
+		
+		#processed sequence display widget
+		hlay = PyQt4.QtGui.QHBoxLayout(self.ProcessedFrameWidget)
+		processedWidget = ImageDisplayWidget()
+		processedWidget.SequenceDisplay = self
+		
+		self.processedWidget = processedWidget
+		hlay.addWidget(processedWidget)
 		
 	def makeConnections(self):
 		self.connect(self.ForwardFrameButton, SIGNAL("clicked()"), self.getNextSequenceFrame)
@@ -74,8 +82,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
 		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
+		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
+		self.connect(self.processedWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.imWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
+		self.connect(self.processedWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
+		
+		self.connect(self.imWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
+		self.connect(self.processedWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
+		
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
@@ -232,6 +247,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def roiRecomputeNeeded(self, isNeeded):
 		self.roiAverageRecomputeNeeded = isNeeded
 		#print("roiRecompute is needed " + str(isNeeded))
+		
+	def roiAdded(self, objId):
+		if objId == id(self.imWidget):
+			self.processedWidget.rois.append(self.imWidget.rois[-1])
+		else:
+			self.imWidget.rois.append(self.processedWidget.rois[-1])
 		
 		
 if __name__== "__main__":

@@ -14,7 +14,7 @@
    <string>SequenceDisplay</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="ImageTabWidget">
       <property name="sizePolicy">
@@ -30,7 +30,7 @@
        <attribute name="title">
         <string>Raw</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QWidget" name="ImageFrameWidget" native="true"/>
         </item>
@@ -40,6 +40,11 @@
        <attribute name="title">
         <string>Processed</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QWidget" name="ProcessedFrameWidget" native="true"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

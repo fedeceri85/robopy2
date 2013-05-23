@@ -145,5 +145,7 @@ class ImageDisplayWidget(QGLWidget):
 			
 			self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 			self.repaint()
+			
+			self.emit(QtCore.SIGNAL("roiAdded(int)"), id(self))
 
 			
