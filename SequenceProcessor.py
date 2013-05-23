@@ -109,7 +109,7 @@ def applyRoiComputationOptions(rdata, fo, rois):
 	
 	nrois = len(rois)
 	
-	print("processType is " + str(fo.processType))
+	#print("processType is " + str(fo.processType))
 	
 	if fo.processType == 0:
 		#print("firstFrame " + str(fo.firstFrame) + " firstWawvelength " + str(fo.firstWavelength))

@@ -29,6 +29,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentShownFrame = 0
 		
 		self.roiProfile = None
+		self.roiAverageRecomputeNeeded = False
 		
 		self.PlayInterframe = 10
 		self.IsPlaying = False
@@ -74,12 +75,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
 		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
+		self.connect(self.imWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
 		
 
-		
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
 	
@@ -200,15 +201,21 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		lf = self.tiffSequence.getFrames()
 		
 		nrois = len(self.tiffSequence.rois)
-		self.roiProfile = np.zeros((lf, nrois))
 		
-		for i in xrange(ff, lf, 100):
-			tlf = i + 100
-			if tlf > lf:
-				tlf = lf
-			self.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)
-			self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
-			self.update()
+		if self.roiAverageRecomputeNeeded:
+			self.roiProfile = np.zeros((lf, nrois))
+		
+			for i in xrange(ff, lf, 100):
+				tlf = i + 100
+				if tlf > lf:
+					tlf = lf
+				self.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)		
+				self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
+				self.update()
+				
+			self.roiAverageRecomputeNeeded = False	
+			
+		
 			
 		##FOR TESTING PURPOSES ONLY
 		#fig,ax = oneColumnFigure(addAxes=True)
@@ -221,6 +228,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		fig.plot(rdata)
 		fig.show()
+		
+	def roiRecomputeNeeded(self, isNeeded):
+		self.roiAverageRecomputeNeeded = isNeeded
+		#print("roiRecompute is needed " + str(isNeeded))
 		
 		
 if __name__== "__main__":

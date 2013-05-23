@@ -141,6 +141,7 @@ class ImageDisplayWidget(QGLWidget):
 			c.setRgbF(roiCol[0], roiCol[1], roiCol[2])
 			self.rois[-1].color = c
 			
+			self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 			
 			self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 			self.repaint()
