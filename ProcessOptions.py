@@ -24,13 +24,13 @@ class Properties(object):
 		self.widgetNames.append(name)
 		
 		if hasattr(obj, "valueChanged"):
-			obj.valueChanged.connect(self._widget_changed)
+			self.parentWidget.connect(obj, SIGNAL("valueChanged(int)"), self._widget_changed)
 		elif hasattr(obj, "sliderReleased"):
-			obj.sliderReleased.connect(self._widget_changed)
+			self.parentWidget.connect(obj, SIGNAL("sliderReleased()"), self._widget_changed)
 		elif hasattr(obj, "currentIndexChanged"):
-			obj.currentIndexChanged.connect(self._widget_changed)
+			self.parentWidget.connect(obj, SIGNAL("currentIndexChanged(int)"), self._widget_changed)
 		elif hasattr(obj, "toggled"):
-			obj.toggled.connect(self._widget_changed)
+			self.parentWidget.connect(obj, SIGNAL("toggled(bool)"), self._widget_changed)
 		
 		self._set_property(name, value)
 		
@@ -55,7 +55,7 @@ class Properties(object):
 	def _get_property(self, name):
 		return getattr(self, '_' + name)
 		
-	def _widget_changed(self, value):
+	def _widget_changed(self, value=None):
 		obj = self.parentWidget.sender()
 		
 		if obj in self.widgetIds:
@@ -68,9 +68,12 @@ class Properties(object):
 				value = 1
 			else:
 				value = 0
+		elif obj.__class__.__name__ == "QSlider":
+			value = obj.value()
 					
 		
 		setattr(self, '_' + name, value)
+		#print("widget " + str(obj) + " changed value to " + str(value))
 			
 
 class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
@@ -96,7 +99,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('displayType', 0, self.DisplayTypeComboBox)
 		fo.add('referenceFrames', 1, self.referenceFrameSpinBox)
 		
-		self.ProcessTypeComboBox.currentIndexChanged.connect(self.processTypeChangedCb)
+		self.connect(self.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.processTypeChangedCb)
 		
 		return fo
 		
@@ -116,6 +119,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		
 		self.frameOptions.displayType = 0
 		
+		#print("processTypeChangedCb ")
 		
 	def initTimeOptions(self):
 		fo = Properties(self)
