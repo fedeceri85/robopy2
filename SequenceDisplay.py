@@ -50,7 +50,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		
 		self.optionsDlg = ProcessOptions(self)
-		rc = self.geometry()
+		rc = self.frameGeometry()
 		dlgRc = self.optionsDlg.geometry()
 		dlgRc.moveTo(rc.right()+5, rc.top())
 		self.optionsDlg.setGeometry(dlgRc)
@@ -111,6 +111,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), needQImage), im
 		#return SequenceProcessor.returnJet(im,returnQimage=True)
 		
+	def updateDisplay(self):
+		if self.ImageTabWidget.currentIndex() == 0:
+			self.imWidget.repaint()
+		else:
+			self.processedWidget.repaint()
+		
 	def getNextSequenceFrame(self):
 		self.CurrentShownFrame = self.CurrentShownFrame + 1
 		if self.CurrentShownFrame >= self.MaxFrames:
@@ -120,7 +126,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
 		
-		self.imWidget.repaint()
+		self.updateDisplay()
 		#self.imWidget.updateGL()
 		self.updateCurrentFrameWidgets()
 		
@@ -133,19 +139,19 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
-		self.imWidget.repaint()
+		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
 		
 	def getFirstSequenceFrame(self):
 		self.CurrentShownFrame = 0
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
-		self.imWidget.repaint()
+		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
 		
 	def getLastSequenceFrame(self):
 		self.CurrentShownFrame = self.MaxFrames - 1
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
-		self.imWidget.repaint()
+		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
 		
 	def updateCurrentFrameWidgets(self):
@@ -174,14 +180,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentShownFrame = self.CurrentFrameSlider.value()
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
 		
-		self.imWidget.repaint()
+		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
 		
 	def currentFrameSpinBoxCb(self):
 		self.CurrentShownFrame = self.CurrentFrameSpinBox.value()
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
 		
-		self.imWidget.repaint()
+		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
 		
 	def playButtonCb(self):
