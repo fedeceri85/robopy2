@@ -1,0 +1,3 @@
+-check if rois are outside the image area
+-make ProcessOptions independent from Qt.
+-Better handling of data (e.g. rois attached to 3 classes)
