@@ -3,7 +3,8 @@ import numpy as np
 import colorconv
 from scipy.misc import imresize
 from matplotlib import cm
-
+from scipy.io import loadmat,savemat
+import Roi
 '''
 A module to hold computations on images or sequences
 
@@ -167,3 +168,41 @@ def singleWavelengthProcess(tiffSeq,frameNumber,fo,f0=None,returnQimage=True):
 		return applyColormap(rawImg,vmin=None,vmax=None,returnQimage=returnQimage) #TODO: add the type of colormap here, vmin and vmax
 	elif fo.useHSV:
 		return HSVImage(rawImg,fo.HSVbackground,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=returnQimage)#TODO: add the background and hsvcutoff to processoptions, vmin and vmax
+
+
+def loadRoisFromFile(filename):
+	ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']
+	#try to solve issue when rois is composed of just one roi
+	try:
+		len(ROIS)
+	except TypeError:
+		ROIS = [ROIS,]
+		
+	roboRois = []
+	for roi in ROIS:
+		r = Roi.Roi()
+		c = roi.Coordinates
+		for x,y in zip(c[0],c[1]):
+			r.addPoint(x,y)
+		r.computePointMap()
+		roboRois.append(r)
+		
+	return roboRois
+
+def saveRoisToFile(filename,rois):
+	roilist=[]
+	for roi in rois:
+		color = np.array(roi.color.getRgb()[:3])
+		x = []
+		y = []
+		for i in xrange(0, roi.size()):
+			p = roi.point(i)
+			x.append(p.x())
+			y.append(p.y())
+		coordinates=np.vstack((np.array(x),np.array(y)))
+		
+		roisdict={'Color': color, 'Coordinates':coordinates, 'LineType':u'-','Map':np.array([], dtype=np.float64),'Rectangular':0, 'h_MovieLine':0,'h_MovieTxt':0,'h_line':0,'h_text':0}
+		
+		roilist.append(roisdict)
+		
+	savemat(filename,{'ROIS':roilist})

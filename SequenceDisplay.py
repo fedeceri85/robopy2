@@ -1,5 +1,6 @@
 import PyQt4
 from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 import sys
 import numpy as np
 from pubTools import oneColumnFigure
@@ -82,6 +83,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
 		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
+		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISCb)
+		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.processedWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
@@ -260,7 +263,21 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		else:
 			self.imWidget.rois.append(self.processedWidget.rois[-1])
 		
+	def loadROISCb(self):
+		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging Roi file",QString(),"Mat Files (*.mat)")
 		
+		roiFile = fname.toAscii().data()
+		rois = SequenceProcessor.loadRoisFromFile(roiFile)
+		for roi in rois:
+			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
+			
+	def saveROISCb(self):
+		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Mat Files (*.mat)")
+		
+		roiFile = fname.toAscii().data()
+		rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois)
+		
+	
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

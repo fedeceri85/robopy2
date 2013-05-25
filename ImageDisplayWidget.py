@@ -129,23 +129,27 @@ class ImageDisplayWidget(QGLWidget):
 			
 			#a,b = self.screenToImage(event.x(), event.y())
 			#self.rois[-1].addPoint(a,b)
-			
-			self.rois[-1].computePointMap()
-			self.rois[-1].ordinal = len(self.rois) - 1
-			
-			colorCycle = matplotlib.rcParams["axes.color_cycle"]
-			
-			roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
-			
-			c = QColor()
-			c.setRgbF(roiCol[0], roiCol[1], roiCol[2])
-			self.rois[-1].color = c
-			
-			self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
-			
-			self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
-			self.repaint()
-			
-			self.emit(QtCore.SIGNAL("roiAdded(int)"), id(self))
+			self.addRoi(self.rois[-1])
+	
+	def addRoi(self,roi,fromImageDisplayWidget = True):
+		if not fromImageDisplayWidget:
+			self.rois.append(roi)
+		roi.computePointMap()
+		roi.ordinal = len(self.rois) - 1
+		
+		colorCycle = matplotlib.rcParams["axes.color_cycle"]
+		
+		roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
+		
+		c = QColor()
+		c.setRgbF(roiCol[0], roiCol[1], roiCol[2])
+		roi.color = c
+		
+		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+		
+		self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
+		self.repaint()
+		
+		self.emit(QtCore.SIGNAL("roiAdded(int)"), id(self))
 
-			
+		
