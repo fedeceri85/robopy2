@@ -279,7 +279,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		rdata = SequenceProcessor.applyRoiComputationOptions(self.roiProfile, self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		
-		fig.plot(rdata)
+		fig.plot(self.tiffSequence.timesDict.times(),rdata)
+		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
 		
 	def roiRecomputeNeeded(self, isNeeded):

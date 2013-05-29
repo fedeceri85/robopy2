@@ -1,6 +1,7 @@
 from libtiff import TIFF
-from numpy import zeros
+from numpy import zeros,loadtxt,array,uint16
 import Roi
+from os.path import splitext
 #from pubTools import oneColumnFigure
 class TiffSequence:
 	def __init__(self, fNames):
@@ -11,11 +12,13 @@ class TiffSequence:
 		self.frames = 0
 		
 		self.SequenceFiles = fNames
+		
 		self.FramesPerFile = list()
 		
 		self.tifHandlers = list()
 		self.rois = list()
 		self.arraySequence = None
+		self.timesDict = TimesDict()
 		self.open()
 		for i in self.tifHandlers:
 			width, height, frames = self.getTifInfo(i)
@@ -30,7 +33,10 @@ class TiffSequence:
 					break
 			self.FramesPerFile.append(frames)
 			self.frames = self.frames + frames
+		
+		self.initTimesDict()
 
+		
 		
 	def __del__(self):
 		self.clearTifHandler()
@@ -103,11 +109,12 @@ class TiffSequence:
 
 		
 	def getFrame(self, n):
+		index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:,:,n]
+			return self.arraySequence[:,:,index]
 		else:
 			if self.tifHandlers[0] != None:
-				i,n = self.getFileIndexes(n)
+				i,n = self.getFileIndexes(index)
 				
 				if i == -1:
 					return None
@@ -157,4 +164,82 @@ class TiffSequence:
 			th.SetField(262, 1) #samples per pixel
 			
 			th.write_image(self.getFrame(i), "lzw", False)
-			
+		
+		
+	def initTimesDict(self,filename=None):
+		if filename is None:
+			#if (size(self.SequenceFiles))==1:
+		#		filename=splitext(self.SequenceFiles)+'_times.txt'
+		#	else:
+			filename=splitext(self.SequenceFiles[0])[0]+'_times.txt'
+		
+		try:
+			self.timesDict = loadTimes(filename,firstFrameIndex = 0, firstTimeValue = 0.0,scaleFactor=1000.0)
+			self.timesDict.setLabel('Time (s)')
+			if len(self.timesDict)< self.frames:
+				print("Warning. More frames than timepoints")
+				print("Timepoints: "+str(len(self.timesDict)))
+				print("Number of frames: " + str(self.frames))
+				kv = range(self.frames)
+				self.timesDict = TimesDict(zip(kv,kv))
+				self.timesDict.setLabel('Frames')
+			#delete unnecessary timepoints
+			elif len(self.timesDict)>self.frames:
+				print("Warning. More timepoints than frames. Discarding unnecessary timepoints")
+				for key in xrange(self.frames,len(self.timesDict)):
+					del(self.timesDict[key])
+		except IOError:
+			print("Warning. No associated time file")
+			kv = range(self.frames)
+			self.timesDict = TimesDict(zip(kv,kv))
+			self.timesDict.setLabel('Frames')
+
+
+
+
+		
+def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
+	
+	#times=numpy.loadtxt(splitext(filename)[0]+'_times.txt',delimiter='\t',skiprows=1,usecols=(0,1))
+	times = loadtxt(filename,delimiter='\t',skiprows=1,usecols=(0,1))
+	return TimesDict(zip(list((times[:,0]+firstFrameIndex).astype(uint16)),list((times[:,1]+firstTimeValue)/scaleFactor)))
+
+
+
+class TimesDict(dict):
+	"""
+	A dict to hold the original times of the tiff sequence. Each time is stored as framenumber:time.
+	times and frames method returns all times and frames as a numpy array
+	"""
+	def __init__(self,*arg,**kw):
+		super(TimesDict, self).__init__(*arg, **kw)
+		self.label=''
+
+		
+	def times(self):
+		"""
+		Return times array as a numpy array
+		"""
+		a=[]
+		for val in self.itervalues():
+			a.append(val)
+		return array(a)
+	
+	def frames(self):
+		"""
+		Return frames as a numpy array
+		"""
+		a=[]
+		for key in self.iterkeys():
+			a.append(key)
+		return array(a)
+	
+	def dt(self):
+		"""
+		Return the average time step
+		"""
+		return (diff(self.times())/(diff(self.frames())*1.0)).mean()
+	
+	def setLabel(self,label):
+		self.label=label
+	

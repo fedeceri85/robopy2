@@ -49,6 +49,6 @@ class MPlot(QDialog):
 		
 		self.mplToolbar = NavigationToolbar(self.canvas, self.mainFrame)
 		
-	def plot(self, data):
-		self.axes.plot(data)
+	def plot(self, x,data):
+		self.axes.plot(x,data)
        
