@@ -179,9 +179,16 @@
     </widget>
     <addaction name="menuFilters"/>
    </widget>
+   <widget class="QMenu" name="menuOutput">
+    <property name="title">
+     <string>Output</string>
+    </property>
+    <addaction name="actionSave_raw_sequence"/>
+   </widget>
    <addaction name="menuRois"/>
    <addaction name="menuStacks"/>
    <addaction name="menuDisplay"/>
+   <addaction name="menuOutput"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionCompute_Rois">
@@ -267,6 +274,11 @@
   <action name="actionTemporal_Smoothing">
    <property name="text">
     <string>Temporal Smoothing</string>
+   </property>
+  </action>
+  <action name="actionSave_raw_sequence">
+   <property name="text">
+    <string>Save raw sequence</string>
    </property>
   </action>
  </widget>

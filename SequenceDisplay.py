@@ -13,6 +13,7 @@ import SequenceProcessor
 from mplot import MPlot
 
 from ProcessOptions import ProcessOptions
+from Worker import Worker
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False):
@@ -35,11 +36,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.PlayInterframe = 10
 		self.IsPlaying = False
 		self.timer = QBasicTimer()
+		self.FrameImage = None
 		
 		self.makeConnections()
 		
 		self.show()
 		
+		self.tiffFiles = files
+		self.loadInRam = loadInRam
+		#self.worker = Worker(self, self.tiffLoad, self, True)
+		#self.worker.connect(self.worker, SIGNAL("jobDone()"), self, SLOT("tiffLoadFinished()"))
+		#self.connect(self, SIGNAL("startWorkerJob()"), self.worker, SLOT("startJob()"))
+		#self.worker.start()
+		
+		#self.emit(SIGNAL("startWorkerJob()"))
 		
 		self.tiffSequence = TiffSequence(files)
 		if loadInRam:
@@ -56,6 +66,21 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		dlgRc.moveTo(rc.right()+5, rc.top())
 		self.optionsDlg.setGeometry(dlgRc)
 		self.optionsDlg.show()
+		
+		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
+		
+	def tiffLoad(self):
+		print("entering tiffLoad from worker")
+		self.tiffSequence = TiffSequence(self.files)
+		if self.loadInRam:
+			self.tiffSequence.loadWholeTiff()
+		
+	def tiffLoadFinished(self):
+		print("Tiff load finished")
+		self.MaxFrames = self.tiffSequence.getFrames()
+		self.updateFrameWidgetsRange()
+		self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")
+		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
 		
 		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
 		
@@ -86,6 +111,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISCb)
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		
+		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
+		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.processedWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.imWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
@@ -93,6 +120,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.connect(self.imWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
 		self.connect(self.processedWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
+		
+		
 		
 		#menus
 		##ROIS
@@ -276,6 +305,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		roiFile = fname.toAscii().data()
 		rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois)
+		
+	def saveRawSequence(self):
+		if self.tiffSequence == None:
+			return
+			
+		fname = QFileDialog.getSaveFileName(self, "Save tif sequence to file", QString(), "Images (*.tif)")
+		if not fname.isEmpty():
+			self.tiffSequence.saveSequence(fname.toAscii())
 		
 	
 if __name__== "__main__":

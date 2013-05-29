@@ -145,3 +145,16 @@ class TiffSequence:
 				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
 				
 		return roiProfile
+		
+	def saveSequence(self, f):
+		th = TIFF.open(str(f), 'w')
+		
+		for i in range(self.frames):
+			th.SetField(256, self.width)
+			th.SetField(257, self.height)
+			th.SetField(277, 1) #phtometric interpretation black is minimum
+			th.SetField(258, 16) #bits per sample
+			th.SetField(262, 1) #samples per pixel
+			
+			th.write_image(self.getFrame(i), "lzw", False)
+			

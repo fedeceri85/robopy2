@@ -11,7 +11,7 @@ class Worker(QThread):
 		self.withSignals = withSignals
 		
 	def run(self):
-		if self.cb != None and self.withSignals=True:
+		if self.cb != None and self.withSignals==True:
 			if self.data != None:
 				self.cb(self.data)
 			else:

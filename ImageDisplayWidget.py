@@ -29,6 +29,7 @@ class ImageDisplayWidget(QGLWidget):
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
 		self.rois = list()
+		self.setAutoBufferSwap(True)
 		
 	def createGradient(self):
 		self.gradient.setCoordinateMode(QGradient.ObjectBoundingMode);

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Thu May 23 15:08:20 2013
+# Created: Wed May 29 12:51:22 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -102,6 +102,8 @@ class Ui_SequenceDisplayWnd(object):
         self.menuDisplay.setObjectName(_fromUtf8("menuDisplay"))
         self.menuFilters = QtGui.QMenu(self.menuDisplay)
         self.menuFilters.setObjectName(_fromUtf8("menuFilters"))
+        self.menuOutput = QtGui.QMenu(self.menubar)
+        self.menuOutput.setObjectName(_fromUtf8("menuOutput"))
         SequenceDisplayWnd.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(SequenceDisplayWnd)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -140,6 +142,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionGaussian_filter.setObjectName(_fromUtf8("actionGaussian_filter"))
         self.actionTemporal_Smoothing = QtGui.QAction(SequenceDisplayWnd)
         self.actionTemporal_Smoothing.setObjectName(_fromUtf8("actionTemporal_Smoothing"))
+        self.actionSave_raw_sequence = QtGui.QAction(SequenceDisplayWnd)
+        self.actionSave_raw_sequence.setObjectName(_fromUtf8("actionSave_raw_sequence"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -163,9 +167,11 @@ class Ui_SequenceDisplayWnd(object):
         self.menuFilters.addSeparator()
         self.menuFilters.addAction(self.actionTemporal_Smoothing)
         self.menuDisplay.addAction(self.menuFilters.menuAction())
+        self.menuOutput.addAction(self.actionSave_raw_sequence)
         self.menubar.addAction(self.menuRois.menuAction())
         self.menubar.addAction(self.menuStacks.menuAction())
         self.menubar.addAction(self.menuDisplay.menuAction())
+        self.menubar.addAction(self.menuOutput.menuAction())
 
         self.retranslateUi(SequenceDisplayWnd)
         self.ImageTabWidget.setCurrentIndex(0)
@@ -185,6 +191,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuMath_2.setTitle(_translate("SequenceDisplayWnd", "Math", None))
         self.menuDisplay.setTitle(_translate("SequenceDisplayWnd", "Display", None))
         self.menuFilters.setTitle(_translate("SequenceDisplayWnd", "Filters", None))
+        self.menuOutput.setTitle(_translate("SequenceDisplayWnd", "Output", None))
         self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Roi", None))
         self.actionLoad_from_file.setText(_translate("SequenceDisplayWnd", "Load from file...", None))
         self.actionSave_to_file.setText(_translate("SequenceDisplayWnd", "Save to file", None))
@@ -202,4 +209,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionMedian_filter.setText(_translate("SequenceDisplayWnd", "Median filter", None))
         self.actionGaussian_filter.setText(_translate("SequenceDisplayWnd", "Gaussian filter", None))
         self.actionTemporal_Smoothing.setText(_translate("SequenceDisplayWnd", "Temporal Smoothing", None))
+        self.actionSave_raw_sequence.setText(_translate("SequenceDisplayWnd", "Save raw sequence", None))
 
