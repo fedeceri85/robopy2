@@ -109,12 +109,12 @@ class TiffSequence:
 
 		
 	def getFrame(self, n):
-		index = self.timesDict.frames()[n]
+		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:,:,index]
+			return self.arraySequence[:,:,n]
 		else:
 			if self.tifHandlers[0] != None:
-				i,n = self.getFileIndexes(index)
+				i,n = self.getFileIndexes(n)
 				
 				if i == -1:
 					return None
