@@ -106,7 +106,7 @@ def mean_filter():
 def gaussian_filter():
 	pass
 
-def applyRoiComputationOptions(rdata, fo, rois):
+def applyRoiComputationOptions(rdata, times, fo, rois):
 	
 	nrois = len(rois)
 	
@@ -116,6 +116,7 @@ def applyRoiComputationOptions(rdata, fo, rois):
 		#print("firstFrame " + str(fo.firstFrame) + " firstWawvelength " + str(fo.firstWavelength))
 		
 		outData = rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois]
+		times = times[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize]
 		
 		f0 = np.mean(outData[0:fo.referenceFrames])
 		
@@ -139,6 +140,7 @@ def applyRoiComputationOptions(rdata, fo, rois):
 			else:
 				swFrames = swFrames[0:fwSize]
 		
+		times = times[fwFrames]
 		outData = np.divide(rdata[fwFrames, 0:nrois], rdata[swFrames, 0:nrois])
 		
 		r0 = np.mean(outData[0:fo.referenceFrames])
@@ -147,7 +149,7 @@ def applyRoiComputationOptions(rdata, fo, rois):
 			outData = outData - r0
 		elif fo.displayType == 2:
 			outData = (outData - r0) / r0
-	return outData
+	return outData, times
 
 def singleWavelengthProcess(tiffSeq,frameNumber,fo,f0=None,returnQimage=True):
 	

@@ -58,6 +58,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.updateFrameWidgetsRange()
 		self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")
 		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
+		self.updateDisplay()
 		
 		
 		self.optionsDlg = ProcessOptions(self)
@@ -87,16 +88,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def imageWidgetSetup(self):
 		#raw sequence display widget
 		hlay = PyQt4.QtGui.QHBoxLayout(self.ImageFrameWidget)
-		imWidget = ImageDisplayWidget()
-		imWidget.SequenceDisplay = self
+		imWidget = ImageDisplayWidget(self)
 		
 		self.imWidget = imWidget
 		hlay.addWidget(imWidget)
 		
 		#processed sequence display widget
 		hlay = PyQt4.QtGui.QHBoxLayout(self.ProcessedFrameWidget)
-		processedWidget = ImageDisplayWidget()
-		processedWidget.SequenceDisplay = self
+		processedWidget = ImageDisplayWidget(self)
 		
 		self.processedWidget = processedWidget
 		hlay.addWidget(processedWidget)
@@ -144,9 +143,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#return SequenceProcessor.returnJet(im,returnQimage=True)
 		
 	def updateDisplay(self):
+		
+		if self.FrameImage == None:
+			return
+			
+		pix = QPixmap.fromImage(self.FrameImage)
+		
 		if self.ImageTabWidget.currentIndex() == 0:
+			self.imWidget.pix = pix
 			self.imWidget.repaint()
 		else:
+			self.processedWidget.pix = pix
 			self.processedWidget.repaint()
 		
 	def getNextSequenceFrame(self):
@@ -277,9 +284,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		fig = MPlot(self)
 		
-		rdata = SequenceProcessor.applyRoiComputationOptions(self.roiProfile, self.optionsDlg.frameOptions, self.tiffSequence.rois)
+		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.roiProfile, self.tiffSequence.timesDict.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		
-		fig.plot(self.tiffSequence.timesDict.times(),rdata)
+		fig.plot(times,rdata)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
 		

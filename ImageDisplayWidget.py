@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui, QtOpenGL
+from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4.QtCore import *
@@ -9,16 +9,16 @@ import matplotlib
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
 computer running must be opengl es 2.0 capable
 '''
-class ImageDisplayWidget(QGLWidget):
+class ImageDisplayWidget(QWidget):
 	def __init__(self, parent=None):
-		#QGLWidget.__init__(self, parent=parent)
-		super(ImageDisplayWidget, self).__init__(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers), parent=parent)
+		super(ImageDisplayWidget, self).__init__(parent)
+		self.SequenceDisplay = parent
+		self.pix = None
 		
 		self.gradient = QRadialGradient()
 		self.createGradient()
 		self.setMouseTracking(True)
 		
-		self.SequenceDisplay = parent
 		self.ImagePositionX = 0
 		self.ImagePositionY = 0
 		
@@ -29,7 +29,7 @@ class ImageDisplayWidget(QGLWidget):
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
 		self.rois = list()
-		self.setAutoBufferSwap(True)
+		
 		
 	def createGradient(self):
 		self.gradient.setCoordinateMode(QGradient.ObjectBoundingMode);
@@ -58,10 +58,8 @@ class ImageDisplayWidget(QGLWidget):
 		painter.end()
 		
 	def drawSequenceImage(self, painter):
-		p = self.SequenceDisplay
-		
-		if p.FrameImage != None:
-			painter.drawImage(self.ImagePositionX, self.ImagePositionY, p.FrameImage)
+		if self.pix != None:
+			painter.drawPixmap(self.ImagePositionX, self.ImagePositionY, self.pix)
 			
 	def drawRoi(self, painter, r):
 		pen = QPen(r.color)
