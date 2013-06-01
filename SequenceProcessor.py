@@ -71,9 +71,9 @@ def applyColormap(image,vmin=None,vmax=None,returnQimage=False,cmap=cm.jet):
 		dmin = image.min()
 		if dmin<0:
 			dmin = 0
-		
 	else:
 		dmin = vmin
+		
 	if vmax == None:		
 		dmax = image.max()
 	else:
@@ -171,6 +171,16 @@ def singleWavelengthProcess(tiffSeq,frameNumber,fo,f0=None,returnQimage=True):
 	elif fo.useHSV:
 		return HSVImage(rawImg,fo.HSVbackground,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=returnQimage)#TODO: add the background and hsvcutoff to processoptions, vmin and vmax
 
+def computeReference(tiffSeq, fo):
+	if fo.processType == 0:
+		f0Frames = tiffSeq.getFramesInterval(fo.firstFrame,fo.firstFrame+fo.referenceFrames*fo.cycleSize)
+		f0 = f0Frames[:,:,0:-1:fo.cycleSize].mean(2)
+	elif fo.processType == 1:
+		f1Frame = tiffSeq.getFrame(fo.firstFrame + fo.firstWavelength - 1)
+		f2Frame = tiffSeq.getFrame(fo.firstFrame + fo.secondWavelength - 1)
+		f0 = np.divide(f1Frame, f2Frame)
+		pass
+	return f0
 
 def loadRoisFromFile(filename, w, h):
 	ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']

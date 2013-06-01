@@ -40,8 +40,6 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		sd = SequenceDisplay(self, files)
 		#self.sequences.append(sd)
 		
-		
-		
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
 
 	def roboActionLoadInRamCb(self):
