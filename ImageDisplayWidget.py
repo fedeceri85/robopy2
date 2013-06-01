@@ -101,13 +101,16 @@ class ImageDisplayWidget(QWidget):
 			
 			a,b = self.screenToImage(event.x(), event.y())
 			
-			if self.DrawRoiStatus == "idle":
-				self.DrawRoiStatus = "drawing"
-				self.rois.append(Roi())
+			im = self.SequenceDisplay.FrameImage
+			
+			if im != None and im.width() > a and a > 0 and im.height() > b and b > 0:
+				if self.DrawRoiStatus == "idle":
+					self.DrawRoiStatus = "drawing"
+					self.rois.append(Roi())
 
-				
-			self.rois[-1].addPoint(a,b)
-			self.repaint()
+					
+				self.rois[-1].addPoint(a,b)
+				self.repaint()
 		
 		self.IsMouseDown = 0
 		

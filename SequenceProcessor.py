@@ -172,7 +172,7 @@ def singleWavelengthProcess(tiffSeq,frameNumber,fo,f0=None,returnQimage=True):
 		return HSVImage(rawImg,fo.HSVbackground,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=returnQimage)#TODO: add the background and hsvcutoff to processoptions, vmin and vmax
 
 
-def loadRoisFromFile(filename):
+def loadRoisFromFile(filename, w, h):
 	ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']
 	#try to solve issue when rois is composed of just one roi
 	try:
@@ -184,10 +184,17 @@ def loadRoisFromFile(filename):
 	for roi in ROIS:
 		r = Roi.Roi()
 		c = roi.Coordinates
+		
+		isValidRoi = True
+		
 		for x,y in zip(c[0],c[1]):
+			if w < x or x < 0 or h < y or y < 0:
+				isValidRoi = False
 			r.addPoint(x,y)
-		r.computePointMap()
-		roboRois.append(r)
+			
+		if isValidRoi:
+			r.computePointMap()
+			roboRois.append(r)
 		
 	return roboRois
 

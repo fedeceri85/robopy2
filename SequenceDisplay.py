@@ -301,10 +301,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.imWidget.rois.append(self.processedWidget.rois[-1])
 		
 	def loadROISCb(self):
+		
+		if self.FrameImage == None:
+			return
+		
 		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging Roi file",QString(),"Mat Files (*.mat)")
 		
 		roiFile = fname.toAscii().data()
-		rois = SequenceProcessor.loadRoisFromFile(roiFile)
+		rois = SequenceProcessor.loadRoisFromFile(roiFile, self.FrameImage.width(), self.FrameImage.height())
 		for roi in rois:
 			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
 			
