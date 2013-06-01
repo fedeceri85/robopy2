@@ -1,3 +1,4 @@
+-introduce the widgets for image pixel value range control (min, max, eventually brightness contrast)
 -compute, show and save (as avi, mp4 ore whatever is accepted for articles) pixel by pixel image processing
 -make ProcessOptions independent from Qt.
 -Better handling of data (e.g. rois attached to 3 classes)

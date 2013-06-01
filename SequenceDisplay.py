@@ -137,10 +137,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if im == None:
 			return None
 		
-		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))
+		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))	
+		if self.ImageTabWidget.currentIndex() == 0:
+			return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), needQImage), im
+		elif self.ImageTabWidget.currentIndex() == 1:
+			#processed stuff
+			return None, None
+			
+		return None, None
+			
 		
-		return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), needQImage), im
-		#return SequenceProcessor.returnJet(im,returnQimage=True)
 		
 	def updateDisplay(self):
 		
