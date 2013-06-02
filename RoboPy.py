@@ -5,6 +5,8 @@ import sys
 
 from RoboPyGui import Ui_RoboMainWnd
 from SequenceDisplay import SequenceDisplay
+from IPython.frontend.terminal.embed import InteractiveShellEmbed
+
 '''
 Main window of Robopy project
 Launches various windows and tools
@@ -19,7 +21,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		self.initData()
 		
 		self.makeConnections()
-		
+		self.seqDispList=[]
 		self.show()
 		
 	def initData(self):
@@ -39,7 +41,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		
 		sd = SequenceDisplay(self, files)
 		#self.sequences.append(sd)
-		
+		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
 
 	def roboActionLoadInRamCb(self):
@@ -48,7 +50,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		
 		sd = SequenceDisplay(self, files,loadInRam = True)
 		#self.sequences.append(sd)
-		
+		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
 		
 	def showStatusMessage(self, msg):
@@ -65,7 +67,10 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
-	window = RoboPy()
-	window.show()
-	
+	robopy = RoboPy()
+	robopy.show()
+
+	ipshell = InteractiveShellEmbed()
+	ipshell()
+
 	sys.exit(app.exec_())
