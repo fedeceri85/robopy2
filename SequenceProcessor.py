@@ -78,8 +78,7 @@ def applyColormap(image,vmin=None,vmax=None,returnQImage=False,cmap=cm.jet):
 		dmax = image.max()
 	else:
 		dmax = vmax
-	dmin = -3
-	dmax = 3
+	
 	image[image<dmin] = dmin
 	image[image>dmax] = dmax
 	
