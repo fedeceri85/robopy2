@@ -129,13 +129,13 @@ class TiffSequence:
 	def getFramesFromList(self,listOfFrames):
 		 #Ensure listOfFrames is actually a list, not a tuple
 		listOfFrames = list(listOfFrames)
-		outArray = zeros((self.height,self.width,size(listOfFrames)))
-		for n in listOfFrames:
-			outArray[:,:,n]=self.getFrame(n)
+		outArray = zeros((self.height,self.width,len(listOfFrames)))
+		for n in range(len(listOfFrames)):
+			outArray[:,:,n]=self.getFrame(listOfFrames[n])
 		return outArray
 
 	def getFramesInterval(self,firstIndex,lastIndex):
-		return getFramesFromList(range(firstIndex,lastIndex))
+		return self.getFramesFromList(range(firstIndex,lastIndex))
 				
 	def computeRois(self,firstIndex = None, lastIndex = None):
 		if firstIndex == None:

@@ -1,4 +1,4 @@
-from PyQt4.QtGui import QImage
+from PyQt4.QtGui import QImage, QColor
 import numpy as np
 import colorconv
 from scipy.misc import imresize
@@ -64,7 +64,7 @@ def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=Fa
 		return rgbToQimage(rgbMat)
 		
 		
-def applyColormap(image,vmin=None,vmax=None,returnQimage=False,cmap=cm.jet):
+def applyColormap(image,vmin=None,vmax=None,returnQImage=False,cmap=cm.jet):
 	#d=image.copy() #Determine if image is passed by reference or by value
 
 	if vmin == None:
@@ -78,16 +78,29 @@ def applyColormap(image,vmin=None,vmax=None,returnQimage=False,cmap=cm.jet):
 		dmax = image.max()
 	else:
 		dmax = vmax
-	
+	dmin = -3
+	dmax = 3
 	image[image<dmin] = dmin
 	image[image>dmax] = dmax
 	
-	rgbMat =  cmap((image*1.0-dmin)/(dmax-dmin))*255
 
-	if not returnQimage:
+	if not returnQImage:
+		rgbMat =  cmap((image*1.0-dmin)/(dmax-dmin))*255
 		return rgbMat
 	else:
-		return rgbToQimage(rgbMat)
+		imMat = ((image*1.0-dmin)/(dmax-dmin) * 255).astype(np.int8)
+		h,w = imMat.shape
+		im = QImage(imMat, w,h, QImage.Format_Indexed8)
+		im.setColorCount(256)
+		
+		cols = cmap(xrange(256))
+		cols = (cols * 255).astype(np.long)
+		colTable = list(cols[:,3] << 24 | cols[:,0] << 16 | cols[:,1] << 8 | cols[:,2])
+		colTable = map(long, colTable)
+			
+		im.setColorTable(colTable)
+			
+		return im
 		
 		
 def rgbToQimage(rgbMat):
@@ -174,13 +187,37 @@ def singleWavelengthProcess(tiffSeq,frameNumber,fo,f0=None,returnQimage=True):
 def computeReference(tiffSeq, fo):
 	if fo.processType == 0:
 		f0Frames = tiffSeq.getFramesInterval(fo.firstFrame,fo.firstFrame+fo.referenceFrames*fo.cycleSize)
-		f0 = f0Frames[:,:,0:-1:fo.cycleSize].mean(2)
+		f0 = f0Frames[:,:,0::fo.cycleSize].mean(2)
 	elif fo.processType == 1:
 		f1Frame = tiffSeq.getFrame(fo.firstFrame + fo.firstWavelength - 1)
 		f2Frame = tiffSeq.getFrame(fo.firstFrame + fo.secondWavelength - 1)
 		f0 = np.divide(f1Frame, f2Frame)
-		pass
+	
 	return f0
+	
+def computeProcessedFrame(tif, n, fo, ref):
+	f = None
+	if fo.processType == 0:
+		f = tif.getFrame(n + fo.firstWavelength - 1)
+		f = f.astype(np.float32)
+	elif fo.processType == 1:
+		f1 = tif.getFrame(n + fo.firstWavelength - 1)
+		f2 = tif.getFrame(n + fo.secondWavelength - 1)
+		f1 = f1.astype(np.float32)
+		f = np.divide(f1, f2)
+	else:
+		return None
+		
+	
+	if fo.displayType == 0:
+		f = f
+	elif fo.displayType == 1:
+		f = f-ref
+	elif fo.displayType == 2:
+		f = np.divide((f-ref), ref) 	
+		
+	return f
+		
 
 def loadRoisFromFile(filename, w, h):
 	ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']

@@ -60,15 +60,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
 		self.updateDisplay()
 		
+		self.setWindowTitle(files[0])
+		
 		
 		self.optionsDlg = ProcessOptions(self)
-		rc = self.frameGeometry()
-		dlgRc = self.optionsDlg.geometry()
-		dlgRc.moveTo(rc.right()+5, rc.top())
-		self.optionsDlg.setGeometry(dlgRc)
+		#rc = self.frameGeometry()
+		#dlgRc = self.optionsDlg.geometry()
+		#dlgRc.moveTo(rc.right()+5, rc.top())
+		#self.optionsDlg.setGeometry(dlgRc)
 		self.optionsDlg.show()
 		
 		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
+		
+		self.recomputeFalseColorReference()
+		self.makeProcessReferenceConnections(self.optionsDlg)
 		
 	def tiffLoad(self):
 		print("entering tiffLoad from worker")
@@ -126,6 +131,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
 		
+	
+	def makeProcessReferenceConnections(self, dlg):
+		self.connect(dlg.FirstFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
+		self.connect(dlg.CycleSizeSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
+		self.connect(dlg.FirstWavelengthSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
+		self.connect(dlg.SecondWavelengthSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
+		self.connect(dlg.referenceFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
+		self.connect(dlg.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.recomputeFalseColorReference)
+		
 
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
@@ -142,11 +156,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			return SequenceProcessor.convert16Bitto8Bit(im, im.min(), im.max(), needQImage), im
 		elif self.ImageTabWidget.currentIndex() == 1:
 			#processed stuff
-			return None, None
+			f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions, self.falseColorRefFrame)
+			
+			return SequenceProcessor.applyColormap(f, returnQImage = True ), f
 			
 		return None, None
-			
 		
+	def getSequenceStartAndStep(self):
+		if self.ImageTabWidget.currentIndex() == 0:
+			return self.optionsDlg.frameOptions.firstFrame - 1, 1
+		elif self.ImageTabWidget.currentIndex() == 1:
+			return self.optionsDlg.frameOptions.firstFrame - 1, self.optionsDlg.frameOptions.cycleSize
 		
 	def updateDisplay(self):
 		
@@ -163,10 +183,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.processedWidget.repaint()
 		
 	def getNextSequenceFrame(self):
-		self.CurrentShownFrame = self.CurrentShownFrame + 1
+		first, step = self.getSequenceStartAndStep()
+		self.CurrentShownFrame = self.CurrentShownFrame + step
 		if self.CurrentShownFrame >= self.MaxFrames:
 			self.showStatusMessage("Trying to show frame " + str(self.CurrentShownFrame) + " of " + str(self.MaxFrames) + ". Impossible!!")
-			self.CurrentShownFrame = self.CurrentShownFrame - 1
+			self.CurrentShownFrame = self.CurrentShownFrame - step
 			return
 			
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame, True)
@@ -176,10 +197,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.updateCurrentFrameWidgets()
 		
 	def getPreviousSequenceFrame(self):
-		self.CurrentShownFrame = self.CurrentShownFrame - 1
+		first, step = self.getSequenceStartAndStep()
+		self.CurrentShownFrame = self.CurrentShownFrame - step
 		if self.CurrentShownFrame < 0:
 			self.showStatusMessage("Trying to show frame " + str(self.CurrentShownFrame) + " of " + str(self.MaxFrames) + ". Impossible!!")
-			self.CurrentShownFrame = self.CurrentShownFrame + 1
+			self.CurrentShownFrame = self.CurrentShownFrame + step
 			return
 		
 		
@@ -188,13 +210,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.updateCurrentFrameWidgets()
 		
 	def getFirstSequenceFrame(self):
-		self.CurrentShownFrame = 0
+		first, step = self.getSequenceStartAndStep()
+		self.CurrentShownFrame = first
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
 		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
 		
 	def getLastSequenceFrame(self):
-		self.CurrentShownFrame = self.MaxFrames - 1
+		first, step = self.getSequenceStartAndStep()
+		self.CurrentShownFrame = ((self.MaxFrames - first) / step - 1) * step + first
 		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
 		self.updateDisplay()
 		self.updateCurrentFrameWidgets()
@@ -331,6 +355,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fname = QFileDialog.getSaveFileName(self, "Save tif sequence to file", QString(), "Images (*.tif)")
 		if not fname.isEmpty():
 			self.tiffSequence.saveSequence(fname.toAscii())
+			
+	def recomputeFalseColorReference(self):
+		self.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
 		
 	
 if __name__== "__main__":

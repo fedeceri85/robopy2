@@ -40,7 +40,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
 		
 		sd = SequenceDisplay(self, files)
-		#self.sequences.append(sd)
+		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
 
@@ -70,7 +70,9 @@ if __name__== "__main__":
 	robopy = RoboPy()
 	robopy.show()
 
-	ipshell = InteractiveShellEmbed()
-	ipshell()
+	#ipshell = InteractiveShellEmbed()
+	#ipshell()
+	
+	ans = app.exec_()
 
-	sys.exit(app.exec_())
+	sys.exit(ans)
