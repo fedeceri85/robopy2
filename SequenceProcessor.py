@@ -16,8 +16,8 @@ TODO:
 '''
 
 def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
-	#img[img<vmin]=vmin
-	#img[img>vmax]=vmax
+	img[img<vmin]=vmin
+	img[img>vmax]=vmax
 	
 	img = img - vmin
 	img = img * (255.0 / (vmax - vmin) )
