@@ -38,7 +38,7 @@ def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=Fa
 	bckgrn2=imresize(background,(image.shape[0],image.shape[1]))
 	value = (bckgrn2-bckgrn2.min())/(bckgrn2.max()*1.0-bckgrn2.min()*1.0)
 
-	d=image.copy() #Determine if image is passed by reference or by value
+	#d=image.copy() #Determine if image is passed by reference or by value
 	if vmin == None:
 		dmin = image.min()
 		if dmin<0:
@@ -51,9 +51,8 @@ def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=Fa
 	else:
 		dmax = vmax
 	
-	d[d<dmin] = dmin
-	d[d>dmax] = dmax
-	hue =  1-((d*1.0 - dmin)/(dmax -  dmin)*(1-hsvcutoff)+hsvcutoff)
+	np.clip(image,dmin,dmax,image)
+	hue =  1-((image*1.0 - dmin)/(dmax -  dmin)*(1-hsvcutoff)+hsvcutoff)
 	saturation = np.ones(hue.shape)
 	hsvMat = np.array([hue,saturation,value]).transpose(1,2,0)
 
@@ -79,9 +78,7 @@ def applyColormap(image,vmin=None,vmax=None,returnQImage=False,cmap=cm.jet):
 	else:
 		dmax = vmax
 	
-	image[image<dmin] = dmin
-	image[image>dmax] = dmax
-	
+	np.clip(image,dmin,dmax,image)
 
 	if not returnQImage:
 		rgbMat =  cmap((image*1.0-dmin)/(dmax-dmin))*255
