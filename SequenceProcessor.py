@@ -4,6 +4,7 @@ import colorconv
 from scipy.misc import imresize
 from matplotlib import cm
 from scipy.io import loadmat,savemat
+from scipy import weave
 import Roi
 from scipy import weave
 from scipy.weave import converters
@@ -198,7 +199,7 @@ def computeReference(tiffSeq, fo):
 		f2Frame = tiffSeq.getFrame(fo.firstFrame + fo.secondWavelength - 1)
 		f0 = np.divide(f1Frame, f2Frame)
 	
-	return f0
+	return f0.astype(np.float32)
 	
 def computeProcessedFrame(tif, n, fo, ref):
 	f = None
@@ -222,6 +223,92 @@ def computeProcessedFrame(tif, n, fo, ref):
 		f = np.divide((f-ref), ref) 	
 		
 	return f
+	
+def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0):
+	f1 = tif.getFrame(n + fo.firstWavelength - 1)
+	f2 = None
+	if f1 == None:
+		return None
+		
+		
+	if fo.processType == 0 and fo.displayType == 0:
+		f1 = f1.astype(np.float32)
+		return f1
+		
+	h = f1.shape[0]
+	w = f1.shape[1]
+	res = np.zeros(f1.shape, dtype=np.float32)
+	
+	if fo.processType == 1:
+		f2 = tif.getFrame(n + fo.secondWavelength - 1)
+	
+	codes = list()
+	vrs = ["f1", "f2", "w", "h", "ref", "res", "b1", "b2"]
+	
+	code = """
+		__m128i x1, xzero, x1low, x1high, xb1;
+		unsigned short *pf1 = (unsigned short *)f1;
+		float *pref = ref, *pres = res;
+		__m128	fl1Low, fl1High, flrefLow, flrefHigh;
+		unsigned cycles = w / 8;
+		unsigned rmd = w % 8;
+		
+		xzero = _mm_setzero_si128();
+		unsigned short usb1 = (unsigned short)b1;
+		xb1 = _mm_set_epi16(usb1, usb1, usb1, usb1, usb1, usb1, usb1, usb1);
+		
+		for(unsigned i=0; i<h; i++){
+			for(unsigned j=0; j<cycles; j++) {
+				x1 = _mm_loadu_si128((__m128i *)pf1);
+				pf1+=8;
+				x1 = _mm_sub_epi16(x1, xb1);
+				x1low = _mm_unpacklo_epi16(x1, xzero);
+				flrefLow = _mm_loadu_ps(pref);
+				pref+=4;
+				fl1Low = _mm_cvtepi32_ps(x1low);
+				fl1Low = _mm_sub_ps(fl1Low, flrefLow);
+				
+				
+				x1high = _mm_unpackhi_epi16(x1, xzero);
+				flrefHigh = _mm_loadu_ps(pref);
+				pref+=4;
+				fl1High = _mm_cvtepi32_ps(x1high);
+				fl1High = _mm_sub_ps(fl1High, flrefHigh);
+				"""
+	
+	if fo.displayType == 2:
+		code = code + """
+		fl1Low = _mm_div_ps(fl1Low, flrefLow);
+		fl1High = _mm_div_ps(fl1High, flrefHigh);
+		"""
+				
+	code = code + """
+				_mm_storeu_ps(pres, fl1Low);
+				pres += 4;
+				_mm_storeu_ps(pres, fl1High);
+				pres += 4;
+			}
+			
+			for(unsigned j=0; j<rmd; j++) {
+				*pres = (float)(*pf1 - b1) - *pref;"""
+				
+	if fo.displayType == 2:
+		code = code + """
+				*pres /= *pref;"""
+				
+	code = code + """
+				++pres;
+				++pref;
+				++pf1;
+			}
+		}
+	"""
+	
+	#print(code)
+	
+	weave.inline(code, vrs, headers = ['"emmintrin.h"'], extra_compile_args=["-mfpmath=sse -msse3"])
+	
+	return res
 		
 
 def loadRoisFromFile(filename, w, h):
