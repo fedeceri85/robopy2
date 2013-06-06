@@ -397,7 +397,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if self.displayParameters.autoAdjust:
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
-			return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				
+			if self.optionsDlg.displayOptions.useLUT == 1:
+				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+			elif self.optionsDlg.displayOptions.useHSV == 1:
+				return SequenceProcessor.HSVImage(f, im, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			
 		return None, None
 		

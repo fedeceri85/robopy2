@@ -30,7 +30,7 @@ def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 		h,w = img.shape
 		return QImage(im2.data,w,h,QImage.Format_Indexed8)
 		
-def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=False):
+def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
 	'''
 	Given a numpy image and background returns (classic) HSVImage
 	'''
@@ -43,9 +43,9 @@ def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=Fa
 		dmin = image.min()
 		if dmin<0:
 			dmin = 0
-		
 	else:
 		dmin = vmin
+		
 	if vmax == None:		
 		dmax = image.max()
 	else:
@@ -57,7 +57,7 @@ def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQimage=Fa
 	hsvMat = np.array([hue,saturation,value]).transpose(1,2,0)
 
 	rgbMat = colorconv.convert_colorspace(hsvMat,'HSV','RGB')
-	if not returnQimage:
+	if not returnQImage:
 		return rgbMat
 	else:
 		return rgbToQimage(rgbMat)
