@@ -13,7 +13,7 @@ class DisplayPamrameters:
 		self.displayGrayMin = 0
 		self.displayGrayMax = 16383
 		self.displayColorMin = 0.0
-		self.displayColorMax = 5.0
+		self.displayColorMax = 16383.0
 		self.displayColorSteps = 1000
 		self.autoAdjust = True
 		

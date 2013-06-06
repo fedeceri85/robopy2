@@ -191,6 +191,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def changeDisplayColorMin(self, v):
 		mn, mx, steps = self.recomputeDisplayRange(float(v), self.displayParameters.displayColorMax)
 		self.displayParameters.displayColorMin = float(v)
+		#print("changeDisplayColorMin: mn=" + str(mn) + ", mx" + str(mx) + ", steps=" + str(steps))
 		self.updateDisplayRangeWidgets(mn, mx, steps)
 		
 		self.colorMinSpinBox.blockSignals(True)
@@ -205,7 +206,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def changeDisplayColorMax(self, v):
 		
-		mn, mx, steps = self.recomputeDisplayRange(float(self.displayParameters.displayColorMax), float(v))
+		mn, mx, steps = self.recomputeDisplayRange(float(self.displayParameters.displayColorMin), float(v))
 		self.displayParameters.displayColorMax = float(v)
 		self.updateDisplayRangeWidgets(mn, mx, steps)
 		
@@ -322,6 +323,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def computeRangeParameters(self):
 		mn = self.colorMinSpinBox.minimum()
 		mx = self.colorMinSpinBox.maximum()
+		#print("computeRangeParameters mn=" + str(mn) + ", mx=" + str(mx))
 		stepSize = (mx - mn)/self.displayParameters.displayColorSteps
 		
 		return mn, mx, stepSize
@@ -342,8 +344,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			#print("mn " + str(mn) + ", mx " + str(mx) + ", steps" + str(steps))
 		elif type(mn) == float:
 			mn, mx = l - rng*0.1, h + rng*0.1
-			if mn < 0:
-				mn = mn - 1
+			#if mn < 0:
+				#mn = mn - 1
 			mn = float(int(mn))
 			
 			#print("float mn " + str(mn) + ", mx " + str(mx) + ", steps" + str(steps))
@@ -360,11 +362,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.colorMaxSpinBox.blockSignals(False)
 		
 		self.colorMinSlider.blockSignals(True)
-		self.colorMinSlider.setRange(mn, mx)
+		if type(mn) == int:
+			self.colorMinSlider.setRange(mn, mx)
+		else:
+			self.colorMinSlider.setRange(0, steps)
 		self.colorMinSlider.blockSignals(False)
 		
 		self.colorMaxSlider.blockSignals(True)
-		self.colorMaxSlider.setRange(mn, mx)
+		if type(mn) == int:
+			self.colorMaxSlider.setRange(mn, mx)
+		else:
+			self.colorMaxSlider.setRange(0, steps)
 		self.colorMaxSlider.blockSignals(False)
 	
 	def getSequenceFrame(self, n, needQImage = True):
@@ -386,10 +394,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		elif viewType == 1:
 			#processed stuff
 			f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
-			#if self.displayParameters.autoAdjust:
-				#self.changeDisplayColorMin(f.min())
-				#self.changeDisplayColorMax(f.max())
-			return SequenceProcessor.applyColormap(f, returnQImage = True ), f
+			if self.displayParameters.autoAdjust:
+				self.changeDisplayColorMin(f.min())
+				self.changeDisplayColorMax(f.max())
+			return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			
 		return None, None
 		
