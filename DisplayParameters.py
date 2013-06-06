@@ -8,6 +8,8 @@ class DisplayPamrameters:
 		self.initRoiRelatedParams()
 		
 		self.falseColorRefFrame = None
+		self.HSVvalue = None
+		#self.HSVsaturation = None
 		
 	def initColorRangeParam(self):
 		self.displayGrayMin = 0

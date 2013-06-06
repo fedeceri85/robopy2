@@ -152,6 +152,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(dlg.referenceFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
 		self.connect(dlg.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.recomputeFalseColorReference)
 		
+		self.connect(dlg.HSVradioButton, SIGNAL("released()"), self.recomputeHSVvalue)
 
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
@@ -401,7 +402,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if self.optionsDlg.displayOptions.useLUT == 1:
 				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			elif self.optionsDlg.displayOptions.useHSV == 1:
-				return SequenceProcessor.HSVImage(f, im, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			
 		return None, None
 		
@@ -610,7 +611,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def recomputeFalseColorReference(self):
 		self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
 		
-	
+	def recomputeHSVvalue(self):
+		pass
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

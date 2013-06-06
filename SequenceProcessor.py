@@ -5,6 +5,9 @@ from scipy.misc import imresize
 from matplotlib import cm
 from scipy.io import loadmat,savemat
 import Roi
+from scipy import weave
+from scipy.weave import converters
+
 '''
 A module to hold computations on images or sequences
 
@@ -29,14 +32,20 @@ def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 	else:
 		h,w = img.shape
 		return QImage(im2.data,w,h,QImage.Format_Indexed8)
-		
-def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
+
+def computeValue(background,shape=None):
+	if shape is not None:
+		bckgrn2=imresize(background,(shape[0],shape[1]))
+	else:
+		bckgrn2=background
+	value = (bckgrn2-bckgrn2.min())/(bckgrn2.max()*1.0-bckgrn2.min()*1.0)
+	return value
+
+def HSVImage(image,value,vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
 	'''
 	Given a numpy image and background returns (classic) HSVImage
 	'''
 
-	bckgrn2=imresize(background,(image.shape[0],image.shape[1]))
-	value = (bckgrn2-bckgrn2.min())/(bckgrn2.max()*1.0-bckgrn2.min()*1.0)
 
 	#d=image.copy() #Determine if image is passed by reference or by value
 	if vmin == None:
@@ -60,7 +69,7 @@ def HSVImage(image,background,vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=Fa
 	if not returnQImage:
 		return rgbMat
 	else:
-		return rgbToQimage(rgbMat)
+		return rgbToQimage(rgbMat*2**8)
 		
 		
 def applyColormap(image,vmin=None,vmax=None,returnQImage=False,cmap=cm.jet):
@@ -258,3 +267,73 @@ def saveRoisToFile(filename,rois):
 		roilist.append(roisdict)
 		
 	savemat(filename,{'ROIS':roilist})
+
+
+def HSVtoRGB(arr):
+	code = """
+	#include <stdlib.h>
+	#include <math.h>
+
+	int rows = Narr[0];
+	int cols = Narr[1];
+	int depth = Narr[2];
+
+	double chroma;
+	double H1;
+	double m;
+	double x;
+	npy_intp dims[3]  ={rows,cols,depth};
+	PyObject* out_array = PyArray_SimpleNew(3, dims, NPY_DOUBLE);
+	double* out = (double*) ((PyArrayObject*) out_array)->data;
+
+	for (int i=0; i < rows; i++)
+		{
+			for (int j=0; j < cols; j++)
+			{
+				chroma = arr[(i*cols + j)*depth + 1]*arr[(i*cols + j)*depth + 2];
+				H1 =  arr[(i*cols + j)*depth] * 6.0;
+				m =  arr[(i*cols + j)*depth + 2] - chroma;
+				x = chroma*(1 - abs((int(floor(H1))%2) -1) );
+				
+				if ((H1>=0) && (H1<1))
+				{
+					out[(i*cols + j)*depth + 0]=chroma+m;
+					out[(i*cols + j)*depth + 1]=x+m;
+					out[(i*cols + j)*depth + 2]=m;
+				}
+				if ((H1>=1) && (H1<2))
+				{
+					out[(i*cols + j)*depth + 0]=x+m;
+					out[(i*cols + j)*depth + 1]=chroma+m;
+					out[(i*cols + j)*depth + 2]=m;
+				}				
+				 if ((H1>=2) && (H1<3))
+				{
+					out[(i*cols + j)*depth + 0]=m;
+					out[(i*cols + j)*depth + 1]=chroma+m;
+					out[(i*cols + j)*depth + 2]=x+m;
+				}
+				 if ((H1>=3) && (H1<4))
+				{
+					out[(i*cols + j)*depth + 0]=m;
+					out[(i*cols + j)*depth + 1]=x+m;
+					out[(i*cols + j)*depth + 2]=chroma+m;
+				}
+				 if ((H1>=4) && (H1<5))
+				{
+					out[(i*cols + j)*depth + 0]=x+m;
+					out[(i*cols + j)*depth + 1]=m;
+					out[(i*cols + j)*depth + 2]=chroma+m;
+				}
+				 if ((H1>=5) && (H1<6))
+				{
+					out[(i*cols + j)*depth + 0]=chroma+m;
+					out[(i*cols + j)*depth + 1]=m;
+					out[(i*cols + j)*depth + 2]=x+m;
+				}
+			}
+
+		}
+	return_val = out_array;
+	"""
+	return weave.inline(code,['arr'])
