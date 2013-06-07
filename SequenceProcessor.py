@@ -248,7 +248,6 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 	code = """
 		__m128i x1, x2, xzero, x1low, x1high, x2low, x2high, xb1, xb2, x2thresh;
 		unsigned short *pf1 = (unsigned short *)f1;
-		unsigned short *pf2 = (unsigned short *)f2;
 		
 		float *pref = ref, *pres = res;
 		__m128	fl1Low, fl1High, fl2Low, fl2High, flrefLow, flrefHigh;
@@ -261,8 +260,14 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 		unsigned short usth2 = (unsigned short)wave2Threshold;
 		xb1 = _mm_set_epi16(usb1, usb1, usb1, usb1, usb1, usb1, usb1, usb1);
 		xb2 = _mm_set_epi16(usb2, usb2, usb2, usb2, usb2, usb2, usb2, usb2);
-		x2thresh = _mm_set_epi16(usth2, usth2, usth2, usth2, usth2, usth2, usth2, usth2);
+		x2thresh = _mm_set_epi16(usth2, usth2, usth2, usth2, usth2, usth2, usth2, usth2); """
 		
+	if fo.processType == 1:
+		code = code + """
+		unsigned short *pf2 = (unsigned short *)f2;
+		"""
+	
+	code = code + """
 		for(unsigned i=0; i<h; i++){
 			for(unsigned j=0; j<cycles; j++) {
 				x1 = _mm_loadu_si128((__m128i *)pf1);

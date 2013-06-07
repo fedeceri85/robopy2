@@ -394,7 +394,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			return SequenceProcessor.convert16Bitto8Bit(im, self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax, needQImage), im
 		elif viewType == 1:
 			#processed stuff
-			f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
+			f = SequenceProcessor.computeProcessedFrameWeave(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
 			if self.displayParameters.autoAdjust:
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
