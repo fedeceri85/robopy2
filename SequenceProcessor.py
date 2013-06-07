@@ -224,7 +224,7 @@ def computeProcessedFrame(tif, n, fo, ref):
 		
 	return f
 	
-def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0):
+def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold = 16):
 	f1 = tif.getFrame(n + fo.firstWavelength - 1)
 	f2 = None
 	if f1 == None:
@@ -243,19 +243,25 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0):
 		f2 = tif.getFrame(n + fo.secondWavelength - 1)
 	
 	codes = list()
-	vrs = ["f1", "f2", "w", "h", "ref", "res", "b1", "b2"]
+	vrs = ["f1", "f2", "w", "h", "ref", "res", "b1", "b2", "wave2Threshold"]
 	
 	code = """
-		__m128i x1, xzero, x1low, x1high, xb1;
+		__m128i x1, x2, xzero, x1low, x1high, x2low, x2high, xb1, xb2, x2thresh;
 		unsigned short *pf1 = (unsigned short *)f1;
+		unsigned short *pf2 = (unsigned short *)f2;
+		
 		float *pref = ref, *pres = res;
-		__m128	fl1Low, fl1High, flrefLow, flrefHigh;
+		__m128	fl1Low, fl1High, fl2Low, fl2High, flrefLow, flrefHigh;
 		unsigned cycles = w / 8;
 		unsigned rmd = w % 8;
 		
 		xzero = _mm_setzero_si128();
 		unsigned short usb1 = (unsigned short)b1;
+		unsigned short usb2 = (unsigned short)b2;
+		unsigned short usth2 = (unsigned short)wave2Threshold;
 		xb1 = _mm_set_epi16(usb1, usb1, usb1, usb1, usb1, usb1, usb1, usb1);
+		xb2 = _mm_set_epi16(usb2, usb2, usb2, usb2, usb2, usb2, usb2, usb2);
+		x2thresh = _mm_set_epi16(usth2, usth2, usth2, usth2, usth2, usth2, usth2, usth2);
 		
 		for(unsigned i=0; i<h; i++){
 			for(unsigned j=0; j<cycles; j++) {
@@ -266,15 +272,33 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0):
 				flrefLow = _mm_loadu_ps(pref);
 				pref+=4;
 				fl1Low = _mm_cvtepi32_ps(x1low);
-				fl1Low = _mm_sub_ps(fl1Low, flrefLow);
-				
 				
 				x1high = _mm_unpackhi_epi16(x1, xzero);
 				flrefHigh = _mm_loadu_ps(pref);
 				pref+=4;
 				fl1High = _mm_cvtepi32_ps(x1high);
-				fl1High = _mm_sub_ps(fl1High, flrefHigh);
 				"""
+				
+	if fo.processType == 1:
+		code = code + """
+				x2 = _mm_loadu_si128((__m128i *)pf2);
+				pf2+=8;
+				x2 = _mm_sub_epi16(x2, xb2);
+				x2 = _mm_max_epi16(x2, x2thresh);
+				x2low = _mm_unpacklo_epi16(x2, xzero);
+				fl2Low = _mm_cvtepi32_ps(x2low);
+				fl1Low = _mm_div_ps(fl1Low, fl2Low);
+				
+				x2high = _mm_unpackhi_epi16(x2, xzero);
+				fl2High = _mm_cvtepi32_ps(x2high);
+				fl1High = _mm_div_ps(fl1High, fl2High);
+		"""
+		
+	if fo.displayType == 1:
+		code = code + """
+				fl1High = _mm_sub_ps(fl1High, flrefHigh);
+				fl1Low = _mm_sub_ps(fl1Low, flrefLow);
+		"""
 	
 	if fo.displayType == 2:
 		code = code + """
