@@ -319,7 +319,21 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 			}
 			
 			for(unsigned j=0; j<rmd; j++) {
-				*pres = (float)(*pf1 - b1) - *pref;"""
+				*pres = (float)(*pf1 - b1);"""
+				
+	if fo.processType == 1:
+		code = code + """
+				unsigned short t2 = (*pf2 -b2);
+				if (t2 < wave2Threshold) {
+					t2 = wave2Threshold;
+				}
+				*pres /= (float)t2;
+		"""
+		
+	if fo.displayType == 1:
+		code = code + """
+				*pres -= *pref;
+		"""
 				
 	if fo.displayType == 2:
 		code = code + """
