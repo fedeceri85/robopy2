@@ -72,6 +72,41 @@ def HSVImage(image,value,vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
 	else:
 		return rgbToQimage(rgbMat*2**8)
 		
+def HSVImageByMap(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
+	'''
+	Given a numpy image and background returns (classic) HSVImage using a map
+	'''
+
+	#d=image.copy() #Determine if image is passed by reference or by value
+	if vmin == None:
+		dmin = image.min()
+		if dmin<0:
+			dmin = 0
+	else:
+		dmin = vmin
+		
+	if vmax == None:		
+		dmax = image.max()
+	else:
+		dmax = vmax
+	
+	np.clip(image,dmin,dmax,image)
+	#hue =  1-((image*1.0 - dmin)/(dmax -  dmin)*(1-hsvcutoff)) + hsvcutoff)
+	hue =  (1.0 - (((image- dmin)/(dmax -  dmin)) * (1-hsvcutoff))) + hsvcutoff
+	h,w = hue.shape
+	hue = hue * 255
+	hue = hue.astype(np.uint16)
+	value = value * 65535.0
+	value = value.astype(np.uint16)
+	
+	rgbMat = mp[value + hue]
+	
+	
+	if not returnQImage:
+		return rgbMat
+	else:
+		return QImage(rgbMat,w,h,QImage.Format_ARGB32)
+		
 		
 def applyColormap(image,vmin=None,vmax=None,returnQImage=False,cmap=cm.jet):
 	#d=image.copy() #Determine if image is passed by reference or by value

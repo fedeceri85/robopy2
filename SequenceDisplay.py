@@ -258,7 +258,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		elif viewType == 1:
 			mn, mx, stepSize = self.computeRangeParameters()
 			self.displayParameters.displayColorMax = mn + v * stepSize
-			v = self.displayParameters.displayColorMin
+			v = self.displayParameters.displayColorMax
 			mn, mx, steps = self.recomputeDisplayRange(self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
 		
 		#self.updateDisplayRangeWidgets(mn, mx, steps)
@@ -402,6 +402,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if self.optionsDlg.displayOptions.useLUT == 1:
 				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			elif self.optionsDlg.displayOptions.useHSV == 1:
+				#return SequenceProcessor.HSVImageByMap(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			
 		return None, None
