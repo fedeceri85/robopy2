@@ -9,6 +9,7 @@ import Roi
 from scipy import weave
 from scipy.weave import converters
 import threading
+import pyopencl as cl
 
 '''
 A module to hold computations on images or sequences
@@ -452,6 +453,76 @@ def computeProcessedFrame(tif, n, fo, ref):
 	elif fo.displayType == 2:
 		f = np.divide((f-ref), ref) 	
 		
+	return f
+	
+def computeProcessedFrameOpenCL(tif, n, fo, ref):
+	f = tif.getFrame(n + fo.firstWavelength - 1).astype(np.float32)
+	
+	if fo.processType == 0 and fo.displayType == 0:
+		return f
+		
+	h,w = f.shape
+	
+	
+	ctx = cl.create_some_context()
+	queue = cl.CommandQueue(ctx)
+	mf = cl.mem_flags
+	
+	pType = np.int32(fo.processType)
+	dType = np.int32(fo.displayType)
+	
+	f2 = None
+	
+	f_buf = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=f)
+	ref_buf = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=ref)
+	
+	#res = np.empty_like(f)
+	#res_buf = cl.Buffer(ctx, mf.WRITE_ONLY, res.nbytes)
+	
+	#print("Opencl in action")
+	
+	if pType == 0:
+		prgRef = cl.Program(ctx, """
+		__kernel void procRef(__global float* f, __global const float* ref, const int dType, const int w) {
+			int col = get_global_id(0);
+			int row = get_global_id(1);
+			int id = w * row + col;
+			//res[id] = f[id];
+			if(dType != 0) {
+				f[id] = f[id] - ref[id];
+			}
+			
+			if(dType == 2) {
+				f[id] = f[id] / ref[id];
+			}
+		}
+		""").build()
+		event = prgRef.procRef(queue, (w,h), None, f_buf, ref_buf, dType, np.int32(w))
+	if pType == 1:
+		f2 = tif.getFrame(n + fo.secondWavelength - 1).astype(np.float32)
+		f2_buf = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=f2)
+		
+		prgDiv = cl.Program(ctx, """
+			__kernel void procDiv(__global float* f, __global const float* f2, __global const float *ref, const int w, const int dType) {
+				int col = get_global_id(0);
+				int row = get_global_id(1);
+				int id = w * row + col;
+				f[id] = f[id] / f2[id];
+				
+				if(dType != 0) {
+					f[id] = f[id] - ref[id];
+				}
+				
+				if(dType == 2) {
+					f[id] = f[id] / ref[id];
+				}
+			}
+		""").build()
+		event = prgDiv.procDiv(queue, (w,h), None, f_buf, f2_buf, ref_buf, np.int32(w), dType)
+	
+	
+	event.wait()
+	cl.enqueue_copy(queue, f, f_buf)
 	return f
 	
 def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold = 16):
