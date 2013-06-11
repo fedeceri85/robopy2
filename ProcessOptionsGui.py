@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Wed May 22 10:01:54 2013
+# Created: Tue Jun 11 14:39:11 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -170,7 +170,7 @@ class Ui_ProcessOptionsDlg(object):
         self.DOgroupBox.setTitle(_fromUtf8(""))
         self.DOgroupBox.setObjectName(_fromUtf8("DOgroupBox"))
         self.layoutWidget1 = QtGui.QWidget(self.DOgroupBox)
-        self.layoutWidget1.setGeometry(QtCore.QRect(50, 30, 190, 54))
+        self.layoutWidget1.setGeometry(QtCore.QRect(10, 30, 190, 54))
         self.layoutWidget1.setObjectName(_fromUtf8("layoutWidget1"))
         self.verticalLayout_4 = QtGui.QVBoxLayout(self.layoutWidget1)
         self.verticalLayout_4.setMargin(0)
@@ -191,6 +191,18 @@ class Ui_ProcessOptionsDlg(object):
         self.HSVradioButton = QtGui.QRadioButton(self.layoutWidget1)
         self.HSVradioButton.setObjectName(_fromUtf8("HSVradioButton"))
         self.verticalLayout_4.addWidget(self.HSVradioButton)
+        self.widget = QtGui.QWidget(self.DOgroupBox)
+        self.widget.setGeometry(QtCore.QRect(240, 33, 106, 47))
+        self.widget.setObjectName(_fromUtf8("widget"))
+        self.verticalLayout_6 = QtGui.QVBoxLayout(self.widget)
+        self.verticalLayout_6.setMargin(0)
+        self.verticalLayout_6.setObjectName(_fromUtf8("verticalLayout_6"))
+        self.medianFilterCheckbox = QtGui.QCheckBox(self.widget)
+        self.medianFilterCheckbox.setObjectName(_fromUtf8("medianFilterCheckbox"))
+        self.verticalLayout_6.addWidget(self.medianFilterCheckbox)
+        self.gaussianFilterCheckbox = QtGui.QCheckBox(self.widget)
+        self.gaussianFilterCheckbox.setObjectName(_fromUtf8("gaussianFilterCheckbox"))
+        self.verticalLayout_6.addWidget(self.gaussianFilterCheckbox)
         self.verticalLayout_5.addWidget(self.DOgroupBox)
         self.horizontalLayout_5 = QtGui.QHBoxLayout()
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
@@ -261,6 +273,8 @@ class Ui_ProcessOptionsDlg(object):
         self.ColorMapcomboBox.setItemText(1, _translate("ProcessOptionsDlg", "Winter", None))
         self.ColorMapcomboBox.setItemText(2, _translate("ProcessOptionsDlg", "...", None))
         self.HSVradioButton.setText(_translate("ProcessOptionsDlg", "HSV", None))
+        self.medianFilterCheckbox.setText(_translate("ProcessOptionsDlg", "Median filter", None))
+        self.gaussianFilterCheckbox.setText(_translate("ProcessOptionsDlg", "Gaussian filter", None))
         self.chooseBackgroundButton.setText(_translate("ProcessOptionsDlg", "Choose HSV Background", None))
         self.label_2.setText(_translate("ProcessOptionsDlg", "Saturation", None))
         self.enlargeToBckCheckBox.setText(_translate("ProcessOptionsDlg", "Enlarge to background", None))

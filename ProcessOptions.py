@@ -137,6 +137,8 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('useHSV', 0, self.HSVradioButton)
 		fo.add('hsvSaturation', 1.0, self.saturationSpinBox)
 		fo.add('enlargeToBackground', 0, self.enlargeToBckCheckBox)
+		fo.add('medianFilterOn', 0, self.medianFilterCheckbox)
+		fo.add('gaussianFilterOn', 0, self.gaussianFilterCheckbox)
 		return fo
 		
 	def applyWidgetValueWithoutSignal(self, obj, v):

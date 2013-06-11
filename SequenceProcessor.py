@@ -4,10 +4,11 @@ import colorconv
 from scipy.misc import imresize
 from matplotlib import cm
 from scipy.io import loadmat,savemat
-from scipy import weave
+from scipy import weave, misc, ndimage
 import Roi
 from scipy import weave
 from scipy.weave import converters
+import threading
 
 '''
 A module to hold computations on images or sequences
@@ -18,6 +19,19 @@ TODO:
 3-
 
 '''
+
+class ThreadWorker(threading.Thread):
+	def __init__(self, myCallback, data):
+		self.myCallback = myCallback
+		self.data = data
+		self.result = None
+		threading.Thread.__init__(self)
+		
+	def getResult(self):
+		return self.results
+		
+	def run(self):
+		self.result = self.myCallback(*self.data)
 
 def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 	img[img<vmin]=vmin
@@ -38,9 +52,9 @@ def computeValue(background,shape=None):
 	if shape is not None:
 		bckgrn2=imresize(background,(shape[0],shape[1]))
 	else:
-		bckgrn2=background
+		bckgrn2=background.copy()
 	value = (bckgrn2-bckgrn2.min())/(bckgrn2.max()*1.0-bckgrn2.min()*1.0)
-	return value
+	return value.astype(np.float32)
 
 def HSVImage(image,value,vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
 	'''
@@ -80,8 +94,6 @@ def HSVImageByMap(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQIma
 	#d=image.copy() #Determine if image is passed by reference or by value
 	if vmin == None:
 		dmin = image.min()
-		if dmin<0:
-			dmin = 0
 	else:
 		dmin = vmin
 		
@@ -94,9 +106,9 @@ def HSVImageByMap(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQIma
 	#hue =  1-((image*1.0 - dmin)/(dmax -  dmin)*(1-hsvcutoff)) + hsvcutoff)
 	hue =  (1.0 - (((image- dmin)/(dmax -  dmin)) * (1-hsvcutoff))) + hsvcutoff
 	h,w = hue.shape
-	hue = hue * 255
+	hue = hue * 65535.0
 	hue = hue.astype(np.uint16)
-	value = value * 65535.0
+	value = value * 255.0
 	value = value.astype(np.uint16)
 	
 	rgbMat = mp[value + hue]
@@ -107,6 +119,189 @@ def HSVImageByMap(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQIma
 	else:
 		return QImage(rgbMat,w,h,QImage.Format_ARGB32)
 		
+def HSVImageByMapSSE(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQImage=False):
+	'''
+	Given a numpy image and background returns (classic) HSVImage using a map
+	'''
+
+	#d=image.copy() #Determine if image is passed by reference or by value
+	if vmin == None:
+		dmin = image.min()
+	else:
+		dmin = vmin
+		
+	if vmax == None:		
+		dmax = image.max()
+	else:
+		dmax = vmax
+		
+	h,w = image.shape
+	
+	h = int(h)
+	w = int(w)
+	
+	rgbMat = np.zeros((h,w), dtype = np.uint32)
+		
+	vrs = ["image", "value", "mp", "rgbMat", "w", "h", "dmin", "dmax", "hsvcutoff"]
+	
+	code = """
+		__m128 im, v, xcutoff, notcutoff, oneps, xmin, xmax, xrange, x255, x256;
+		__m128i imInt, vInt;
+		float *pimage = (float *)image;
+		float *pv = (float *)value;
+		unsigned int *pmp = (unsigned int*)mp;
+		unsigned int *pres = (unsigned int *)rgbMat;
+		
+		unsigned els = w*h;
+		unsigned cycles = els / 4;
+		unsigned remainder = els % 4;
+		
+		unsigned hIdx[4], vIdx[4];
+		
+		xcutoff = _mm_set1_ps(hsvcutoff);
+		oneps = _mm_set1_ps(1.0);
+		notcutoff = _mm_sub_ps(oneps, xcutoff);
+		xmin = _mm_set1_ps(dmin);
+		xmax = _mm_set1_ps(dmax);
+		xrange = _mm_sub_ps(xmax, xmin);
+		xrange = _mm_max_ps(xrange, _mm_set1_ps(0.01));
+		
+		x255 = _mm_set1_ps(255.0);
+		x256 = _mm_set1_ps(256.0);
+		
+		for(unsigned int i=0; i<cycles; i++) {
+			im = _mm_loadu_ps(pimage);
+			pimage += 4;
+			v = _mm_loadu_ps(pv);
+			pv += 4;
+			
+			im = _mm_max_ps(im, xmin);
+			im = _mm_min_ps(im, xmax);
+			
+			im = _mm_sub_ps(im, xmin);
+			im = _mm_div_ps(im, xrange);
+			
+			
+			v = _mm_mul_ps(v, x255);
+			v = _mm_mul_ps(v, x256);
+			vInt = _mm_cvttps_epi32(v);
+			_mm_storeu_si128((__m128i *)vIdx, vInt);
+			
+			im = _mm_mul_ps(im, notcutoff);
+			
+			im = _mm_add_ps(im, xcutoff); //hue
+			im = _mm_sub_ps(oneps, im);
+			
+			im = _mm_mul_ps(im, x255);
+			imInt = _mm_cvttps_epi32(im);
+			
+			_mm_storeu_si128((__m128i *)hIdx, imInt);
+			
+			*pres++ = pmp[hIdx[0] + vIdx[0]];
+			*pres++ = pmp[hIdx[1] + vIdx[1]];
+			*pres++ = pmp[hIdx[2] + vIdx[2]];
+			*pres++ = pmp[hIdx[3] + vIdx[3]];
+		}
+		
+		for(unsigned int i=0; i<remainder; i++) {
+			float h = (1.0 - ((*pimage++ - dmin) / (dmax-dmin) * (1-hsvcutoff))) + hsvcutoff;
+			h *= 255*256;
+			*pres++ = pmp[(unsigned)h + (unsigned)(*pv++)];
+		}
+		
+		"""
+	
+	
+	weave.inline(code, vrs, headers = ['"emmintrin.h"'], extra_compile_args=["-mfpmath=sse -msse3"], compiler="gcc")
+	
+	if not returnQImage:
+		return rgbMat
+	else:
+		return QImage(rgbMat,w,h,QImage.Format_ARGB32)
+		
+def medianFilter3x3(im):
+	
+	h,w = im.shape
+	vrs = ["im", "im2", "h", "w"]
+	
+	im2 = np.zeros_like(im)
+	
+	code = """
+		for(unsigned i=0; i<h-2; i++) {
+			float *p1 = im + i*w;
+			float *p2 = p1 + w;
+			float *p3 = p2 + w;
+			
+			float *res = im2 + (i+1)*w;
+			
+			float a[9];
+			
+			float *pstop = p1 + w - 2;
+			do {
+				a[0] = *p1++;
+				a[1] = *p1++;
+				a[2] = *p1--;
+				a[3] = *p2++;
+				a[4] = *p2++;
+				a[5] = *p2--;
+				a[6] = *p3++;
+				a[7] = *p3++;
+				a[8] = *p3--;
+				
+				for(unsigned k=0; k < 5; k++) {
+					unsigned minIndex = k;
+					float minValue = a[k];
+					for(unsigned l = k+1; l<9; l++) {
+						if(a[l] < minValue) {
+							minIndex = l;
+							minValue = a[l];
+						}
+					}
+					
+					float t = a[k];
+					a[k] = a[minIndex];
+					a[minIndex] = t;
+				}
+				
+				*res++ = a[4];
+				
+			} while (p1 < pstop);
+		}
+	"""
+	
+	weave.inline(code, vrs, headers = ['"emmintrin.h"'], extra_compile_args=["-mfpmath=sse -msse3"], compiler="gcc")
+	
+	return im2
+	
+def medianFilterScipy(im, thrds = 2):
+	h,w = im.shape
+	
+	if thrds == 1:
+		im = ndimage.median_filter(im, (3,3))
+		return im.astype(np.float32)
+	
+	pieceSize = int(w / thrds)
+	
+	lowLim = range(0, w, pieceSize)
+	highLim = range(pieceSize, w, pieceSize)
+	
+	if len(lowLim) > len(highLim):
+		highLim.append(w)
+	
+	threadList = list()
+	for ll, hl in zip(lowLim, highLim):
+		th = ThreadWorker(medianFilterScipyTile, (im,ll,hl))
+		th.start()
+		threadList.append(th)
+		
+	for th in threadList:
+		th.join()
+		im[:, th.data[1]:th.data[2]] = th.result
+		
+	return im.astype(np.float32)
+	
+def medianFilterScipyTile(im, ll, hl):
+	return ndimage.median_filter(im[:, ll:hl], (3,3))
 		
 def applyColormap(image,vmin=None,vmax=None,returnQImage=False,cmap=cm.jet):
 	#d=image.copy() #Determine if image is passed by reference or by value
@@ -384,7 +579,7 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 	
 	#print(code)
 	
-	weave.inline(code, vrs, headers = ['"emmintrin.h"'], extra_compile_args=["-mfpmath=sse -msse3"])
+	weave.inline(code, vrs, headers = ['"emmintrin.h"'], extra_compile_args=["-mfpmath=sse -msse3"], compiler="gcc")
 	
 	return res
 		

@@ -333,7 +333,7 @@
          <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
-            <x>50</x>
+            <x>10</x>
             <y>30</y>
             <width>190</width>
             <height>54</height>
@@ -377,6 +377,32 @@
             <widget class="QRadioButton" name="HSVradioButton">
              <property name="text">
               <string>HSV</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <property name="geometry">
+           <rect>
+            <x>240</x>
+            <y>33</y>
+            <width>106</width>
+            <height>47</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QCheckBox" name="medianFilterCheckbox">
+             <property name="text">
+              <string>Median filter</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="gaussianFilterCheckbox">
+             <property name="text">
+              <string>Gaussian filter</string>
              </property>
             </widget>
            </item>

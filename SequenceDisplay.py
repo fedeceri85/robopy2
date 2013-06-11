@@ -402,8 +402,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if self.optionsDlg.displayOptions.useLUT == 1:
 				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			elif self.optionsDlg.displayOptions.useHSV == 1:
-				#return SequenceProcessor.HSVImageByMap(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
-				return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				if self.optionsDlg.displayOptions.medianFilterOn:
+					#f = SequenceProcessor.medianFilter3x3(f)
+					f = SequenceProcessor.medianFilterScipy(f,1)
+				return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			
 		return None, None
 		
