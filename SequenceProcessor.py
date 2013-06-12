@@ -21,6 +21,10 @@ TODO:
 
 '''
 
+openClCtx = cl.create_some_context(interactive=False, answers='0')
+openClQueue = cl.CommandQueue(openClCtx)
+openClmf = cl.mem_flags
+
 class ThreadWorker(threading.Thread):
 	def __init__(self, myCallback, data):
 		self.myCallback = myCallback
@@ -274,6 +278,62 @@ def medianFilter3x3(im):
 	
 	return im2
 	
+def medianFilterOpenCl(im):
+	h,w = im.shape
+	
+	out = np.empty_like(im)
+	
+	im_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=im)
+	out_buf = cl.Buffer(openClCtx, openClmf.WRITE_ONLY, out.nbytes)
+	prgMedian = cl.Program(openClCtx, """
+		__kernel void procMedian(__global const float* f, __global float *out, const int w, const int h) {
+			int col = get_global_id(0);
+			int row = get_global_id(1);
+			int id = w * row + col;
+			
+			if((row < 1 || row > h-2) || (col < 1 || col > w-2)) {
+				out[id] = f[id];
+			} else {
+				float a[9];
+				
+				int sid = w * (row - 1) + col - 1;
+				
+				a[0] = f[sid++];
+				a[1] = f[sid++];
+				a[2] = f[sid];
+				sid += w - 2;
+				a[3] = f[sid++];
+				a[4] = f[sid++];
+				a[5] = f[sid];
+				sid += w - 2;
+				a[6] = f[sid++];
+				a[7] = f[sid++];
+				a[8] = f[sid];
+				
+				for(unsigned k=0; k < 5; k++) {
+					unsigned minIndex = k;
+					float minValue = a[k];
+					for(unsigned l = k+1; l<9; l++) {
+						if(a[l] < minValue) {
+							minIndex = l;
+							minValue = a[l];
+						}
+					}
+					
+					float t = a[k];
+					a[k] = a[minIndex];
+					a[minIndex] = t;
+				}
+				
+				out[id] = a[4];
+			}
+		}
+		""").build()
+	event = prgMedian.procMedian(openClQueue, (w,h), None, im_buf, out_buf, np.int32(w), np.int32(h))
+	event.wait()
+	cl.enqueue_copy(openClQueue, out, out_buf)
+	return out
+	
 def medianFilterScipy(im, thrds = 2):
 	h,w = im.shape
 	
@@ -464,17 +524,18 @@ def computeProcessedFrameOpenCL(tif, n, fo, ref):
 	h,w = f.shape
 	
 	
-	ctx = cl.create_some_context()
-	queue = cl.CommandQueue(ctx)
-	mf = cl.mem_flags
+	#ctx = cl.create_some_context()
+	#queue = cl.CommandQueue(ctx)
+	
+	#mf = cl.mem_flags
 	
 	pType = np.int32(fo.processType)
 	dType = np.int32(fo.displayType)
 	
 	f2 = None
 	
-	f_buf = cl.Buffer(ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=f)
-	ref_buf = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=ref)
+	f_buf = cl.Buffer(openClCtx, openClmf.READ_WRITE | openClmf.COPY_HOST_PTR, hostbuf=f)
+	ref_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=ref)
 	
 	#res = np.empty_like(f)
 	#res_buf = cl.Buffer(ctx, mf.WRITE_ONLY, res.nbytes)
@@ -482,7 +543,7 @@ def computeProcessedFrameOpenCL(tif, n, fo, ref):
 	#print("Opencl in action")
 	
 	if pType == 0:
-		prgRef = cl.Program(ctx, """
+		prgRef = cl.Program(openClCtx, """
 		__kernel void procRef(__global float* f, __global const float* ref, const int dType, const int w) {
 			int col = get_global_id(0);
 			int row = get_global_id(1);
@@ -497,12 +558,12 @@ def computeProcessedFrameOpenCL(tif, n, fo, ref):
 			}
 		}
 		""").build()
-		event = prgRef.procRef(queue, (w,h), None, f_buf, ref_buf, dType, np.int32(w))
+		event = prgRef.procRef(openClQueue, (w,h), None, f_buf, ref_buf, dType, np.int32(w))
 	if pType == 1:
 		f2 = tif.getFrame(n + fo.secondWavelength - 1).astype(np.float32)
-		f2_buf = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=f2)
+		f2_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=f2)
 		
-		prgDiv = cl.Program(ctx, """
+		prgDiv = cl.Program(openClCtx, """
 			__kernel void procDiv(__global float* f, __global const float* f2, __global const float *ref, const int w, const int dType) {
 				int col = get_global_id(0);
 				int row = get_global_id(1);
@@ -518,11 +579,11 @@ def computeProcessedFrameOpenCL(tif, n, fo, ref):
 				}
 			}
 		""").build()
-		event = prgDiv.procDiv(queue, (w,h), None, f_buf, f2_buf, ref_buf, np.int32(w), dType)
+		event = prgDiv.procDiv(openClQueue, (w,h), None, f_buf, f2_buf, ref_buf, np.int32(w), dType)
 	
 	
 	event.wait()
-	cl.enqueue_copy(queue, f, f_buf)
+	cl.enqueue_copy(openClQueue, f, f_buf)
 	return f
 	
 def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold = 16):
