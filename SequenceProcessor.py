@@ -21,7 +21,7 @@ TODO:
 
 '''
 
-openClCtx = cl.create_some_context(interactive=False, answers='0')
+openClCtx = cl.create_some_context(interactive=False, answers='1')
 openClQueue = cl.CommandQueue(openClCtx)
 openClmf = cl.mem_flags
 
@@ -330,6 +330,44 @@ def medianFilterOpenCl(im):
 		}
 		""").build()
 	event = prgMedian.procMedian(openClQueue, (w,h), None, im_buf, out_buf, np.int32(w), np.int32(h))
+	event.wait()
+	cl.enqueue_copy(openClQueue, out, out_buf)
+	return out
+	
+def gaussianFilterOpenCl(im):
+	h,w = im.shape
+	
+	out = np.empty_like(im)
+	
+	im_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=im)
+	out_buf = cl.Buffer(openClCtx, openClmf.WRITE_ONLY, out.nbytes)
+	prgGaussian = cl.Program(openClCtx, """
+		__kernel void procGaussian(__global const float* f, __global float *out, const int w, const int h) {
+			int col = get_global_id(0);
+			int row = get_global_id(1);
+			int id = w * row + col;
+			
+			if((row < 2 || row > h-3) || (col < 2 || col > w-3)) {
+				out[id] = f[id];
+			} else {
+			
+				int sid = w * (row - 2) + col - 2;
+				out[id] = 0.0;
+				
+				const float g[25] = {0.000000069624782, 0.000028088641754 ,  0.000207548549665,   0.000028088641754, 0.000000069624782, 
+					0.000028088641754  , 0.011331766853774 ,  0.083731060982536 ,  0.011331766853774, 0.000028088641754, 
+					0.000207548549665 ,  0.083731060982536  , 0.618693506822940 ,  0.083731060982536, 0.000207548549665, 
+					0.000028088641754  , 0.011331766853774 ,  0.083731060982536 ,  0.011331766853774, 0.000028088641754,
+					0.000000069624782, 0.000028088641754 ,  0.000207548549665,   0.000028088641754, 0.000000069624782 
+				};
+				
+				for(unsigned i=0; i<25; i++) {
+					out[id] += g[i] * f[sid + w*(i/5) + (i%5)];
+				}
+			}
+		}
+		""").build()
+	event = prgGaussian.procGaussian(openClQueue, (w,h), None, im_buf, out_buf, np.int32(w), np.int32(h))
 	event.wait()
 	cl.enqueue_copy(openClQueue, out, out_buf)
 	return out
