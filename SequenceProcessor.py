@@ -28,9 +28,11 @@ def CreateOpenClContext():
 	if len(platforms) == 0:
 		print "Failed to find any OpenCL platforms."
 		return None
-	devices = platforms[0].get_devices(cl.device_type.GPU)
-	
-	if len(devices) == 0:
+	try:
+		devices = platforms[0].get_devices(cl.device_type.GPU)
+	except cl.RuntimeError:
+		
+	#if len(devices) == 0:
 		print "Could not find GPU device, trying CPU..."
 		devices = platforms[0].get_devices(cl.device_type.CPU)
 		
