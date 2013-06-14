@@ -21,8 +21,29 @@ TODO:
 
 '''
 
-openClCtx = cl.create_some_context(interactive=False, answers='1')
-openClQueue = cl.CommandQueue(openClCtx)
+
+
+def CreateOpenClContext():
+	platforms = cl.get_platforms()
+	if len(platforms) == 0:
+		print "Failed to find any OpenCL platforms."
+		return None
+	devices = platforms[0].get_devices(cl.device_type.GPU)
+	
+	if len(devices) == 0:
+		print "Could not find GPU device, trying CPU..."
+		devices = platforms[0].get_devices(cl.device_type.CPU)
+		
+		if len(devices) == 0:
+			print "Could not find OpenCL GPU or CPU device."
+			return None, None
+			
+	context = cl.Context([devices[0]])
+	return context, devices[0]
+
+#openClCtx = cl.create_some_context(interactive=False, answers='1')
+openClCtx, openClDevice = CreateOpenClContext()
+openClQueue = cl.CommandQueue(openClCtx, openClDevice)
 openClmf = cl.mem_flags
 
 class ThreadWorker(threading.Thread):
@@ -552,6 +573,178 @@ def computeProcessedFrame(tif, n, fo, ref):
 		f = np.divide((f-ref), ref) 	
 		
 	return f
+	
+def computeProcessedFrameOpenCL2(tif, n, fo, ref, medFiltOn = True, gaussFiltOn = True):
+	f1 = tif.getFrame(n + fo.firstWavelength - 1)
+	
+	h,w = f1.shape
+	pType = np.int32(fo.processType)
+	dType = np.int32(fo.displayType)
+	
+	if pType == 0:
+		f2 = f1.copy()
+	else:
+		f2 = tif.getFrame(n + fo.secondWavelength - 1)
+		
+	
+	f1_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=f1)
+	f2_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=f2)
+	ref_buf = cl.Buffer(openClCtx, openClmf.READ_ONLY | openClmf.COPY_HOST_PTR, hostbuf=ref)
+	
+	out = np.empty_like(f1, dtype=np.float32)
+	out_buf = cl.Buffer(openClCtx, openClmf.READ_WRITE, out.nbytes)
+	out_buf2 = cl.Buffer(openClCtx, openClmf.READ_WRITE, out.nbytes)
+	
+	buffSwap = 0
+	
+	prgCompute = cl.Program(openClCtx, """
+			__kernel void procCompute(__global const unsigned short* f1, __global const unsigned short* f2, 
+				__global const float* ref, __global float* out, const int w, const int h, 
+				const int pType, const int dType) {
+				
+				int col = get_global_id(0);
+				int row = get_global_id(1);
+				int id = w * row + col;
+				
+				float v1 = (float)f1[id];
+				float v2 = v1;
+				if (pType == 1) {
+					v2 = (float)f2[id];
+					if( v2 < 1.0) {
+						v2 = 1.0;
+					}
+					
+					v1 /= v2;
+				}
+				
+				float r = 0.0f;
+				
+				if( dType >  0) {
+					r = ref[id];
+					v1 -= r;
+				} 
+				
+				if(dType == 2) {
+					if (r == 0.0f) {
+						if (r < 0.0f) {
+							r = -0.001f;
+						} else {
+							r = 0.001f;
+						}
+					}
+					
+					v1 /= r;
+				}
+				
+				out[id] = v1;
+				
+			}
+		""").build()
+		
+	event = prgCompute.procCompute(openClQueue, (w,h), None, f1_buf, f2_buf, ref_buf, out_buf, np.int32(w), np.int32(h), pType, dType)
+	event.wait()
+	
+	prgMedian = cl.Program(openClCtx, """
+		__kernel void procMedian(__global const float* f, __global float *out, const int w, const int h) {
+			int col = get_global_id(0);
+			int row = get_global_id(1);
+			int id = w * row + col;
+			
+			if((row < 1 || row > h-2) || (col < 1 || col > w-2)) {
+				out[id] = f[id];
+			} else {
+				float a[9];
+				
+				int sid = w * (row - 1) + col - 1;
+				
+				a[0] = f[sid++];
+				a[1] = f[sid++];
+				a[2] = f[sid];
+				sid += w - 2;
+				a[3] = f[sid++];
+				a[4] = f[sid++];
+				a[5] = f[sid];
+				sid += w - 2;
+				a[6] = f[sid++];
+				a[7] = f[sid++];
+				a[8] = f[sid];
+				
+				for(unsigned k=0; k < 5; k++) {
+					unsigned minIndex = k;
+					float minValue = a[k];
+					for(unsigned l = k+1; l<9; l++) {
+						if(a[l] < minValue) {
+							minIndex = l;
+							minValue = a[l];
+						}
+					}
+					
+					float t = a[k];
+					a[k] = a[minIndex];
+					a[minIndex] = t;
+				}
+				
+				out[id] = a[4];
+			}
+		}
+		""").build()
+		
+	prgGaussian = cl.Program(openClCtx, """
+		__kernel void procGaussian(__global const float* f, __global float *out, const int w, const int h) {
+			int col = get_global_id(0);
+			int row = get_global_id(1);
+			int id = w * row + col;
+			
+			if((row < 2 || row > h-3) || (col < 2 || col > w-3)) {
+				out[id] = f[id];
+			} else {
+			
+				int sid = w * (row - 2) + col - 2;
+				out[id] = 0.0;
+				
+				const float g[25] = {0.000000069624782, 0.000028088641754 ,  0.000207548549665,   0.000028088641754, 0.000000069624782, 
+					0.000028088641754  , 0.011331766853774 ,  0.083731060982536 ,  0.011331766853774, 0.000028088641754, 
+					0.000207548549665 ,  0.083731060982536  , 0.618693506822940 ,  0.083731060982536, 0.000207548549665, 
+					0.000028088641754  , 0.011331766853774 ,  0.083731060982536 ,  0.011331766853774, 0.000028088641754,
+					0.000000069624782, 0.000028088641754 ,  0.000207548549665,   0.000028088641754, 0.000000069624782 
+				};
+				
+				for(unsigned i=0; i<25; i++) {
+					out[id] += g[i] * f[sid + w*(i/5) + (i%5)];
+				}
+			}
+		}
+		""").build()
+		
+	if medFiltOn:
+		event = prgMedian.procMedian(openClQueue, (w,h), None, out_buf, out_buf2, np.int32(w), np.int32(h))
+		event.wait()
+		
+		buffSwap = 1
+		
+	if gaussFiltOn:
+		
+		if buffSwap == 0:
+			source_buf = out_buf
+			result_buf = out_buf2
+		else:
+			source_buf = out_buf2
+			result_buf = out_buf
+			
+		buffSwap = buffSwap + 1
+		
+		event = prgGaussian.procGaussian(openClQueue, (w,h), None, source_buf, result_buf, np.int32(w), np.int32(h))
+		event.wait()
+		
+		
+	if buffSwap == 1:
+		result_buf = out_buf2
+	else:
+		result_buf = out_buf
+	
+	cl.enqueue_copy(openClQueue, out, result_buf)
+		
+	return out
 	
 def computeProcessedFrameOpenCL(tif, n, fo, ref):
 	f = tif.getFrame(n + fo.firstWavelength - 1).astype(np.float32)
