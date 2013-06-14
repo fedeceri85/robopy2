@@ -576,7 +576,7 @@ def computeProcessedFrame(tif, n, fo, ref):
 		
 	return f
 	
-def computeProcessedFrameOpenCL2(tif, n, fo, ref, medFiltOn = True, gaussFiltOn = True):
+def computeProcessedFrameOpenCL2(tif, n, fo, ref, medFiltOn = True, gaussFiltOn = True,returnRaw=False):
 	f1 = tif.getFrame(n + fo.firstWavelength - 1)
 	
 	h,w = f1.shape
@@ -745,15 +745,20 @@ def computeProcessedFrameOpenCL2(tif, n, fo, ref, medFiltOn = True, gaussFiltOn 
 		result_buf = out_buf
 	
 	cl.enqueue_copy(openClQueue, out, result_buf)
-		
-	return out
+	if not returnRaw:
+		return out
+	else:
+		return out,f1
 	
-def computeProcessedFrameOpenCL(tif, n, fo, ref):
+def computeProcessedFrameOpenCL(tif, n, fo, ref,returnRaw=False):
 	f = tif.getFrame(n + fo.firstWavelength - 1).astype(np.float32)
 	
+
 	if fo.processType == 0 and fo.displayType == 0:
 		return f
-		
+	
+	if returnRaw:
+		raw = f.copy()
 	h,w = f.shape
 	
 	
@@ -817,7 +822,10 @@ def computeProcessedFrameOpenCL(tif, n, fo, ref):
 	
 	event.wait()
 	cl.enqueue_copy(openClQueue, f, f_buf)
-	return f
+	if not returnRaw:
+		return f
+	else:
+		return f,raw
 	
 def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold = 16):
 	f1 = tif.getFrame(n + fo.firstWavelength - 1)

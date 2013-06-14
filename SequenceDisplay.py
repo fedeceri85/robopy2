@@ -378,41 +378,50 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	
 	def getSequenceFrame(self, n, needQImage = True):
 			
-		im = self.tiffSequence.getFrame(n)
-		
-		if im == None:
-			return None
-			
+
 		viewType = self.getViewType()
-		if viewType == 0:
-			if self.displayParameters.autoAdjust:
-				self.changeDisplayGrayMin(im.min())
-				self.changeDisplayGrayMax(im.max())
 		
 		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))	
 		if viewType == 0:
+			im = self.tiffSequence.getFrame(n)
+		
+			if im == None:
+				return None
+			if self.displayParameters.autoAdjust:
+				self.changeDisplayGrayMin(im.min())
+				self.changeDisplayGrayMax(im.max())
+				
 			return SequenceProcessor.convert16Bitto8Bit(im, self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax, needQImage), im
 		elif viewType == 1:
 			#processed stuff
 			#f = SequenceProcessor.computeProcessedFrameWeave(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
 			#f = SequenceProcessor.computeProcessedFrameOpenCL(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
+			if self.optionsDlg.displayOptions.useLUT == 1:			
+				f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
 			
-			f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
-			
-			if self.displayParameters.autoAdjust:
-				self.changeDisplayColorMin(f.min())
-				self.changeDisplayColorMax(f.max())
-				
-			if self.optionsDlg.displayOptions.useLUT == 1:
+				if self.displayParameters.autoAdjust:
+					self.changeDisplayColorMin(f.min())
+					self.changeDisplayColorMax(f.max())
+					
+
 				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			elif self.optionsDlg.displayOptions.useHSV == 1:
+				
+				
+				f,raw = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn,returnRaw=True)
+			
+				if self.displayParameters.autoAdjust:
+					self.changeDisplayColorMin(f.min())
+					self.changeDisplayColorMax(f.max())
+					
+
 				#if self.optionsDlg.displayOptions.medianFilterOn:
 					##f = SequenceProcessor.medianFilter3x3(f)
 					##f = SequenceProcessor.medianFilterScipy(f,1)
 					#f = SequenceProcessor.medianFilterOpenCl(f)
 				#if self.optionsDlg.displayOptions.gaussianFilterOn:
 					#f = SequenceProcessor.gaussianFilterOpenCl(f)
-				return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(raw,shape=raw.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 			
 		return None, None
