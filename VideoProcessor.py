@@ -11,7 +11,7 @@ import numpy as np
 Video processing implemented on a QGLFramebuffer and using GLSL programmin
 '''
 class VideoProcessor(QGLFramebufferObject):
-	def __init__(self, w, h, openglContext, internalType = GL_RGB32F): #GL_LUMINANCE_FLOAT32_ATI):
+	def __init__(self, w, h, openglContext, internalType = GL_RGB32F): # = GL_LUMINANCE_FLOAT32_ATI):
 		
 		self.openglContext = openglContext
 		openglContext.makeCurrent()
@@ -19,7 +19,7 @@ class VideoProcessor(QGLFramebufferObject):
 		super(VideoProcessor, self).__init__(w, h, QGLFramebufferObject.NoAttachment, GL_TEXTURE_RECTANGLE, internalType)
 		
 		
-		supMulti = glGetIntegerv(GL_MAX_TEXTURE_UNITS)
+		supMulti = glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB)
 		print("VideoProcessor: " + str(supMulti) + " textures supported")
 		if supMulti < 3:
 			print("VideoProcessor: needed multi texture mode of at least 3, while only " + str(supMulti) + " supported")

@@ -393,45 +393,27 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	
 	def getSequenceFrame(self, n, needQImage = True):
 			
-<<<<<<< HEAD
 		im = self.tiffSequence.getFrame(n)
 		h,w = im.shape
 		
 		if im == None:
 			return None
 			
-=======
-
->>>>>>> 798c457ce7f7113f062c3d4487ea4152b55b6407
 		viewType = self.getViewType()
-		
-		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))	
 		if viewType == 0:
-			im = self.tiffSequence.getFrame(n)
-		
-			if im == None:
-				return None
 			if self.displayParameters.autoAdjust:
 				self.changeDisplayGrayMin(im.min())
 				self.changeDisplayGrayMax(im.max())
-<<<<<<< HEAD
 		
 		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))	
 		if viewType == 0:
 			tex = self.imWidget.processData(list([im]), list([0]), list([list([self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax])]))
 			return tex, im
-=======
-				
-			return SequenceProcessor.convert16Bitto8Bit(im, self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax, needQImage), im
->>>>>>> 798c457ce7f7113f062c3d4487ea4152b55b6407
 		elif viewType == 1:
 			#processed stuff
 			#f = SequenceProcessor.computeProcessedFrameWeave(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
 			#f = SequenceProcessor.computeProcessedFrameOpenCL(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
-			if self.optionsDlg.displayOptions.useLUT == 1:			
-				f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
 			
-<<<<<<< HEAD
 			#f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
 			
 			#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
@@ -458,35 +440,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				if self.displayParameters.autoAdjust == False:
 					f=None
 				return tex, f
-=======
-				if self.displayParameters.autoAdjust:
-					self.changeDisplayColorMin(f.min())
-					self.changeDisplayColorMax(f.max())
-					
-
-				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
->>>>>>> 798c457ce7f7113f062c3d4487ea4152b55b6407
 			elif self.optionsDlg.displayOptions.useHSV == 1:
-				
-				
-				f,raw = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn,returnRaw=True)
-			
-				if self.displayParameters.autoAdjust:
-					self.changeDisplayColorMin(f.min())
-					self.changeDisplayColorMax(f.max())
-					
-
 				#if self.optionsDlg.displayOptions.medianFilterOn:
 					##f = SequenceProcessor.medianFilter3x3(f)
 					##f = SequenceProcessor.medianFilterScipy(f,1)
 					#f = SequenceProcessor.medianFilterOpenCl(f)
 				#if self.optionsDlg.displayOptions.gaussianFilterOn:
 					#f = SequenceProcessor.gaussianFilterOpenCl(f)
-<<<<<<< HEAD
 				#return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
-=======
-				return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(raw,shape=raw.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
->>>>>>> 798c457ce7f7113f062c3d4487ea4152b55b6407
 				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				
 				valImage = SequenceProcessor.computeValue(im,shape=im.shape)
