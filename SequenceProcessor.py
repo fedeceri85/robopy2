@@ -9,7 +9,7 @@ import Roi
 from scipy import weave
 from scipy.weave import converters
 import threading
-import pyopencl as cl
+#import pyopencl as cl
 
 '''
 A module to hold computations on images or sequences
@@ -42,9 +42,9 @@ def CreateOpenClContext():
 	return context, devices[0]
 
 #openClCtx = cl.create_some_context(interactive=False, answers='1')
-openClCtx, openClDevice = CreateOpenClContext()
-openClQueue = cl.CommandQueue(openClCtx, openClDevice)
-openClmf = cl.mem_flags
+#openClCtx, openClDevice = CreateOpenClContext()
+#openClQueue = cl.CommandQueue(openClCtx, openClDevice)
+#openClmf = cl.mem_flags
 
 class ThreadWorker(threading.Thread):
 	def __init__(self, myCallback, data):
@@ -75,7 +75,7 @@ def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 		return QImage(im2.data,w,h,QImage.Format_Indexed8)
 
 def computeValue(background,shape=None):
-	if shape is not None:
+	if shape is not None and shape != background.shape:
 		bckgrn2=imresize(background,(shape[0],shape[1]))
 	else:
 		bckgrn2=background.copy()
@@ -244,6 +244,18 @@ def HSVImageByMapSSE(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQ
 		return rgbMat
 	else:
 		return QImage(rgbMat,w,h,QImage.Format_ARGB32)
+		
+def applyColormapGLSL(procWdg, image, w, h, imMin, imMax, returnType = "texture"):
+	
+	f = procWdg.applyColormapGLSL(image, w, h, imMin, imMax, returnType)	
+	
+	return f
+	
+def HSVImageGLSL(procWdg, image,value, w, h, imMin, imMax, vmin=0.0, vmax=1.0, hsvcutoff=0.45, returnType = "texture"):
+		
+	f = procWdg.HSVImageGLSL(image, value, w, h, imMin, imMax, vmin, vmax, returnType)
+	
+	return f
 		
 def medianFilter3x3(im):
 	
@@ -816,6 +828,51 @@ def computeProcessedFrameOpenCL(tif, n, fo, ref):
 	event.wait()
 	cl.enqueue_copy(openClQueue, f, f_buf)
 	return f
+	
+	
+def computeProcessedFrameGLSL(procWdg, tif, n, fo, do, ref, b1=0, b2=0, returnType="float"):
+		
+		f1 = tif.getFrame(n + fo.firstWavelength - 1)
+		f2 = f1
+		if f1 == None:
+			return None
+			
+		if fo.processType == 0 and fo.displayType == 0 and do.medianFilterOn == False and do.gaussianFilterOn == False:
+			f1 = f1.astype(np.float32)
+			return f1
+			
+		h = f1.shape[0]
+		w = f1.shape[1]
+		
+		if fo.processType == 1:
+			f2 = tif.getFrame(n + fo.secondWavelength - 1)
+			
+		#preparing arguments for processing
+		buffers = list([f1, f2, ref])
+		bufferType = list(['uint16', 'uint16', 'float'])
+		
+		argList = list([list([fo.processType, fo.displayType, b1, b2])])
+		
+		programs = list([4])
+		if do.medianFilterOn:
+			programs.append(1)
+			argList.append(list())
+		if do.gaussianFilterOn:
+			programs.append(2)
+			argList.append(list())
+			
+		f = procWdg.processData(buffers, programs, argList, returnType, bufferType)
+		
+		if returnType == "texture":
+			return f
+		
+		f = f.squeeze()
+		h,w = f.shape
+		f = f.reshape(w,h)
+		return f
+		
+		
+			
 	
 def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold = 16):
 	f1 = tif.getFrame(n + fo.firstWavelength - 1)

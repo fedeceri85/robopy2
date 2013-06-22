@@ -37,7 +37,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.roiProfile = None
 		#self.roiAverageRecomputeNeeded = False
 		
-		self.PlayInterframe = 10
+		self.PlayInterframe = 50
 		self.IsPlaying = False
 		self.timer = QBasicTimer()
 		self.FrameImage = None
@@ -62,6 +62,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.updateFrameWidgetsRange()
 		self.showStatusMessage("Counted " + str(self.MaxFrames) + " frames")
 		self.FrameImage, self.FrameData = self.getSequenceFrame(0)
+		self.frameWidth = self.tiffSequence.width
+		self.frameHeight = self.tiffSequence.height
 		self.updateDisplay()
 		
 		self.setWindowTitle(files[0])
@@ -104,12 +106,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.imWidget = imWidget
 		hlay.addWidget(imWidget)
 		
+		self.imWidget.createShaders()
+		
 		#processed sequence display widget
 		hlay = PyQt4.QtGui.QHBoxLayout(self.ProcessedFrameWidget)
 		processedWidget = ImageDisplayWidget(self)
 		
 		self.processedWidget = processedWidget
 		hlay.addWidget(processedWidget)
+		
+		self.processedWidget.createShaders()
 		
 	def makeConnections(self):
 		self.connect(self.ForwardFrameButton, SIGNAL("clicked()"), self.getNextSequenceFrame)
@@ -199,8 +205,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.colorMinSpinBox.setValue(v)
 		self.colorMinSpinBox.blockSignals(False)
 		
-		self.colorMinSlider.blockSignals(True)
+		
 		mn, mx, stepSize = self.computeRangeParameters()
+		
+		if stepSize == 0.0:
+			return
+		
+		self.colorMinSlider.blockSignals(True)
 		nv = int((v - mn) / stepSize)
 		self.colorMinSlider.setValue(nv)
 		self.colorMinSlider.blockSignals(False)
@@ -215,8 +226,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.colorMaxSpinBox.setValue(v)
 		self.colorMaxSpinBox.blockSignals(False)
 		
-		self.colorMaxSlider.blockSignals(True)
 		mn, mx, stepSize = self.computeRangeParameters()
+		
+		if stepSize == 0.0:
+			return
+		
+		self.colorMaxSlider.blockSignals(True)
 		nv = int((v - mn) / stepSize)
 		self.colorMaxSlider.setValue(nv)
 		self.colorMaxSlider.blockSignals(False)
@@ -379,6 +394,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def getSequenceFrame(self, n, needQImage = True):
 			
 		im = self.tiffSequence.getFrame(n)
+		h,w = im.shape
 		
 		if im == None:
 			return None
@@ -391,20 +407,39 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))	
 		if viewType == 0:
-			return SequenceProcessor.convert16Bitto8Bit(im, self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax, needQImage), im
+			tex = self.imWidget.processData(list([im]), list([0]), list([list([self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax])]))
+			return tex, im
 		elif viewType == 1:
 			#processed stuff
 			#f = SequenceProcessor.computeProcessedFrameWeave(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
 			#f = SequenceProcessor.computeProcessedFrameOpenCL(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
 			
-			f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
+			#f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
+			
+			#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+			#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+			
+			
+			#print("Processed result " + str(f) + " with shape " + str(f.shape))
+			
 			
 			if self.displayParameters.autoAdjust:
+				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
-				
+			else:
+				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
+			
+			#print("Processed result " + str(f) + " with shape " + str(f.shape))
+			
 			if self.optionsDlg.displayOptions.useLUT == 1:
-				return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				#return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				tex = SequenceProcessor.applyColormapGLSL(self.processedWidget, f, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+				if self.displayParameters.autoAdjust == False:
+					f=None
+				return tex, f
 			elif self.optionsDlg.displayOptions.useHSV == 1:
 				#if self.optionsDlg.displayOptions.medianFilterOn:
 					##f = SequenceProcessor.medianFilter3x3(f)
@@ -412,8 +447,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 					#f = SequenceProcessor.medianFilterOpenCl(f)
 				#if self.optionsDlg.displayOptions.gaussianFilterOn:
 					#f = SequenceProcessor.gaussianFilterOpenCl(f)
-				return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				#return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				
+				valImage = SequenceProcessor.computeValue(im,shape=im.shape)
+				
+				tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, valImage, w, h,
+					self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+					
+				if self.displayParameters.autoAdjust == False:
+					f=None
+				return tex, f
 			
 		return None, None
 		
@@ -432,14 +476,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if self.FrameImage == None:
 			return
 			
-		pix = QPixmap.fromImage(self.FrameImage)
-		
+		h, w = self.frameHeight, self.frameWidth
+			
 		if self.ImageTabWidget.currentIndex() == 0:
-			self.imWidget.pix = pix
-			self.imWidget.repaint()
+			self.imWidget.currentDrawData["tex"] = self.FrameImage
+			self.imWidget.currentDrawData["width"] = w
+			self.imWidget.currentDrawData["height"] = h
+			self.imWidget.updateGL()
 		else:
-			self.processedWidget.pix = pix
-			self.processedWidget.repaint()
+			self.processedWidget.currentDrawData["tex"] = self.FrameImage
+			self.processedWidget.currentDrawData["width"] = w
+			self.processedWidget.currentDrawData["height"] = h
+			self.processedWidget.updateGL()
+			
+		
 		
 	def getNextSequenceFrame(self):
 		first, step = self.getSequenceStartAndStep()

@@ -7,6 +7,8 @@ from RoboPyGui import Ui_RoboMainWnd
 from SequenceDisplay import SequenceDisplay
 from IPython.frontend.terminal.embed import InteractiveShellEmbed
 
+from OpenGL.GLUT import *
+
 '''
 Main window of Robopy project
 Launches various windows and tools
@@ -66,6 +68,9 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		return files
 
 if __name__== "__main__":
+	
+	glutInit(sys.argv)
+	
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	robopy = RoboPy()
 	robopy.show()

@@ -35,6 +35,7 @@ class TiffSequence:
 			self.frames = self.frames + frames
 		
 		self.initTimesDict()
+		self.cachedFrames = {0:None, 1:None}
 
 		
 		
@@ -111,17 +112,24 @@ class TiffSequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:,:,n]
+			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
+				self.cachedFrames.popitem()
+				self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
+				
+			return self.cachedFrames[n]
 		else:
 			if self.tifHandlers[0] != None:
 				i,n = self.getFileIndexes(n)
 				
 				if i == -1:
 					return None
+					
+				if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
+					self.cachedFrames.popitem()
+					self.tifHandlers[i].SetDirectory(n)
+					self.cachedFrames[n] = self.tifHandlers[i].read_image()
 				
-				self.tifHandlers[i].SetDirectory(n)
-				
-				return self.tifHandlers[i].read_image()
+				return self.cachedFrames[n]
 			
 			return None
 	

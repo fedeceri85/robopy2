@@ -48,20 +48,20 @@ class Roi(QPolygon):
 			
 		return avg/self.mapSize
 		
-	def computeMassCenter(r):
+	def computeMassCenter(self):
 		x = 0.0
 		y = 0.0
 		
-		if r.size() < 1:
+		if self.size() < 1:
 			return x,y
 		
-		for i in xrange(0, r.size()):
-			p = r.point(i)
+		for i in xrange(0, self.size()):
+			p = self.point(i)
 			x = x + p.x()
 			y = y + p.y()
 			
-		x = x / r.size()
-		y = y / r.size()
+		x = x / self.size()
+		y = y / self.size()
 		
 		return x,y
 		
