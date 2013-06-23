@@ -2,6 +2,7 @@ from libtiff import TIFF
 from numpy import zeros,loadtxt,array,uint16
 import Roi
 from os.path import splitext
+import thread
 #from pubTools import oneColumnFigure
 class TiffSequence:
 	def __init__(self, fNames):
@@ -35,7 +36,7 @@ class TiffSequence:
 			self.frames = self.frames + frames
 		
 		self.initTimesDict()
-		self.cachedFrames = {0:None, 1:None}
+		self.cachedFrames = {0:None, 1:None, 2:None}
 
 		
 		
@@ -113,7 +114,12 @@ class TiffSequence:
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
 			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
-				self.cachedFrames.popitem()
+				if self.cachedFrames.has_key(n-2):
+					self.cachedFrames.pop(n-2)
+				elif self.cachedFrames.has_key(n+2):
+					self.cachedFrames.pop(n+2)
+				elif len(self.cachedFrames) > 2:
+					self.cachedFrames.popitem()
 				self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
 				
 			return self.cachedFrames[n]
@@ -125,7 +131,12 @@ class TiffSequence:
 					return None
 					
 				if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
-					self.cachedFrames.popitem()
+					if self.cachedFrames.has_key(n-2):
+						self.cachedFrames.pop(n-2)
+					elif self.cachedFrames.has_key(n+2):
+						self.cachedFrames.pop(n+2)
+					elif len(self.cachedFrames) > 2:
+						self.cachedFrames.popitem()
 					self.tifHandlers[i].SetDirectory(n)
 					self.cachedFrames[n] = self.tifHandlers[i].read_image()
 				

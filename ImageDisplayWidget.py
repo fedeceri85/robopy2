@@ -70,6 +70,12 @@ class ImageDisplayWidget(QGLWidget):
 		
 		glEnable(GL_TEXTURE_RECTANGLE)
 		
+		
+		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR )
+		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
+		
 	def createShaders(self):
 		self.makeCurrent()
 		sh = Shader()
@@ -233,10 +239,6 @@ class ImageDisplayWidget(QGLWidget):
 		glBindTexture(GL_TEXTURE_RECTANGLE, tex)
 		self.checkGLError("glBindTexture - GL_TEXTURE_RECTANGLE")
 		
-		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP)
-		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP)
-		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR )
-		glTexParameterf(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
 		
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
 		
