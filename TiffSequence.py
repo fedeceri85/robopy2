@@ -2,8 +2,22 @@ from libtiff import TIFF
 from numpy import zeros,loadtxt,array,uint16
 import Roi
 from os.path import splitext
-import thread
+import threading
 #from pubTools import oneColumnFigure
+
+class ThreadedRead(threading.Thread):
+	def __init__(self, threadId, tifSequence):
+		threading.Thread.__init__(self)
+		self.threadId = threadId
+		
+		self.tifSequence = tifSequence
+		self.frameToLoad = 0
+		
+	def run(self):
+		self.tifSequence.threadLock.acquire()
+		self.tifSequence.loadFrameInCache(self.frameToLoad)
+		self.tifSequence.threadLock.release()
+
 class TiffSequence:
 	def __init__(self, fNames):
 		
@@ -38,7 +52,7 @@ class TiffSequence:
 		self.initTimesDict()
 		self.cachedFrames = {0:None, 1:None, 2:None}
 
-		
+		self.threadLock = threading.Lock()
 		
 	def __del__(self):
 		self.clearTifHandler()
@@ -109,6 +123,19 @@ class TiffSequence:
 				self.tifHandlers[i].SetDirectory(n)
 				self.arraySequence[:,:,index]=self.tifHandlers[i].read_image()
 
+	def loadFrameInCache(self, n):
+		if self.arraySequence is not None:
+			self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
+		else:
+			if self.tifHandlers[0] != None:
+				i,n = self.getFileIndexes(n)
+				
+				if i == -1:
+					return None
+					
+				self.tifHandlers[i].SetDirectory(n)
+				self.cachedFrames[n] = self.tifHandlers[i].read_image()
+				#print("Cached frame " + str(n) + " from file ")
 		
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
@@ -130,15 +157,33 @@ class TiffSequence:
 				if i == -1:
 					return None
 					
+				#print("Cache length is " + str(self.cachedFrames.keys()))
+				
+					
+				ks = self.cachedFrames.keys()
+				if len(ks) > 3:
+					for k in ks:
+						if k != n-1 and k != n+1:
+							del self.cachedFrames[k]
+					
 				if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
-					if self.cachedFrames.has_key(n-2):
-						self.cachedFrames.pop(n-2)
-					elif self.cachedFrames.has_key(n+2):
-						self.cachedFrames.pop(n+2)
-					elif len(self.cachedFrames) > 2:
-						self.cachedFrames.popitem()
+					self.threadLock.acquire()
 					self.tifHandlers[i].SetDirectory(n)
 					self.cachedFrames[n] = self.tifHandlers[i].read_image()
+					self.threadLock.release()	
+				
+					
+				if not self.cachedFrames.has_key(n+1):
+					loader1 = ThreadedRead(1, self)
+					loader1.frameToLoad = n+1
+					loader1.start()
+					
+				if n > 1 and not self.cachedFrames.has_key(n-1):
+					loader2 = ThreadedRead(2, self)
+					loader2.frameToLoad = n-1
+					loader2.start()
+					
+				#print("Returning frame " + str(n) + " with values" + str(self.cachedFrames[n]))
 				
 				return self.cachedFrames[n]
 			
