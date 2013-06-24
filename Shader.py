@@ -92,55 +92,32 @@ class Shader():
 				
 				int ch = 2;
 				
-				vec4 gaussData[6];
-				gaussData[0] = vec4(6.9624782e-8,  2.8088641754e-5 ,  2.07548549665e-4,   2.8088641754e-5);
-				gaussData[1] = vec4(2.8088641754e-5  , 1.1331766853774e-2 ,  8.3731060982536e-2 ,  1.1331766853774e-2);
-				gaussData[2] = vec4(2.07548549665e-4 ,8.3731060982536e-2  , 6.18693506822940e-1 ,  8.3731060982536e-2);
-				gaussData[3] = vec4(2.8088641754e-5  ,  1.1331766853774e-2  ,  8.3731060982536e-2 ,  0.011331766853774);
-				gaussData[4] = vec4(6.9624782e-8 ,  2.8088641754e-5 ,  2.07548549665e-4  , 2.8088641754e-5);
-				gaussData[5] = vec4(gaussData[0][0], gaussData[1][0], gaussData[2][0], gaussData[3][0]);
-				float gaussDataLast = float(gaussData[4][0]);
-					
 				o = texture2DRect(tex,vec2(i,j)) [ch];
 				
-				vec4 v[2];
-				v[0][0] = texture2DRect(tex,vec2(i-1,j-1)) [ch];
-				v[0][1] = texture2DRect(tex,vec2(i-1,j)) [ch];
-				v[0][2] = texture2DRect(tex,vec2(i-1,j+1)) [ch];
-				v[0][3] = texture2DRect(tex,vec2(i,j-1)) [ch];
-					
-				v[1][0] = texture2DRect(tex,vec2(i,j+1)) [ch];
-				v[1][1] = texture2DRect(tex,vec2(i+1,j-1)) [ch];
-				v[1][2] = texture2DRect(tex,vec2(i+1,j)) [ch];
-				v[1][3] = texture2DRect(tex,vec2(i+1,j+1)) [ch];
-					
-				o = dot(gaussData[0], vec4(texture2DRect(tex,vec2(i-2,j-2)) [ch], texture2DRect(tex,vec2(i-2,j-1)) [ch], texture2DRect(tex,vec2(i-2,j)) [ch], texture2DRect(tex,vec2(i-2,j+1)) [ch])) + 
-						dot(gaussData[1], vec4(texture2DRect(tex,vec2(i-1,j-2)) [ch], texture2DRect(tex,vec2(i-1,j-1)) [ch], texture2DRect(tex,vec2(i-1,j)) [ch], texture2DRect(tex,vec2(i-1,j+1)) [ch])) +
-						dot(gaussData[2], vec4(texture2DRect(tex,vec2(i,j-2)) [ch], texture2DRect(tex,vec2(i,j-1)) [ch], texture2DRect(tex,vec2(i,j)) [ch], texture2DRect(tex,vec2(i,j+1)) [ch])) +
-						dot(gaussData[3], vec4(texture2DRect(tex,vec2(i+1,j-2)) [ch], texture2DRect(tex,vec2(i+1,j-1)) [ch], texture2DRect(tex,vec2(i+1,j)) [ch], texture2DRect(tex,vec2(i+1,j+1)) [ch])) + 
-						dot(gaussData[4], vec4(texture2DRect(tex,vec2(i+2,j-2)) [ch], texture2DRect(tex,vec2(i+2,j-1)) [ch], texture2DRect(tex,vec2(i+2,j)) [ch], texture2DRect(tex,vec2(i+2,j+1)) [ch])) +
-						dot(gaussData[5], vec4(texture2DRect(tex,vec2(i-2,j+2)) [ch], texture2DRect(tex,vec2(i-1,j+2)) [ch], texture2DRect(tex,vec2(i,j+2)) [ch], texture2DRect(tex,vec2(i+1,j+2)) [ch])) + 
-						texture2DRect(tex,vec2(i+2,j+2)) [ch] * gaussDataLast;
+				const vec3 gr1 = vec3(6.9624782e-8,  2.8088641754e-5 ,  2.07548549665e-4);
+				const vec3 gr2 = vec3(2.8088641754e-5  , 1.1331766853774e-2 ,  8.3731060982536e-2);
+				const vec3 gr3 = vec3(2.07548549665e-4 ,8.3731060982536e-2  , 6.18693506822940e-1);
 				
+				const vec3 one3 = vec3(1.0, 1.0, 1.0);
+				const vec2 one = vec2(one3);
 				
-						
-				/*vec3 gData[3];
-				gData[0] = vec3(6.9624782e-8,  2.8088641754e-5 ,  2.07548549665e-4);
-				gData[1] = vec3(2.8088641754e-5  , 1.1331766853774e-2 ,  8.3731060982536e-2);
-				gData[2] = vec3(2.07548549665e-4 ,8.3731060982536e-2  , 6.18693506822940e-1);
-				
-				o = 0.0;
-				vec2 coordOffsets[4];
-				coordOffsets[0] = vec2(0,1);
-				coordOffsets[1] = vec2(0,2);
-				coordOffsets[2] = vec2(0,3);
-				coordOffsets[3] = vec2(0,4);
-				for(int k=0; i<5; i++) {
-					vec2 coord = vec2(i-2+k,j-2);
-					o += dot(gData[i], vec3(texture2DRect(tex, coord)[0], texture2DRect(tex, coord+coordOffsets[0])[0], texture2DRect(tex, coord+coordOffsets[1])[0]));
-					o += gData[i][1] * texture2DRect(tex, coord+coordOffsets[2])[0];
-					o += gData[i][0] * texture2DRect(tex, coord+coordOffsets[3])[0];
-				}*/
+				mat3 m1 = mat3(texture2DRect(tex,vec2(i-2,j-2)) [ch], texture2DRect(tex,vec2(i-2,j-1)) [ch], texture2DRect(tex,vec2(i-2,j)) [ch], 
+								texture2DRect(tex,vec2(i-1,j-2)) [ch], texture2DRect(tex,vec2(i-1,j-1)) [ch], texture2DRect(tex,vec2(i-1,j)) [ch],	
+								texture2DRect(tex,vec2(i,j-2)) [ch], texture2DRect(tex,vec2(i,j-1)) [ch], texture2DRect(tex,vec2(i,j)) [ch]);
+				mat2 m2 = mat2(texture2DRect(tex,vec2(i+1,j-2)) [ch], texture2DRect(tex,vec2(i+1,j-1)) [ch], 
+								texture2DRect(tex,vec2(i+2,j-2)) [ch], texture2DRect(tex,vec2(i+2,j-1)) [ch]);
+								
+				mat2 m3 = mat2(texture2DRect(tex,vec2(i+1,j)) [ch], texture2DRect(tex,vec2(i+1,j+1)) [ch], 
+								texture2DRect(tex,vec2(i+2,j)) [ch], texture2DRect(tex,vec2(i+2,j+1)) [ch]);
+								
+				mat2 m4 = mat2(texture2DRect(tex,vec2(i-2,j+2)) [ch], texture2DRect(tex,vec2(i-2,j+1)) [ch], 
+								texture2DRect(tex,vec2(i-1,j+2)) [ch], texture2DRect(tex,vec2(i-1,j+1)) [ch]);
+								
+				o = dot(matrixCompMult(m1,mat3(gr1, gr2, gr3)) * one3, one3);
+				o += dot(matrixCompMult(m2,mat2(vec2(gr2), vec2(gr1))) * one, one);
+				o += dot(matrixCompMult(m3,mat2(vec2(gr2), vec2(gr1))) * one, one);
+				o += dot(matrixCompMult(m3,mat2(gr2[2], gr2[1], gr1[2], gr1[1])) * one, one);
+				o += texture2DRect(tex,vec2(i,j+1)) [ch] * gr3[1];
 			}
 
 				
