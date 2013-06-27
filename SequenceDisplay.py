@@ -362,7 +362,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			mn, mx = l - rng*0.1, h + rng*0.1
 			#if mn < 0:
 				#mn = mn - 1
-			mn = float(int(mn))
+			#mn = float(int(mn))
 			
 			#print("float mn " + str(mn) + ", mx " + str(mx) + ", steps" + str(steps))
 			

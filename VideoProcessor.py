@@ -187,20 +187,49 @@ class VideoProcessor(QGLFramebufferObject):
 			dTypeLoc = prg.uniformLocation("dispType")
 			bck1Loc = prg.uniformLocation("bck1")
 			bck2Loc = prg.uniformLocation("bck2")
+			if pTypeLoc != -1:
+				prg.setUniformValue(pTypeLoc, int(pType))
+			else:
+				print("pType not used!")
 			
-			prg.setUniformValue(pTypeLoc, int(pType))
-			prg.setUniformValue(dTypeLoc, int(dType))
-			prg.setUniformValue(bck1Loc, float(bck1))
-			prg.setUniformValue(bck2Loc, float(bck2))
+			if dTypeLoc != -1:
+				prg.setUniformValue(dTypeLoc, int(dType))
+			else:
+				print("dTypeLoc not used!")
+			
+			if bck1Loc != -1:
+				prg.setUniformValue(bck1Loc, float(bck1))
+			else:
+				print("bck1Loc not used!")
+			
+			if bck2Loc != -1:
+				prg.setUniformValue(bck2Loc, float(bck2))
+			else:
+				print("bck2Loc not used!")
 			
 			#prg.setUniformValue("procType", pType)
 			#prg.setUniformValue("dispType", dType)
 			#prg.setUniformValue("bck1", bck1)
 			#prg.setUniformValue("bck2", bck2)
 			
-			prg.setUniformValue("f1", 0)
-			prg.setUniformValue("f2", 1)
-			prg.setUniformValue("ref", 2)
+			f1Loc = prg.uniformLocation("f1")
+			f2Loc = prg.uniformLocation("f2")
+			refLoc = prg.uniformLocation("ref")
+			
+			if f1Loc != -1:
+				prg.setUniformValue("f1", 0)
+			else:
+				print("f1Loc not used!")
+			
+			if f2Loc != -1:
+				prg.setUniformValue("f2", 1)
+			else:
+				print("f2Loc not used!")
+			
+			if refLoc != -1:
+				prg.setUniformValue("ref", 2)
+			else:
+				print("refLoc not used!")
 			
 			self.endRender(prg, list([t1, t2, tref]), w, h)
 			
