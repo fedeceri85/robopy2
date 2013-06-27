@@ -18,6 +18,7 @@ class Shader():
 
 	def getImadjustCode(self):
 		s = """
+			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect tex;
 			uniform float mn, mx, r, g, b;
 			
@@ -40,6 +41,7 @@ class Shader():
 		
 	def getMedianCode(self):
 		s = """
+			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect tex;
 			
 			/*
@@ -85,6 +87,7 @@ class Shader():
 		
 	def getGaussianCode(self):
 		s = """
+			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect tex;
 
 			void applyGaussianFilter(in int i, in int j, out float o)
@@ -144,6 +147,7 @@ class Shader():
 		
 	def getHsv2RgbCode(self):
 		s = """
+			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect view1, bckView;
 
 			uniform float hmn;
@@ -154,52 +158,6 @@ class Shader():
 			vec3 h2r(float h, float s, float v) {
 				return mix(vec3(1.),clamp((abs(fract(h+vec3(3.,2.,1.)/3.)*6.-3.)-1.),0.,1.),s)*v;
 			}
-
-			void hsv2rgb(inout vec4 c)
-			{
-				float h = c.r * 6.0;
-				int hi = int(floor(h));
-				
-				h = h - float(hi);
-				float p = c.b * (1.0 - c.g);
-				float q = c.b * (1.0 - h * c.g);
-				float t = c.b * (1.0 - (1.0 - h) * c.g);
-				
-				switch (hi)
-				{
-					case 0:
-						c.r = c.b;
-						c.g = t;
-						c.b = p;
-						break;
-					case 1:
-						c.r = q;
-						c.g = c.b;
-						c.b = p;
-						break;
-					case 2:
-						c.r = p;
-						c.g = c.b;
-						c.b = t;
-						break;
-					case 3:
-						c.r = p;
-						c.g = q;
-						break;
-					case 4:
-						c.r = t;
-						c.g = p;
-						break;
-					case 5:
-						c.r = c.b;
-						c.g = p;
-						c.b = q;
-						break;
-					default:
-						break;
-				}
-			}
-
 				
 			void main()
 			{
@@ -232,8 +190,6 @@ class Shader():
 				}
 				
 				c.r = 0.63 * (1.0 - c.r); //select a certain range for hue
-				//hsv2rgb(c);
-				//gl_FragColor = c;
 				
 				gl_FragColor = vec4(h2r(c.r, c.g, c.b), 1.0);
 				
@@ -244,6 +200,7 @@ class Shader():
 		
 	def getFluorescenceProcessCode(self):
 		s = """
+			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect f1, f2, ref;
 			
 			uniform int procType, dispType;
@@ -290,6 +247,7 @@ class Shader():
 		
 	def getJetColormapCode(self):
 		s = """
+			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect f1;
 			uniform float mapMn;
 			uniform float mapMx;
