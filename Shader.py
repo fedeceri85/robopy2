@@ -150,6 +150,10 @@ class Shader():
 			uniform float hmx;
 			uniform float mn;
 			uniform float mx;
+			
+			vec3 h2r(float h, float s, float v) {
+				return mix(vec3(1.),clamp((abs(fract(h+vec3(3.,2.,1.)/3.)*6.-3.)-1.),0.,1.),s)*v;
+			}
 
 			void hsv2rgb(inout vec4 c)
 			{
@@ -228,12 +232,11 @@ class Shader():
 				}
 				
 				c.r = 0.63 * (1.0 - c.r); //select a certain range for hue
-				hsv2rgb(c);
+				//hsv2rgb(c);
+				//gl_FragColor = c;
 				
+				gl_FragColor = vec4(h2r(c.r, c.g, c.b), 1.0);
 				
-				gl_FragColor = c;
-				//gl_FragColor = vec4(s, tv, hmx, 1.0);
-				gl_FragColor.a = 1.0;
 			}
 		"""
 		
