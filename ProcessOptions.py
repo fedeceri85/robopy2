@@ -139,8 +139,21 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('enlargeToBackground', 0, self.enlargeToBckCheckBox)
 		fo.add('medianFilterOn', 0, self.medianFilterCheckbox)
 		fo.add('gaussianFilterOn', 0, self.gaussianFilterCheckbox)
+		fo.add('FrameByFrameBackground',1,self.FrameByFrameRadioButton)
+		fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
+		self.connect(self.HSVradioButton,SIGNAL('toggled(bool)'),self.HSVchanged)
 		return fo
-		
+	
+	def HSVchanged(self):
+		if self.HSVradioButton.isChecked():
+			self.HSVbackGroupBox.setEnabled(True)
+			self.saturationLabel.setEnabled(True)
+			self.saturationSpinBox.setEnabled(True)
+		else:
+			self.HSVbackGroupBox.setEnabled(False)
+			self.saturationLabel.setEnabled(False)
+			self.saturationSpinBox.setEnabled(False)
+			
 	def applyWidgetValueWithoutSignal(self, obj, v):
 		obj.blockSignals(True)
 		obj.setValue(v)

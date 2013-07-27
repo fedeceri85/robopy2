@@ -481,11 +481,11 @@ def rgbToQimage(rgbMat):
 	return QImage(rgbMat2,w,h,QImage.Format_RGB32)
 		
 
-def mean_filter():
-	pass
+def median_filter(im):
+	ndimage.median_filter(im,3,output=im)
 
-def gaussian_filter():
-	pass
+def gaussian_filter(im):
+	ndimage.gaussian_filter(im,3,output=im)
 
 def applyRoiComputationOptions(rdata, times, fo, rois):
 	
@@ -499,7 +499,7 @@ def applyRoiComputationOptions(rdata, times, fo, rois):
 		outData = rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois]
 		times = times[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize]
 		
-		f0 = np.mean(outData[0:fo.referenceFrames])
+		f0 = outData[0:fo.referenceFrames,:].mean(0)
 		
 		#print("outData " + str(outData))
 		
@@ -563,7 +563,7 @@ def computeReference(tiffSeq, fo):
 	
 	return f0.astype(np.float32)
 	
-def computeProcessedFrame(tif, n, fo, ref):
+def computeProcessedFrame(tif, n, fo,do, ref):
 	f = None
 	if fo.processType == 0:
 		f = tif.getFrame(n + fo.firstWavelength - 1)
@@ -583,6 +583,10 @@ def computeProcessedFrame(tif, n, fo, ref):
 		f = f-ref
 	elif fo.displayType == 2:
 		f = np.divide((f-ref), ref) 	
+	if do.medianFilterOn:
+		f=medianFilterScipy(f)
+	if do.gaussianFilterOn:
+		ndimage.gaussian_filter(f,3,output=f)
 		
 	return f
 	

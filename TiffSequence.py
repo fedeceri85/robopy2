@@ -1,8 +1,10 @@
 from libtiff import TIFF
 from numpy import zeros,loadtxt,array,uint16
+import numpy as np
 import Roi
 from os.path import splitext
 import threading
+from scipy.ndimage import zoom
 #from pubTools import oneColumnFigure
 
 class ThreadedRead(threading.Thread):
@@ -19,7 +21,7 @@ class ThreadedRead(threading.Thread):
 		self.tifSequence.threadLock.release()
 
 class TiffSequence:
-	def __init__(self, fNames):
+	def __init__(self, fNames,options = None):
 		
 		self.fileName = None
 		self.width = -1
@@ -27,7 +29,8 @@ class TiffSequence:
 		self.frames = 0
 		
 		self.SequenceFiles = fNames
-		
+		self.options = options
+
 		self.FramesPerFile = list()
 		
 		self.tifHandlers = list()
@@ -98,6 +101,9 @@ class TiffSequence:
 				
 			frames = th.CurrentDirectory().value
 			th.SetDirectory(currDir)
+		if self.options['rebin'] is not None:
+			width = width/self.options['rebin']
+			height = height/self.options['rebin']
 		return width, height, frames
 		
 	def getFileIndexes(self, n):
@@ -134,7 +140,43 @@ class TiffSequence:
 					return None
 					
 				self.tifHandlers[i].SetDirectory(n)
-				self.cachedFrames[n] = self.tifHandlers[i].read_image()
+				if self.options['rebin'] is not None:
+					if self.options['LineCorrection']:
+						img = self.tifHandlers[i].read_image()
+						
+						lsub = img[:,:self.options['LeftLC']]
+						if self.options['RightLC']!=0:
+							rsub = img[:,-self.options['RightLC']::]
+							lrsub = np.hstack((lsub,rsub)).mean(1)
+
+						else:
+							lrsub = lsub.mean(1)
+						
+						lrsub = lrsub.reshape((lrsub.shape[0],1))
+						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						self.cachedFrames[n] = zoom(img-sub+400,1.0/self.options['rebin'],order=0)
+						
+						
+					else:
+						self.cachedFrames[n] = zoom(self.tifHandlers[i].read_image(),1.0/self.options['rebin'],order=0)
+				else:
+					if self.options['LineCorrection']:
+						img = self.tifHandlers[i].read_image()
+						
+						lsub = img[:,:self.options['LeftLC']]
+						if self.options['RightLC']!=0:
+							rsub = img[:,-self.options['RightLC']::]
+							lrsub = np.hstack((lsub,rsub)).mean(1)
+
+						else:
+							lrsub=lsub.mean(1)
+							
+						lrsub = lrsub.reshape((lrsub.shape[0],1))
+						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						self.cachedFrames[n] = img-sub+400
+						
+					else:	
+						self.cachedFrames[n] = self.tifHandlers[i].read_image()
 				#print("Cached frame " + str(n) + " from file ")
 		
 	def getFrame(self, n):
@@ -169,7 +211,43 @@ class TiffSequence:
 				if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
 					self.threadLock.acquire()
 					self.tifHandlers[i].SetDirectory(n)
-					self.cachedFrames[n] = self.tifHandlers[i].read_image()
+					if self.options['rebin'] is not None:
+						if self.options['LineCorrection']:
+							img = self.tifHandlers[i].read_image()
+							
+							lsub = img[:,:self.options['LeftLC']]
+							if self.options['RightLC']!=0:
+								rsub = img[:,-self.options['RightLC']::]
+								lrsub = np.hstack((lsub,rsub)).mean(1)
+
+							else:
+								lrsub = lsub.mean(1)
+							
+							lrsub = lrsub.reshape((lrsub.shape[0],1))
+							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+							self.cachedFrames[n] = zoom(img-sub+400,1.0/self.options['rebin'],order=0)
+							
+							
+						else:
+							self.cachedFrames[n] = zoom(self.tifHandlers[i].read_image(),1.0/self.options['rebin'],order=0)
+					else:
+						if self.options['LineCorrection']:
+							img = self.tifHandlers[i].read_image()
+							
+							lsub = img[:,:self.options['LeftLC']]
+							if self.options['RightLC']!=0:
+								rsub = img[:,-self.options['RightLC']::]
+								lrsub = np.hstack((lsub,rsub)).mean(1)
+
+							else:
+								lrsub=lsub.mean(1)
+								
+							lrsub = lrsub.reshape((lrsub.shape[0],1))
+							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+							self.cachedFrames[n] = img-sub+400
+							
+						else:	
+							self.cachedFrames[n] = self.tifHandlers[i].read_image()
 					self.threadLock.release()	
 				
 					

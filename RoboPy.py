@@ -4,6 +4,7 @@ from PyQt4.QtGui import *
 import sys
 
 from RoboPyGui import Ui_RoboMainWnd
+from RawSequenceOptionsGui import Ui_Dialog
 from SequenceDisplay import SequenceDisplay
 from IPython.frontend.terminal.embed import InteractiveShellEmbed
 
@@ -14,7 +15,45 @@ Main window of Robopy project
 Launches various windows and tools
 
 '''
+class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
+	def __init__(self,parent=None):
+		PyQt4.QtGui.QDialog.__init__(self,parent)
+		self.setupUi(self)
+		self.connect(self.LCcheckBox,SIGNAL("stateChanged(int)"),self.LCstateChanged)
 
+		self.show()
+	
+	def LCstateChanged(self):
+		if self.LCcheckBox.isChecked():
+			self.label_2.setEnabled(True)
+			self.label_3.setEnabled(True)
+			self.leftLCSpinBox.setEnabled(True)
+			self.rightLCSpinBox.setEnabled(True)
+		else:
+			self.label_2.setEnabled(False)
+			self.label_3.setEnabled(False)
+			self.leftLCSpinBox.setEnabled(False)
+			self.rightLCSpinBox.setEnabled(False)
+			
+	def getValues(self):
+		options = {}
+		rebin = int(str(self.rebinComboBox.currentText()))
+		if rebin == 1:
+			options['rebin'] = None
+		else:
+			options['rebin'] = int(rebin)
+		
+
+		if self.LCcheckBox.isChecked():
+			options['LineCorrection'] = True
+			options['RightLC'] = self.rightLCSpinBox.value()
+			options['LeftLC'] = self.rightLCSpinBox.value()
+		else:
+			options['LineCorrection'] = False
+			options['RightLC'] = 0
+			options['LeftLC'] = 0
+			
+		return options
 class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -40,8 +79,12 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def roboActionOpenCb(self):
 		
 		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
-		
-		sd = SequenceDisplay(self, files)
+		optDlg = RawSequenceOptions(parent=self)
+		options = None
+		if optDlg.exec_():
+			options = optDlg.getValues()
+			print(options)
+		sd = SequenceDisplay(self, files,options=options)
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
@@ -49,6 +92,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def roboActionLoadInRamCb(self):
 		
 		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
+
 		
 		sd = SequenceDisplay(self, files,loadInRam = True)
 		#self.sequences.append(sd)

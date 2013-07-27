@@ -17,12 +17,12 @@ from ProcessOptions import ProcessOptions
 from Worker import Worker
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
-	def __init__(self, parent = None, files=None,loadInRam=False):
+	def __init__(self, parent = None, files=None,loadInRam=False,options = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
 		
 		self.setupUi(self)
 		self.imageWidgetSetup()
-		
+		self.rawOptions=options
 		#l = dir(self.CurrentFrameSlider)
 		#for i in l:
 		#	print(i)
@@ -55,7 +55,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		#self.emit(SIGNAL("startWorkerJob()"))
 		
-		self.tiffSequence = TiffSequence(files)
+		self.tiffSequence = TiffSequence(files,self.rawOptions)
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
 		self.MaxFrames = self.tiffSequence.getFrames()
@@ -85,7 +85,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def tiffLoad(self):
 		print("entering tiffLoad from worker")
-		self.tiffSequence = TiffSequence(self.files)
+		self.tiffSequence = TiffSequence(self.files,self.rawOptions)
 		if self.loadInRam:
 			self.tiffSequence.loadWholeTiff()
 		
@@ -159,7 +159,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(dlg.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.recomputeFalseColorReference)
 		
 		self.connect(dlg.HSVradioButton, SIGNAL("released()"), self.recomputeHSVvalue)
-
+		self.connect(dlg.NomarskiRadioButton,SIGNAL("released()"),self.recomputeHSVvalue)
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
 		
@@ -424,13 +424,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 			
 			if self.displayParameters.autoAdjust:
-				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+				#	self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
 			else:
-				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
+				f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+				#	self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
 			
 			#print("Processed result " + str(f) + " with shape " + str(f.shape))
 			
@@ -449,10 +451,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 					#f = SequenceProcessor.gaussianFilterOpenCl(f)
 				#return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
+				if self.optionsDlg.FrameByFrameRadioButton.isChecked():
+					self.displayParameters.HSVvalue = SequenceProcessor.computeValue(im,shape=im.shape)
 				
-				valImage = SequenceProcessor.computeValue(im,shape=im.shape)
-				
-				tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, valImage, w, h,
+				tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, self.displayParameters.HSVvalue, w, h,
 					self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
 					
 				if self.displayParameters.autoAdjust == False:
@@ -673,7 +675,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
 		
 	def recomputeHSVvalue(self):
-		pass
+		if self.optionsDlg.NomarskiRadioButton.isChecked():
+			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff Files (*.tif)")
+			self.optionsDlg.backgroundLineEdit.setText(fname)
+			nomarski = TiffSequence(fname)
+			self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.width,self.tiffSequence.height))
+			
+
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

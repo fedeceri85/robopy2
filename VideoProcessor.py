@@ -5,6 +5,8 @@ from PyQt4.QtCore import *
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GL.ARB.multitexture import *
+
 import numpy as np
 
 '''
