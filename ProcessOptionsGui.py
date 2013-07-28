@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Sat Jul 27 23:13:56 2013
+# Created: Sun Jul 28 00:10:42 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -260,7 +260,7 @@ class Ui_ProcessOptionsDlg(object):
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
         self.retranslateUi(ProcessOptionsDlg)
-        self.PO_TabWidget.setCurrentIndex(2)
+        self.PO_TabWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(ProcessOptionsDlg)
 
     def retranslateUi(self, ProcessOptionsDlg):

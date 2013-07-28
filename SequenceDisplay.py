@@ -126,7 +126,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
 		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISCb)
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
-		
+		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)
+
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
 		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
@@ -632,7 +633,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fig.plot(times,rdata)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
-		
+		return times,rdata
+	
 	def roiRecomputeNeeded(self, isNeeded):
 		self.roiAverageRecomputeNeeded = isNeeded
 		#print("roiRecompute is needed " + str(isNeeded))
@@ -644,7 +646,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.imWidget.rois.append(self.processedWidget.rois[-1])
 			
 		self.displayParameters.roiAverageRecomputeNeeded = True
+	
+	def saveRoiComputations(self):
+		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"CSV Files (*.csv)")
 		
+		roiFile = fname.toAscii().data()
+		print(fname)
+		print(roiFile)
+		times,rdata = self.computeRoisCb()
+
+		np.savetxt(roiFile, np.hstack((times.reshape(rdata.shape),rdata)), delimiter="\t")
+
 	def loadROISCb(self):
 		
 		if self.FrameImage == None:
@@ -656,7 +668,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		rois = SequenceProcessor.loadRoisFromFile(roiFile, self.FrameImage.width(), self.FrameImage.height())
 		for roi in rois:
 			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
-			
+		self.displayParameters.roiAverageRecomputeNeeded = True
+	
 	def saveROISCb(self):
 		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Mat Files (*.mat)")
 		

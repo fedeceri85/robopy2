@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Wed Jun  5 17:26:46 2013
-#      by: PyQt4 UI code generator 4.10
+# Created: Sun Jul 28 00:11:45 2013
+#      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -126,7 +126,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 20))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
@@ -180,12 +180,15 @@ class Ui_SequenceDisplayWnd(object):
         self.actionTemporal_Smoothing.setObjectName(_fromUtf8("actionTemporal_Smoothing"))
         self.actionSave_raw_sequence = QtGui.QAction(SequenceDisplayWnd)
         self.actionSave_raw_sequence.setObjectName(_fromUtf8("actionSave_raw_sequence"))
+        self.actionSave_traces = QtGui.QAction(SequenceDisplayWnd)
+        self.actionSave_traces.setObjectName(_fromUtf8("actionSave_traces"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
         self.menuRois.addAction(self.actionSave_to_file)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionDelete_Last)
+        self.menuRois.addAction(self.actionSave_traces)
         self.menuMath_2.addAction(self.actionAdd)
         self.menuMath_2.addAction(self.actionSubtract)
         self.menuMath_2.addAction(self.actionDivide)
@@ -247,4 +250,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionGaussian_filter.setText(_translate("SequenceDisplayWnd", "Gaussian filter", None))
         self.actionTemporal_Smoothing.setText(_translate("SequenceDisplayWnd", "Temporal Smoothing", None))
         self.actionSave_raw_sequence.setText(_translate("SequenceDisplayWnd", "Save raw sequence", None))
+        self.actionSave_traces.setText(_translate("SequenceDisplayWnd", "Save traces", None))
 

@@ -179,7 +179,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">
@@ -192,6 +192,7 @@
     <addaction name="actionSave_to_file"/>
     <addaction name="separator"/>
     <addaction name="actionDelete_Last"/>
+    <addaction name="actionSave_traces"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -330,6 +331,11 @@
   <action name="actionSave_raw_sequence">
    <property name="text">
     <string>Save raw sequence</string>
+   </property>
+  </action>
+  <action name="actionSave_traces">
+   <property name="text">
+    <string>Save traces</string>
    </property>
   </action>
  </widget>
