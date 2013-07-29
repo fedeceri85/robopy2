@@ -16,7 +16,9 @@ from mplot import MPlot
 from ProcessOptions import ProcessOptions
 from Worker import Worker
 
-from ProcessedSequence import ProcessedSequence
+from SequenceProcessor import ProcessedSequence
+
+
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -428,7 +430,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if self.displayParameters.autoAdjust:
 				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
 					#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
-				f=self.processedSequence.computeProcessedFrameGLSL(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions)
+				f=self.processedSequence.computeProcessedFrame(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions)
 				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
@@ -436,14 +438,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
 					#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
-				f=self.processedSequence.computeProcessedFrameGLSL(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, returnType ="texture")
+				f=self.processedSequence.computeProcessedFrame(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, returnType ="texture")
 			
 			#print("Processed result " + str(f) + " with shape " + str(f.shape))
 			
 			if self.optionsDlg.displayOptions.useLUT == 1:
 				#return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				#tex = SequenceProcessor.applyColormapGLSL(self.processedWidget, f, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
-				tex = self.processedSequence.applyColormapGLSL(f,w,h)
+				tex = self.processedSequence.applyColormap(f,w,h)
 				if self.displayParameters.autoAdjust == False:
 					f=None
 				return tex, f
@@ -461,7 +463,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 					self.processedSequence.computeValue(im)
 				#tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, self.displayParameters.HSVvalue, w, h,
 				#	self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
-				tex = self.processedSequence.HSVImageGLSL(f,w,h)	
+				tex = self.processedSequence.HSVImage(f,w,h)	
 				if self.displayParameters.autoAdjust == False:
 					f=None
 				return tex, f
@@ -695,9 +697,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def recomputeHSVvalue(self):
 		if self.optionsDlg.NomarskiRadioButton.isChecked():
 			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff Files (*.tif)")
-			print fname
 			fname = fname.toAscii().data()
-			print fname
 			self.optionsDlg.backgroundLineEdit.setText(fname)
 			nomarski = TiffSequence([fname,])
 			#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
