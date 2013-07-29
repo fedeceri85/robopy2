@@ -229,6 +229,7 @@ class Shader():
 					if(dispType == 1) {
 						v1 -= r;
 					} else {
+						v1 -= r;
 						if(r > 0.0) {
 							r = max(r, 0.0001);
 						} else {
