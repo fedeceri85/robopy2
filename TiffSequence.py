@@ -30,7 +30,10 @@ class TiffSequence:
 		
 		self.SequenceFiles = fNames
 		self.options = options
-
+		if self.options is None:
+			self.options = {}
+			self.options['rebin'] = None
+			self.options['LineCorrection'] = False
 		self.FramesPerFile = list()
 		
 		self.tifHandlers = list()

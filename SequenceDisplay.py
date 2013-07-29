@@ -690,9 +690,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def recomputeHSVvalue(self):
 		if self.optionsDlg.NomarskiRadioButton.isChecked():
 			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff Files (*.tif)")
+			print fname
+			fname = fname.toAscii().data()
+			print fname
 			self.optionsDlg.backgroundLineEdit.setText(fname)
-			nomarski = TiffSequence(fname)
-			self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.width,self.tiffSequence.height))
+			nomarski = TiffSequence([fname,])
+			self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
 			
 
 if __name__== "__main__":
