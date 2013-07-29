@@ -16,13 +16,13 @@ from mplot import MPlot
 from ProcessOptions import ProcessOptions
 from Worker import Worker
 
+from ProcessedSequence import ProcessedSequence
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
-	def __init__(self, parent = None, files=None,loadInRam=False,options = None):
+	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
 		
 		self.setupUi(self)
 		self.imageWidgetSetup()
-		self.rawOptions=options
 		#l = dir(self.CurrentFrameSlider)
 		#for i in l:
 		#	print(i)
@@ -55,7 +55,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		#self.emit(SIGNAL("startWorkerJob()"))
 		
-		self.tiffSequence = TiffSequence(files,self.rawOptions)
+		self.tiffSequence = TiffSequence(files,rawTiffOptions)
+		self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters)
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
 		self.MaxFrames = self.tiffSequence.getFrames()
@@ -425,21 +426,24 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 			
 			if self.displayParameters.autoAdjust:
-				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+					#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				f=self.processedSequence.computeProcessedFrameGLSL(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions)
 				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
 			else:
 				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
-				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
+				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+					#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
+				f=self.processedSequence.computeProcessedFrameGLSL(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, returnType ="texture")
 			
 			#print("Processed result " + str(f) + " with shape " + str(f.shape))
 			
 			if self.optionsDlg.displayOptions.useLUT == 1:
 				#return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
-				tex = SequenceProcessor.applyColormapGLSL(self.processedWidget, f, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+				#tex = SequenceProcessor.applyColormapGLSL(self.processedWidget, f, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+				tex = self.processedSequence.applyColormapGLSL(f,w,h)
 				if self.displayParameters.autoAdjust == False:
 					f=None
 				return tex, f
@@ -453,11 +457,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				#return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				if self.optionsDlg.FrameByFrameRadioButton.isChecked():
-					self.displayParameters.HSVvalue = SequenceProcessor.computeValue(im,shape=im.shape)
-				
-				tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, self.displayParameters.HSVvalue, w, h,
-					self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
-					
+					#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(im,shape=im.shape)
+					self.processedSequence.computeValue(im)
+				#tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, self.displayParameters.HSVvalue, w, h,
+				#	self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+				tex = self.processedSequence.HSVImageGLSL(f,w,h)	
 				if self.displayParameters.autoAdjust == False:
 					f=None
 				return tex, f
@@ -685,7 +689,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.tiffSequence.saveSequence(fname.toAscii())
 			
 	def recomputeFalseColorReference(self):
-		self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
+		#self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
+		self.processedSequence.computeReference(self.optionsDlg.frameOptions)
 		
 	def recomputeHSVvalue(self):
 		if self.optionsDlg.NomarskiRadioButton.isChecked():
@@ -695,8 +700,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			print fname
 			self.optionsDlg.backgroundLineEdit.setText(fname)
 			nomarski = TiffSequence([fname,])
-			self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
-			
+			#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
+			self.processedSequence.computeValue(nomarski.getFrame(1))
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

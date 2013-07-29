@@ -84,7 +84,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		if optDlg.exec_():
 			options = optDlg.getValues()
 			print(options)
-		sd = SequenceDisplay(self, files,options=options)
+		sd = SequenceDisplay(self, files,rawTiffOptions=options)
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))

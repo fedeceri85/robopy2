@@ -9,8 +9,8 @@ class DisplayPamrameters:
 		self.initColorRangeParam()
 		self.initRoiRelatedParams()
 		
-		self.falseColorRefFrame = None
-		self.HSVvalue = None
+		#self.falseColorRefFrame = None
+		#self.HSVvalue = None
 		#self.HSVsaturation = None
 		self.initHSVColormap()
 		
