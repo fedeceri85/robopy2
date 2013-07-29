@@ -425,15 +425,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 			
 			if self.displayParameters.autoAdjust:
-				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-				#	self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
-				f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
 			else:
-				f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
-				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-				#	self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
+				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
+					self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
 			
 			#print("Processed result " + str(f) + " with shape " + str(f.shape))
 			

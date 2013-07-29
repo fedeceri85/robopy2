@@ -851,6 +851,8 @@ def computeProcessedFrameGLSL(procWdg, tif, n, fo, do, ref, b1=0, b2=0, returnTy
 		if fo.processType == 1:
 			f2 = tif.getFrame(n + fo.secondWavelength - 1)
 			
+		#print("f1[0][0] " + str(f1[0][0]) + " ref[0][0] " + str(ref[0][0]))
+			
 		#preparing arguments for processing
 		buffers = list([f1, f2, ref])
 		bufferType = list(['uint16', 'uint16', 'float'])
@@ -869,6 +871,8 @@ def computeProcessedFrameGLSL(procWdg, tif, n, fo, do, ref, b1=0, b2=0, returnTy
 		
 		if returnType == "texture":
 			return f
+			
+		#print("f[0][0] " + str(f[0][0]))
 		
 		f = f.squeeze()
 		h,w = f.shape
