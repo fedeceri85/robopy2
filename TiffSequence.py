@@ -1,10 +1,11 @@
 from libtiff import TIFF
-from numpy import zeros,loadtxt,array,uint16
+from numpy import zeros,loadtxt,array,uint16,argwhere
 import numpy as np
 import Roi
 from os.path import splitext
 import threading
 from scipy.ndimage import zoom
+
 #from pubTools import oneColumnFigure
 
 class ThreadedRead(threading.Thread):
@@ -157,7 +158,7 @@ class TiffSequence:
 						
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-						self.cachedFrames[n] = zoom(img-sub+400,1.0/self.options['rebin'],order=0)
+						self.cachedFrames[n] = zoom(img-sub+lrsub.mean(),1.0/self.options['rebin'],order=0)
 						
 						
 					else:
@@ -176,7 +177,7 @@ class TiffSequence:
 							
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-						self.cachedFrames[n] = img-sub+400
+						self.cachedFrames[n] = img-sub+lrsub.mean()
 						
 					else:	
 						self.cachedFrames[n] = self.tifHandlers[i].read_image()
@@ -228,7 +229,7 @@ class TiffSequence:
 							
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-							self.cachedFrames[n] = zoom(img-sub+400,1.0/self.options['rebin'],order=0)
+							self.cachedFrames[n] = zoom(img-sub+lrsub.mean(),1.0/self.options['rebin'],order=0)
 							
 							
 						else:
@@ -247,7 +248,7 @@ class TiffSequence:
 								
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-							self.cachedFrames[n] = img-sub+400
+							self.cachedFrames[n] = img-sub+lrsub.mean()
 							
 						else:	
 							self.cachedFrames[n] = self.tifHandlers[i].read_image()
@@ -328,11 +329,18 @@ class TiffSequence:
 				kv = range(self.frames)
 				self.timesDict = TimesDict(zip(kv,kv))
 				self.timesDict.setLabel('Frames')
+				
+
 			#delete unnecessary timepoints
 			elif len(self.timesDict)>self.frames:
 				print("Warning. More timepoints than frames. Discarding unnecessary timepoints")
 				for key in xrange(self.frames,len(self.timesDict)):
 					del(self.timesDict[key])
+					
+			#Check for autosave timepoints error
+				if self.timesDict.checkAutoSaveErrors():
+					print('Correcting times mismatch due to autosave')
+					self.timesDict.correctAutoSaveFrameTime()
 		except IOError:
 			print("Warning. No associated time file")
 			kv = range(self.frames)
@@ -383,8 +391,28 @@ class TimesDict(dict):
 		"""
 		Return the average time step
 		"""
-		return (diff(self.times())/(diff(self.frames())*1.0)).mean()
+		return (np.diff(self.times())/(np.diff(self.frames())*1.0)).mean()
 	
 	def setLabel(self,label):
 		self.label=label
 	
+	def checkAutoSaveErrors(self):
+		dt = (np.diff(self.times())/(np.diff(self.frames())*1.0))
+		pts = argwhere(dt<0)
+		if pts.size != 0:
+			return True
+		else:
+			return False
+			
+	def correctAutoSaveFrameTime(self):
+		dt = (np.diff(self.times())/(np.diff(self.frames())*1.0))
+		pts = argwhere(dt<0)
+		pts = np.append(pts,dt.size)
+		if pts.size == 0:
+			return
+
+		meanDt = dt[0:pts[0]].mean()
+		
+		for i in xrange(len(pts)-1):
+			for ind in xrange(pts[i],pts[i+1]):
+				self[ind+1]=self[ind+1]+meanDt + self[pts[i]]
