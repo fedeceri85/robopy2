@@ -389,11 +389,11 @@ class ImageDisplayWidget(QGLWidget):
 		
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 		
-	def drawTraces(self, data, nPoints, x, y , scalex = 1.0, scaley = 1.0, color=[1.0, 1.0, 1.0], bufId=2):
-		self.videoBuffers[bufId].addTraces(data, nPoints, x, y, scalex, scaley, color)
+	def drawTraces(self, data, nPoints, x, y , scalex = 1.0, scaley = 1.0, color=[1.0, 1.0, 1.0], bufId=2,lineWidth=1):
+		self.videoBuffers[bufId].addTraces(data, nPoints, x, y, scalex, scaley, color,lineWidth=lineWidth)
 		
-	def drawText(self, s, x, y, color, bufId=2):
-		self.videoBuffers[bufId].addText(s, x, y, color)
+	def drawText(self, s, x, y, color, bufId=2,fontsize=12.0):
+		self.videoBuffers[bufId].addText(s, x, y, color,fontsize=fontsize)
 		
 	def checkGLError(self, msg=None):
 		err = glGetError()

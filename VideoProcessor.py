@@ -167,7 +167,7 @@ class VideoProcessor(QGLFramebufferObject):
 		self.checkGLError()
 		self.openglContext.doneCurrent()	
 		
-	def addText(self, s, x, y, color):
+	def addText(self, s, x, y, color,fontsize=12.0):
 		
 		w = self.width()
 		h = self.height()
@@ -188,7 +188,7 @@ class VideoProcessor(QGLFramebufferObject):
 		glOrtho(0, w, 0, h, -1, 1) 
 		
 		fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
-		fontScale = 12.0/fontWidth
+		fontScale = fontsize/fontWidth
 		glTranslatef(x, y, 0.0)
 		glScalef(fontScale, -fontScale, 1.0)
 		

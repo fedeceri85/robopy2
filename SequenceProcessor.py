@@ -1131,21 +1131,24 @@ def HSVtoRGB(arr):
 
 
 class ProcessedSequence:
-	def __init__(self,tiffSequence,processedWidget,displayParameters):
+	def __init__(self,tiffSequence,processedWidget,displayParameters,frameOptions,displayOptions,timeOptions):
 		self.tiffSequence = tiffSequence
 		self.processedWidget = processedWidget
 		self.falseColorRefFrame = None
 		self.HSVvalue = None
 		self.displayParameters = displayParameters
+		self.frameOptions = frameOptions
+		self.displayOptions = displayOptions
+		self.timeOptions = timeOptions
 		self.currentProcessedFrame = 0
 	
-	def computeProcessedFrame(self,n,frameOptions,displayOptions,returnType="float"):
+	def computeProcessedFrame(self,n,returnType="float"):
 		self.currentProcessedFrame = n
-		return computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, frameOptions,displayOptions, self.falseColorRefFrame,returnType=returnType)
+		return computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.frameOptions,self.displayOptions, self.falseColorRefFrame,returnType=returnType)
 		
 	
-	def computeReference(self,frameOptions):
-		self.falseColorRefFrame = computeReference(self.tiffSequence, frameOptions)
+	def computeReference(self):
+		self.falseColorRefFrame = computeReference(self.tiffSequence, self.frameOptions)
 		#return self.falseColorRefFrame
 	
 	def computeValue(self,ValueFrame):
@@ -1155,14 +1158,29 @@ class ProcessedSequence:
 	def applyColormap(self,f,w,h):
 		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax)
 		
-		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", 50, 50, [1.0, 1.0, 1.0])
-		data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0]).astype(np.float32)
-		self.processedWidget.drawTraces(data, 4, self.currentProcessedFrame, 50.0)
+		#self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", 50, 50, [1.0, 1.0, 1.0],fontsize=24.0)
+		#data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0,70.0,10.0]).astype(np.float32)*2.0
+		#self.processedWidget.drawTraces(data, 5, self.currentProcessedFrame, self.currentProcessedFrame,lineWidth=4)
+		if self.timeOptions.displayTimeStamp:
+			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", self.timeOptions.xOffset,
+				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 		
-		
-		
+		if self.displayOptions.displayScalebar:
+			print round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)
+			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
+			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=self.displayOptions.scaleBarLineSize)
 		return tex
 		
 	def HSVImage(self,f,w,h):
-		return HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+		
+		if self.timeOptions.displayTimeStamp:
+			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", self.timeOptions.xOffset,
+				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+		
+		
+		return tex
 	
+	def drawTimeStamp(self,to):
+		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", to.xOffset, to.yOffset, [1.0, 1.0, 1.0],fontsize=to.fontSize)
+		

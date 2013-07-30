@@ -128,8 +128,12 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('interframeInterval', 40.0, self.interframeIntervalSpinBox)
 		fo.add('frameBasedTimes', 0, self.FrameBasedRadioButton)
 		fo.add('time0Frame', 0, self.time0SpinBox)
+		fo.add('displayTimeStamp',1,self.displayTimesCheckBox)
+		fo.add('fontSize',12,self.fontSizeSpinBox)
+		fo.add('xOffset',50,self.xOffsetSpinBox)
+		fo.add('yOffset',50,self.yOffsetSpinBox)
 		return fo
-		
+	
 	def initDisplayOptions(self):
 		fo = Properties(self)
 		fo.add('useLUT', 1, self.LUTradioButton)
@@ -142,6 +146,14 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('FrameByFrameBackground',1,self.FrameByFrameRadioButton)
 		fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
 		self.connect(self.HSVradioButton,SIGNAL('toggled(bool)'),self.HSVchanged)
+		
+		fo.add('displayScalebar',1,self.scalebarCheckBox)
+		fo.add('scaleBarScaleFactor',50.0,self.sbScaleFactorSpinBox)
+		fo.add('scaleBarLength',25,self.sbLengthSpinBox)
+		fo.add('scaleBarFontSize',12.0,self.sbFontSizeSpinBox)
+		fo.add('scaleBarXOffset',50,self.sbXOffsetSpinBox)
+		fo.add('scaleBarYOffset',50,self.sbYOffsetSpinBox)
+		fo.add('scaleBarLineSize',10,self.lineSizeSpinBox)
 		return fo
 	
 	def HSVchanged(self):

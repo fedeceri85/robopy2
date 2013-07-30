@@ -58,7 +58,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.emit(SIGNAL("startWorkerJob()"))
 		
 		self.tiffSequence = TiffSequence(files,rawTiffOptions)
-		self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters)
+		
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
 		self.MaxFrames = self.tiffSequence.getFrames()
@@ -75,6 +75,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		
 		self.optionsDlg = ProcessOptions(self)
+		
+		self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
+					     self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)
 		#rc = self.frameGeometry()
 		#dlgRc = self.optionsDlg.geometry()
 		#dlgRc.moveTo(rc.right()+5, rc.top())
@@ -415,12 +418,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			return tex, im
 		elif viewType == 1:
 			if self.displayParameters.autoAdjust:
-				f=self.processedSequence.computeProcessedFrame(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions)
+				f=self.processedSequence.computeProcessedFrame(n)
 				
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
 			else:
-				f=self.processedSequence.computeProcessedFrame(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, returnType ="texture")
+				f=self.processedSequence.computeProcessedFrame(n,returnType ="texture")
 			
 			if self.optionsDlg.displayOptions.useLUT == 1:
 				tex = self.processedSequence.applyColormap(f,w,h)
@@ -659,7 +662,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 	def recomputeFalseColorReference(self):
 		#self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
-		self.processedSequence.computeReference(self.optionsDlg.frameOptions)
+		self.processedSequence.computeReference()
 		
 	def recomputeHSVvalue(self):
 		if self.optionsDlg.NomarskiRadioButton.isChecked():

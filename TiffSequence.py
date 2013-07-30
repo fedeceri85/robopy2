@@ -158,7 +158,7 @@ class TiffSequence:
 						
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-						self.cachedFrames[n] = zoom(img-sub+lrsub.mean(),1.0/self.options['rebin'],order=0)
+						self.cachedFrames[n] = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 						
 						
 					else:
@@ -177,7 +177,7 @@ class TiffSequence:
 							
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-						self.cachedFrames[n] = img-sub+lrsub.mean()
+						self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 						
 					else:	
 						self.cachedFrames[n] = self.tifHandlers[i].read_image()
@@ -229,7 +229,7 @@ class TiffSequence:
 							
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-							self.cachedFrames[n] = zoom(img-sub+lrsub.mean(),1.0/self.options['rebin'],order=0)
+							self.cachedFrames[n] = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 							
 							
 						else:
@@ -248,7 +248,7 @@ class TiffSequence:
 								
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-							self.cachedFrames[n] = img-sub+lrsub.mean()
+							self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 							
 						else:	
 							self.cachedFrames[n] = self.tifHandlers[i].read_image()
