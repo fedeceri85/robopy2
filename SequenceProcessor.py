@@ -1137,8 +1137,10 @@ class ProcessedSequence:
 		self.falseColorRefFrame = None
 		self.HSVvalue = None
 		self.displayParameters = displayParameters
+		self.currentProcessedFrame = 0
 	
 	def computeProcessedFrame(self,n,frameOptions,displayOptions,returnType="float"):
+		self.currentProcessedFrame = n
 		return computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, frameOptions,displayOptions, self.falseColorRefFrame,returnType=returnType)
 		
 	
@@ -1151,7 +1153,15 @@ class ProcessedSequence:
 		#return self.HSVvalue
 	
 	def applyColormap(self,f,w,h):
-		return applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax)
+		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax)
+		
+		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", 50, 50, [1.0, 1.0, 1.0])
+		data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0]).astype(np.float32)
+		self.processedWidget.drawTraces(data, 4, self.currentProcessedFrame, 50.0)
+		
+		
+		
+		return tex
 		
 	def HSVImage(self,f,w,h):
 		return HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)

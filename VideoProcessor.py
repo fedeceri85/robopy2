@@ -5,6 +5,7 @@ from PyQt4.QtCore import *
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
 from OpenGL.GL.ARB.multitexture import *
 
 import numpy as np
@@ -128,7 +129,10 @@ class VideoProcessor(QGLFramebufferObject):
 		self.checkGLError()
 		self.openglContext.doneCurrent()
 		
-	def addTraces(self, data, offset, color, lineWidth = 1):
+	def addTraces(self, data, nPoints, x, y, scalex, scaley, color, lineWidth = 1):
+		
+		w = self.width()
+		h = self.height()
 		
 		self.openglContext.makeCurrent()
 		self.checkGLError()
@@ -143,14 +147,16 @@ class VideoProcessor(QGLFramebufferObject):
 		glLoadIdentity()
 		
 		glViewport(0,0,w,h)
-		glOrtho(0, w, 0, h, -1, 1) 
+		glOrtho(0, w, h, 0, -1, 1) 
 		
-		glColor4f(color)
+		glColor4f(color[0], color[1], color[2], 0.0)
 		glLineWidth(lineWidth);
-		glTranslatef(0.0, offset, 0.0)
+		glTranslatef(x, y, 0.0)
+		glScalef(scalex, scaley, 1.0)
 		glBegin(GL_LINE_STRIP)
 		
-		glVertex2fv(data)
+		for i in range(0, 2*nPoints, 2):
+			glVertex2f(data[i], data[i+1])
 		
 		glEnd()
 		
@@ -162,6 +168,9 @@ class VideoProcessor(QGLFramebufferObject):
 		self.openglContext.doneCurrent()	
 		
 	def addText(self, s, x, y, color):
+		
+		w = self.width()
+		h = self.height()
 		
 		self.openglContext.makeCurrent()
 		self.checkGLError()
@@ -183,7 +192,7 @@ class VideoProcessor(QGLFramebufferObject):
 		glTranslatef(x, y, 0.0)
 		glScalef(fontScale, -fontScale, 1.0)
 		
-		glColor4f(color)
+		glColor4f(color[0], color[1], color[2], 0.0)
 		glutStrokeString(GLUT_STROKE_ROMAN, s)
 		
 		glFlush()

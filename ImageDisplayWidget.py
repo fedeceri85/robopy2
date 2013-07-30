@@ -389,8 +389,8 @@ class ImageDisplayWidget(QGLWidget):
 		
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 		
-	def drawTraces(self, data, offset, color, bufId=2):
-		self.videoBuffers[bufId].addTraces(data, offset, color)
+	def drawTraces(self, data, nPoints, x, y , scalex = 1.0, scaley = 1.0, color=[1.0, 1.0, 1.0], bufId=2):
+		self.videoBuffers[bufId].addTraces(data, nPoints, x, y, scalex, scaley, color)
 		
 	def drawText(self, s, x, y, color, bufId=2):
 		self.videoBuffers[bufId].addText(s, x, y, color)
