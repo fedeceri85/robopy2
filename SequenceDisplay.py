@@ -414,55 +414,22 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			tex = self.imWidget.processData(list([im]), list([0]), list([list([self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax])]))
 			return tex, im
 		elif viewType == 1:
-			#processed stuff
-			#f = SequenceProcessor.computeProcessedFrameWeave(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
-			#f = SequenceProcessor.computeProcessedFrameOpenCL(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame)
-			
-			#f = SequenceProcessor.computeProcessedFrameOpenCL2(self.tiffSequence, n, self.optionsDlg.frameOptions, self.displayParameters.falseColorRefFrame, self.optionsDlg.displayOptions.medianFilterOn, self.optionsDlg.displayOptions.gaussianFilterOn)
-			
-			#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-			#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
-			
-			
-			#print("Processed result " + str(f) + " with shape " + str(f.shape))
-			
-			
 			if self.displayParameters.autoAdjust:
-				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-					#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
 				f=self.processedSequence.computeProcessedFrame(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions)
-				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
+				
 				self.changeDisplayColorMin(f.min())
 				self.changeDisplayColorMax(f.max())
 			else:
-				#f = SequenceProcessor.computeProcessedFrame(self.tiffSequence, n, self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame)
-				#f = SequenceProcessor.computeProcessedFrameGLSL(self.processedWidget, self.tiffSequence, n, self.optionsDlg.frameOptions,
-					#self.optionsDlg.displayOptions, self.displayParameters.falseColorRefFrame, returnType="texture")
 				f=self.processedSequence.computeProcessedFrame(n,self.optionsDlg.frameOptions,self.optionsDlg.displayOptions, returnType ="texture")
 			
-			#print("Processed result " + str(f) + " with shape " + str(f.shape))
-			
 			if self.optionsDlg.displayOptions.useLUT == 1:
-				#return SequenceProcessor.applyColormap(f, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
-				#tex = SequenceProcessor.applyColormapGLSL(self.processedWidget, f, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
 				tex = self.processedSequence.applyColormap(f,w,h)
 				if self.displayParameters.autoAdjust == False:
 					f=None
 				return tex, f
 			elif self.optionsDlg.displayOptions.useHSV == 1:
-				#if self.optionsDlg.displayOptions.medianFilterOn:
-					##f = SequenceProcessor.medianFilter3x3(f)
-					##f = SequenceProcessor.medianFilterScipy(f,1)
-					#f = SequenceProcessor.medianFilterOpenCl(f)
-				#if self.optionsDlg.displayOptions.gaussianFilterOn:
-					#f = SequenceProcessor.gaussianFilterOpenCl(f)
-				#return SequenceProcessor.HSVImageByMapSSE(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.HSVmap, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
-				#return SequenceProcessor.HSVImage(f, SequenceProcessor.computeValue(im,shape=im.shape), self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, returnQImage = True ), f
 				if self.optionsDlg.FrameByFrameRadioButton.isChecked():
-					#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(im,shape=im.shape)
 					self.processedSequence.computeValue(im)
-				#tex = SequenceProcessor.HSVImageGLSL(self.processedWidget, f, self.displayParameters.HSVvalue, w, h,
-				#	self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
 				tex = self.processedSequence.HSVImage(f,w,h)	
 				if self.displayParameters.autoAdjust == False:
 					f=None
