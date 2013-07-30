@@ -86,10 +86,9 @@ class VideoProcessor(QGLFramebufferObject):
 		
 		glClearColor(0.0, 1.0, 0.0, 0.0)
 		glClear(GL_COLOR_BUFFER_BIT)
-		
 		prg.bind()
 		
-	def endRender(self, prg, tex, w, h):
+	def drawTexes(self, tex, w, h):
 		
 		texParams = list({GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3})
 		nTex = len(tex)
@@ -118,6 +117,8 @@ class VideoProcessor(QGLFramebufferObject):
 			glBindTexture(GL_TEXTURE_RECTANGLE, 0)
 			
 		glActiveTexture(texParams[0])
+		
+	def endRender(self, prg):
 			
 		glFlush()
 		prg.release()
@@ -127,7 +128,70 @@ class VideoProcessor(QGLFramebufferObject):
 		self.checkGLError()
 		self.openglContext.doneCurrent()
 		
+	def addTraces(self, data, offset, color, lineWidth = 1):
 		
+		self.openglContext.makeCurrent()
+		self.checkGLError()
+		self.bind()
+		self.saveGLState()
+		
+		
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
+		
+		glMatrixMode(GL_MODELVIEW)
+		glLoadIdentity()
+		
+		glViewport(0,0,w,h)
+		glOrtho(0, w, 0, h, -1, 1) 
+		
+		glColor4f(color)
+		glLineWidth(lineWidth);
+		glTranslatef(0.0, offset, 0.0)
+		glBegin(GL_LINE_STRIP)
+		
+		glVertex2fv(data)
+		
+		glEnd()
+		
+		glFlush()
+		self.restoreGLState()
+		self.release()
+			
+		self.checkGLError()
+		self.openglContext.doneCurrent()	
+		
+	def addText(self, s, x, y, color):
+		
+		self.openglContext.makeCurrent()
+		self.checkGLError()
+		self.bind()
+		self.saveGLState()
+		
+		
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
+		
+		glMatrixMode(GL_MODELVIEW)
+		glLoadIdentity()
+		
+		glViewport(0,0,w,h)
+		glOrtho(0, w, 0, h, -1, 1) 
+		
+		fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
+		fontScale = 12.0/fontWidth
+		glTranslatef(x, y, 0.0)
+		glScalef(fontScale, -fontScale, 1.0)
+		
+		glColor4f(color)
+		glutStrokeString(GLUT_STROKE_ROMAN, s)
+		
+		glFlush()
+		self.restoreGLState()
+		self.release()
+			
+		self.checkGLError()
+		self.openglContext.doneCurrent()	
 	
 	def imAdjust(self, prg, tex, w, h, mn=0.0, mx=65535.0, r=1.0, g=1.0, b=1.0):
 		if self.isValid():
@@ -150,12 +214,14 @@ class VideoProcessor(QGLFramebufferObject):
 			prg.setUniformValue(gLoc, g)
 			prg.setUniformValue(bLoc, b)
 			
-			self.endRender(prg, list([tex]), w, h)
+			self.drawTexes(list([tex]), w, h)
+			self.endRender(prg)
 			
 	def medGaussFilt(self, prg, tex, w, h):
 		if self.isValid():
 			self.prepareRender(prg)
-			self.endRender(prg, list([tex]), w, h)
+			self.drawTexes(list([tex]), w, h)
+			self.endRender(prg)
 			
 	def hsv2rgb(self, prg, tex, valTex, w, h, hmn, hmx, mn, mx):
 		if self.isValid():
@@ -177,7 +243,8 @@ class VideoProcessor(QGLFramebufferObject):
 			prg.setUniformValue("view1", 0)
 			prg.setUniformValue("bckView", 1)
 			
-			self.endRender(prg, list([tex, valTex]), w, h)
+			self.drawTexes(list([tex, valTex]), w, h)
+			self.endRender(prg)
 			
 	def processFluorescence(self, prg, t1, t2, tref, w, h, pType, dType, bck1=0, bck2=0):
 		if self.isValid():
@@ -233,7 +300,8 @@ class VideoProcessor(QGLFramebufferObject):
 			else:
 				print("refLoc not used!")
 			
-			self.endRender(prg, list([t1, t2, tref]), w, h)
+			self.drawTexes(list([t1, t2, tref]), w, h)
+			self.endRender(prg)
 			
 	def applyColormapGLSL(self, data, prg, w, h, imMin=0.0, imMax=1.0):
 		if self.isValid():
@@ -246,7 +314,8 @@ class VideoProcessor(QGLFramebufferObject):
 			
 			prg.setUniformValue("f1", 0)
 			
-			self.endRender(prg, list([data]), w, h)
+			self.drawTexes(list([data]), w, h)
+			self.endRender(prg)
 	
 	def checkGLError(self, msg=None):
 		err = glGetError()
