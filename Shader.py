@@ -89,57 +89,50 @@ class Shader():
 		s = """
 			#extension GL_ARB_texture_rectangle : enable
 			uniform sampler2DRect tex;
-
-			void applyGaussianFilter(in int i, in int j, out float o)
-			{
-				
-				int ch = 2;
-				
-				o = texture2DRect(tex,vec2(i,j)) [ch];
-				
-				const vec3 gr1 = vec3(6.9624782e-8,  2.8088641754e-5 ,  2.07548549665e-4);
-				const vec3 gr2 = vec3(2.8088641754e-5  , 1.1331766853774e-2 ,  8.3731060982536e-2);
-				const vec3 gr3 = vec3(2.07548549665e-4 ,8.3731060982536e-2  , 6.18693506822940e-1);
-				
-				const vec3 one3 = vec3(1.0, 1.0, 1.0);
-				const vec2 one = vec2(one3);
-				
-				mat3 m1 = mat3(texture2DRect(tex,vec2(i-2,j-2)) [ch], texture2DRect(tex,vec2(i-2,j-1)) [ch], texture2DRect(tex,vec2(i-2,j)) [ch], 
-								texture2DRect(tex,vec2(i-1,j-2)) [ch], texture2DRect(tex,vec2(i-1,j-1)) [ch], texture2DRect(tex,vec2(i-1,j)) [ch],	
-								texture2DRect(tex,vec2(i,j-2)) [ch], texture2DRect(tex,vec2(i,j-1)) [ch], texture2DRect(tex,vec2(i,j)) [ch]);
-				mat2 m2 = mat2(texture2DRect(tex,vec2(i+1,j-2)) [ch], texture2DRect(tex,vec2(i+1,j-1)) [ch], 
-								texture2DRect(tex,vec2(i+2,j-2)) [ch], texture2DRect(tex,vec2(i+2,j-1)) [ch]);
-								
-				mat2 m3 = mat2(texture2DRect(tex,vec2(i+1,j)) [ch], texture2DRect(tex,vec2(i+1,j+1)) [ch], 
-								texture2DRect(tex,vec2(i+2,j)) [ch], texture2DRect(tex,vec2(i+2,j+1)) [ch]);
-								
-				mat2 m4 = mat2(texture2DRect(tex,vec2(i-2,j+2)) [ch], texture2DRect(tex,vec2(i-2,j+1)) [ch], 
-								texture2DRect(tex,vec2(i-1,j+2)) [ch], texture2DRect(tex,vec2(i-1,j+1)) [ch]);
-								
-				o = dot(matrixCompMult(m1,mat3(gr1, gr2, gr3)) * one3, one3);
-				o += dot(matrixCompMult(m2,mat2(vec2(gr2), vec2(gr1))) * one, one);
-				o += dot(matrixCompMult(m3,mat2(vec2(gr2), vec2(gr1))) * one, one);
-				o += dot(matrixCompMult(m3,mat2(gr2[2], gr2[1], gr1[2], gr1[1])) * one, one);
-				o += texture2DRect(tex,vec2(i,j+1)) [ch] * gr3[1];
-			}
-
 				
 			void main()
 			{
-				gl_FragColor = texture2DRect(tex,gl_TexCoord[0].st);
+				vec2 b = gl_TexCoord[0].st;
+				gl_FragColor = texture2DRect(tex, b) * 50.7167019;
 				
-				int i = int(gl_TexCoord[0].s);
-				int j = int(gl_TexCoord[0].t);
+				vec4 t = texture2DRect(tex, b + vec2(-2, -2));
+				t += texture2DRect(tex, b + vec2(-2, 2));
+				t += texture2DRect(tex, b + vec2(2, -2));
+				t += texture2DRect(tex, b + vec2(2, 2));
+				gl_FragColor += t  * 32.518554;
 				
-				float o = 0.0;
+				t = texture2DRect(tex, b + vec2(-2, -1));
+				t += texture2DRect(tex, b + vec2(-2, +1));
+				t += texture2DRect(tex, b + vec2(2, -1));
+				t += texture2DRect(tex, b + vec2(2, 1));
+				t += texture2DRect(tex, b + vec2(-1, -2));
+				t += texture2DRect(tex, b + vec2(1, -2));
+				t += texture2DRect(tex, b + vec2(-1, 2));
+				t += texture2DRect(tex, b + vec2(1, 2));
+				gl_FragColor += t * 38.4161331;
 				
-				applyGaussianFilter(i, j, o);
 				
-				gl_FragColor.r = o;
-				gl_FragColor.g = o;
-				gl_FragColor.b = o;
-				gl_FragColor.a = 1.0;
-				//gl_FragColor[0] = gl_FragColor[2];
+				t = texture2DRect(tex, b + vec2(-2, 0));
+				t += texture2DRect(tex, b + vec2(2, 0));
+				t += texture2DRect(tex, b + vec2(0, -2));
+				t += texture2DRect(tex, b + vec2(0, 2));
+				gl_FragColor += t  * 40.61076;
+				
+				t = texture2DRect(tex, b + vec2(-1, -1));
+				t += texture2DRect(tex, b + vec2(-1, 1));
+				t += texture2DRect(tex, b + vec2(1, -1));
+				t += texture2DRect(tex, b + vec2(1, 1));
+				gl_FragColor += t  * 45.38329;
+				
+				
+				t = texture2DRect(tex, b + vec2(-1, 0));
+				t += texture2DRect(tex, b + vec2(1, 0));
+				t += texture2DRect(tex, b + vec2(0, -1));
+				t += texture2DRect(tex, b + vec2(0, 1));
+				gl_FragColor += t  * 47.9759444;
+				
+				gl_FragColor /= 1024.0;
+				
 			}
 		"""
 		
