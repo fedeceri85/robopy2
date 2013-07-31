@@ -45,6 +45,7 @@ class VideoProcessor(QGLFramebufferObject):
 		glActiveTexture(GL_TEXTURE0)
 		glEnable(GL_TEXTURE_RECTANGLE)
 		
+		glEnable(GL_LINE_SMOOTH)
 		openglContext.doneCurrent()
 		
 	def __del__(self):

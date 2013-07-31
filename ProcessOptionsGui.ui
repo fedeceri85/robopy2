@@ -388,7 +388,7 @@
             <x>240</x>
             <y>33</y>
             <width>106</width>
-            <height>48</height>
+            <height>49</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -756,26 +756,8 @@
        </item>
       </layout>
       <zorder>displayTimesCheckBox</zorder>
-      <zorder>fontSizeLabel</zorder>
-      <zorder>fontSizeSpinBox</zorder>
-      <zorder>xOffsetLabel</zorder>
-      <zorder>yOffsetLabel</zorder>
-      <zorder>yOffsetSpinBox</zorder>
-      <zorder>xOffsetSpinBox</zorder>
       <zorder>verticalSpacer_2</zorder>
       <zorder>scalebarCheckBox</zorder>
-      <zorder>label_2</zorder>
-      <zorder>sbScaleFactorSpinBox</zorder>
-      <zorder>label_4</zorder>
-      <zorder>sbLengthSpinBox</zorder>
-      <zorder>label_5</zorder>
-      <zorder>layoutWidget_2</zorder>
-      <zorder>layoutWidget_3</zorder>
-      <zorder>layoutWidget_4</zorder>
-      <zorder>sbLengthSpinBox</zorder>
-      <zorder>label_4</zorder>
-      <zorder>label_5</zorder>
-      <zorder>lineSizeSpinBox</zorder>
      </widget>
      <widget class="QWidget" name="FiltersTab">
       <attribute name="title">

@@ -24,7 +24,12 @@ class Properties(object):
 		self.widgetNames.append(name)
 		
 		if hasattr(obj, "valueChanged"):
-			self.parentWidget.connect(obj, SIGNAL("valueChanged(int)"), self._widget_changed)
+			if type(obj) == QDoubleSpinBox:	
+				self.parentWidget.connect(obj, SIGNAL("valueChanged(double)"), self._widget_changed)
+			elif type(obj) == QSpinBox:
+				self.parentWidget.connect(obj, SIGNAL("valueChanged(int)"), self._widget_changed)
+			else:
+				print("class Properties: Unknown type of widget!")
 		elif hasattr(obj, "sliderReleased"):
 			self.parentWidget.connect(obj, SIGNAL("sliderReleased()"), self._widget_changed)
 		elif hasattr(obj, "currentIndexChanged"):
@@ -147,9 +152,9 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
 		self.connect(self.HSVradioButton,SIGNAL('toggled(bool)'),self.HSVchanged)
 		
-		fo.add('displayScalebar',1,self.scalebarCheckBox)
-		fo.add('scaleBarScaleFactor',50.0,self.sbScaleFactorSpinBox)
-		fo.add('scaleBarLength',25,self.sbLengthSpinBox)
+		fo.add('displayScalebar',0,self.scalebarCheckBox)
+		fo.add('scaleBarScaleFactor',0.47,self.sbScaleFactorSpinBox)
+		fo.add('scaleBarLength',25.0,self.sbLengthSpinBox)
 		fo.add('scaleBarFontSize',12.0,self.sbFontSizeSpinBox)
 		fo.add('scaleBarXOffset',50,self.sbXOffsetSpinBox)
 		fo.add('scaleBarYOffset',50,self.sbYOffsetSpinBox)

@@ -1166,9 +1166,8 @@ class ProcessedSequence:
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 		
 		if self.displayOptions.displayScalebar:
-			print round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
-			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=self.displayOptions.scaleBarLineSize)
+			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
 		return tex
 		
 	def HSVImage(self,f,w,h):

@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Tue Jul 30 20:14:02 2013
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Wed Jul 31 11:58:00 2013
+#      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -192,7 +192,7 @@ class Ui_ProcessOptionsDlg(object):
         self.HSVradioButton.setObjectName(_fromUtf8("HSVradioButton"))
         self.verticalLayout_4.addWidget(self.HSVradioButton)
         self.layoutWidget2 = QtGui.QWidget(self.DOgroupBox)
-        self.layoutWidget2.setGeometry(QtCore.QRect(240, 33, 106, 48))
+        self.layoutWidget2.setGeometry(QtCore.QRect(240, 33, 106, 49))
         self.layoutWidget2.setObjectName(_fromUtf8("layoutWidget2"))
         self.verticalLayout_6 = QtGui.QVBoxLayout(self.layoutWidget2)
         self.verticalLayout_6.setMargin(0)
