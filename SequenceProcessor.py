@@ -1155,8 +1155,8 @@ class ProcessedSequence:
 		self.HSVvalue = computeValue(ValueFrame,(self.tiffSequence.height,self.tiffSequence.width))
 		#return self.HSVvalue
 	
-	def applyColormap(self,f,w,h):
-		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax)
+	def applyColormap(self,f,w,h,returnType = "texture"):
+		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax,returnType=returnType)
 		
 		#self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", 50, 50, [1.0, 1.0, 1.0],fontsize=24.0)
 		#data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0,70.0,10.0]).astype(np.float32)*2.0

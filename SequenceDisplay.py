@@ -56,22 +56,32 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.connect(self, SIGNAL("startWorkerJob()"), self.worker, SLOT("startJob()"))
 		#self.worker.start()
 		
+		#Load plugins
 		self.plugins=[]
 		#self.emit(SIGNAL("startWorkerJob()"))
+		
 		for i in Plugins.getPlugins():
 			print("Loading plugin " + i["name"])
 			self.plugins.append(Plugins.loadPlugin(i))
-		
+			try:
+				#Try to execute load method of the plugin
+				self.plugins[-1].load(self)
+			except:
+				#If it fails, delete the plugin, 
+				self.plugins.pop()
+				
+				
 		self.optionsDlg = ProcessOptions(self)		
 		self.tiffSequence = None
 		self.processedSequence = None
 		if os.path.splitext(files[0])[1] == '.tif':
 			self.tiffSequence = TiffSequence(files,self.rawTiffOptions)
 			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
-		
-		self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)
-		elif os.path.splitext(files[0])[1] == '.cap':
-			self.plugins[0].run(self)
+				self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)
+		else:
+			for plugin in self.plugins:
+				if plugin.associatedFileType == os.path.splitext(files[0])[1]:
+					plugin.run(self)
 		
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
@@ -446,6 +456,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				tex = self.processedSequence.HSVImage(f,w,h)	
 				if self.displayParameters.autoAdjust == False:
 					f=None
+					
 				return tex, f
 			
 		return None, None
