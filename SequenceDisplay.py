@@ -2,6 +2,7 @@ import PyQt4
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
+import os
 import numpy as np
 from pubTools import oneColumnFigure
 from OpenGL import GL
@@ -17,7 +18,7 @@ from ProcessOptions import ProcessOptions
 from Worker import Worker
 
 from SequenceProcessor import ProcessedSequence
-
+import Plugins
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
@@ -28,7 +29,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#l = dir(self.CurrentFrameSlider)
 		#for i in l:
 		#	print(i)
-		
+		self.rawTiffOptions = rawTiffOptions
 		self.RoboMainWnd = parent
 		self.MaxFrames = 0
 		self.CurrentShownFrame = 0
@@ -55,9 +56,22 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.connect(self, SIGNAL("startWorkerJob()"), self.worker, SLOT("startJob()"))
 		#self.worker.start()
 		
+		self.plugins=[]
 		#self.emit(SIGNAL("startWorkerJob()"))
+		for i in Plugins.getPlugins():
+			print("Loading plugin " + i["name"])
+			self.plugins.append(Plugins.loadPlugin(i))
 		
-		self.tiffSequence = TiffSequence(files,rawTiffOptions)
+		self.optionsDlg = ProcessOptions(self)		
+		self.tiffSequence = None
+		self.processedSequence = None
+		if os.path.splitext(files[0])[1] == '.tif':
+			self.tiffSequence = TiffSequence(files,self.rawTiffOptions)
+			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
+		
+		self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)
+		elif os.path.splitext(files[0])[1] == '.cap':
+			self.plugins[0].run(self)
 		
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
@@ -73,11 +87,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.colorAutoRadioButton.setChecked(self.displayParameters.autoAdjust)
 		
-		
-		self.optionsDlg = ProcessOptions(self)
-		
-		self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
-					     self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)
+
 		#rc = self.frameGeometry()
 		#dlgRc = self.optionsDlg.geometry()
 		#dlgRc.moveTo(rc.right()+5, rc.top())
