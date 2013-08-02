@@ -20,7 +20,11 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QDoubleSpinBox" name="colorMaxSpinBox"/>
+         <widget class="QDoubleSpinBox" name="colorMaxSpinBox">
+          <property name="decimals">
+           <number>4</number>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -53,7 +57,11 @@
          </layout>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="colorMinSpinBox"/>
+         <widget class="QDoubleSpinBox" name="colorMinSpinBox">
+          <property name="decimals">
+           <number>4</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="colorAutoRadioButton">
@@ -179,7 +187,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">

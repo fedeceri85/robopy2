@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Fri Aug  2 11:05:04 2013
-#      by: PyQt4 UI code generator 4.10
+# Created: Sat Aug  3 00:28:48 2013
+#      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -36,6 +36,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.colorMaxSpinBox = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.colorMaxSpinBox.setDecimals(4)
         self.colorMaxSpinBox.setObjectName(_fromUtf8("colorMaxSpinBox"))
         self.verticalLayout_2.addWidget(self.colorMaxSpinBox)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
@@ -60,6 +61,7 @@ class Ui_SequenceDisplayWnd(object):
         self.horizontalLayout_2.addWidget(self.colorMaxSlider)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.colorMinSpinBox = QtGui.QDoubleSpinBox(self.centralwidget)
+        self.colorMinSpinBox.setDecimals(4)
         self.colorMinSpinBox.setObjectName(_fromUtf8("colorMinSpinBox"))
         self.verticalLayout_2.addWidget(self.colorMinSpinBox)
         self.colorAutoRadioButton = QtGui.QRadioButton(self.centralwidget)
@@ -126,7 +128,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 20))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
