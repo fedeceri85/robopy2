@@ -147,6 +147,7 @@ class Shader():
 			uniform float hmx;
 			uniform float mn;
 			uniform float mx;
+			uniform float hcutoff;
 			
 			vec3 h2r(float h, float s, float v) {
 				return mix(vec3(1.),clamp((abs(fract(h+vec3(3.,2.,1.)/3.)*6.-3.)-1.),0.,1.),s)*v;
@@ -182,7 +183,7 @@ class Shader():
 					//c.b = 1.0;
 				}
 				
-				c.r = 0.63 * (1.0 - c.r); //select a certain range for hue
+				c.r = (1.0-hcutoff) * (1.0 - c.r); //select a certain range for hue
 				
 				gl_FragColor = vec4(h2r(c.r, c.g, c.b), 1.0);
 				

@@ -253,7 +253,7 @@ def applyColormapGLSL(procWdg, image, w, h, imMin, imMax, returnType = "texture"
 	
 def HSVImageGLSL(procWdg, image,value, w, h, imMin, imMax, vmin=0.0, vmax=1.0, hsvcutoff=0.45, returnType = "texture"):
 		
-	f = procWdg.HSVImageGLSL(image, value, w, h, imMin, imMax, vmin, vmax, returnType)
+	f = procWdg.HSVImageGLSL(image, value, w, h, imMin, imMax, vmin, vmax, hsvcutoff, returnType)
 	
 	return f
 		
@@ -1171,7 +1171,7 @@ class ProcessedSequence:
 		return tex
 		
 	def HSVImage(self,f,w,h):
-		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax)
+		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, hsvcutoff=self.displayOptions.hsvcutoff)
 		
 		if self.timeOptions.displayTimeStamp:
 			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", self.timeOptions.xOffset,

@@ -159,6 +159,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		fo.add('scaleBarXOffset',50,self.sbXOffsetSpinBox)
 		fo.add('scaleBarYOffset',50,self.sbYOffsetSpinBox)
 		fo.add('scaleBarLineSize',10,self.lineSizeSpinBox)
+		fo.add('hsvcutoff',0.47,self.hsvcutoffSpinBox)
 		return fo
 	
 	def HSVchanged(self):

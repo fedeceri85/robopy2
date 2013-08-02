@@ -375,7 +375,7 @@ class ImageDisplayWidget(QGLWidget):
 		self.videoBuffers[2].applyColormapGLSL(tex1, self.shadePrograms[5], w, h, imMin, imMax)
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 			
-	def HSVImageGLSL(self, image, value, w, h, hmn, hmx, mn, mx, returnType="texture"):
+	def HSVImageGLSL(self, image, value, w, h, hmn, hmx, mn, mx, hsvcutoff=0.47, returnType="texture"):
 		
 		if str(type(image)) != "<type 'numpy.ndarray'>":
 			buffers = list([value])
@@ -392,7 +392,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		
 		
-		self.videoBuffers[2].hsv2rgb(self.shadePrograms[3], tex1, tex2, w, h, hmn, hmx, mn, mx)
+		self.videoBuffers[2].hsv2rgb(self.shadePrograms[3], tex1, tex2, w, h, hmn, hmx, mn, mx, hcutoff=hsvcutoff)
 		
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 		

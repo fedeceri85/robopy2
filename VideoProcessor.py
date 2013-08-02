@@ -233,7 +233,7 @@ class VideoProcessor(QGLFramebufferObject):
 			self.drawTexes(list([tex]), w, h)
 			self.endRender(prg)
 			
-	def hsv2rgb(self, prg, tex, valTex, w, h, hmn, hmx, mn, mx):
+	def hsv2rgb(self, prg, tex, valTex, w, h, hmn, hmx, mn, mx, hcutoff=0.47):
 		if self.isValid():
 			
 			#print("hsv2rgb params: " + str(hmn) + ", " + str(hmx) + ", " + str(mn) + ", " + str(mx))
@@ -244,12 +244,12 @@ class VideoProcessor(QGLFramebufferObject):
 			hmxLoc = prg.uniformLocation("hmx")
 			mnLoc = prg.uniformLocation("mn")
 			mxLoc = prg.uniformLocation("mx")
-			
+			hcutoffLoc = prg.uniformLocation("hcutoff")
 			prg.setUniformValue(hmnLoc, float(hmn))
 			prg.setUniformValue(hmxLoc, float(hmx))
 			prg.setUniformValue(mnLoc, float(mn))
 			prg.setUniformValue(mxLoc, float(mx))
-			
+			prg.setUniformValue(hcutoffLoc,float(hcutoff))
 			prg.setUniformValue("view1", 0)
 			prg.setUniformValue("bckView", 1)
 			
