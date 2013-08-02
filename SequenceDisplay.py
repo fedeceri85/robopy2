@@ -558,6 +558,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.blockSignals(True)
 		self.CurrentFrameSpinBox.setValue(self.CurrentShownFrame)
 		self.CurrentFrameSpinBox.blockSignals(False)
+	
+	def changeCurrentFrameWidget(self,n):
+		self.CurrentFrameSlider.blockSignals(True)
+		self.CurrentFrameSlider.setValue(n)
+		self.CurrentFrameSlider.blockSignals(False)
+		
+		self.CurrentFrameSpinBox.blockSignals(True)
+		self.CurrentFrameSpinBox.setValue(n)
+		self.CurrentFrameSpinBox.blockSignals(False)	
 		
 	def updateFrameWidgetsRange(self):
 		self.CurrentFrameSlider.blockSignals(True)
@@ -700,6 +709,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.tiffSequence.saveSequence(fname.toAscii())
 	
 	def saveSequenceAsAvi(self):
+		first, step = self.getSequenceStartAndStep()
 		fps = int(round(1.0/(self.tiffSequence.timesDict.dt())))
 		self.aviOptions={'fps':fps,'width':self.tiffSequence.getWidth(),'height':self.tiffSequence.getHeight(),
 		'fname':'', 'firstFrame':1, 'lastFrame':self.tiffSequence.getFrames()}
@@ -709,8 +719,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		opt = self.aviOptions
 		aviWriter = AviWriter(opt["fname"], (opt["height"], opt["width"]), opt["fps"])
-		
-		for i in range(opt["firstFrame"]-1, opt["lastFrame"]):
+		totalFrames = int(round((opt["lastFrame"] - opt["firstFrame"]+1)/step))
+		for i in range(opt["firstFrame"]-1, opt["lastFrame"],step):
 			data = self.getSequenceFrameAsRgb(i)
 
 			h,w,k,z = data.shape
@@ -718,7 +728,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			#data = np.swapaxes(data, 0, 1)
 			data = data.reshape(w,h,z)
 			#data = data[:,:,::-1]
-			
+			#st = 'Saving frame number '+str(i+1) + 'of ' + str(totalFrames)
+			#self.showStatusMessage(st)
 			aviWriter.addFrame(data)
 			
 		aviWriter.clearAviHandler()
