@@ -138,12 +138,12 @@ class TiffSequence:
 			self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
 		else:
 			if self.tifHandlers[0] != None:
-				i,n = self.getFileIndexes(n)
+				i,p = self.getFileIndexes(n)
 				
 				if i == -1:
 					return None
 					
-				self.tifHandlers[i].SetDirectory(n)
+				self.tifHandlers[i].SetDirectory(p)
 				if self.options['rebin'] is not None:
 					if self.options['LineCorrection']:
 						img = self.tifHandlers[i].read_image()
@@ -198,7 +198,7 @@ class TiffSequence:
 			return self.cachedFrames[n]
 		else:
 			if self.tifHandlers[0] != None:
-				i,n = self.getFileIndexes(n)
+				i,p = self.getFileIndexes(n)
 				
 				if i == -1:
 					return None
@@ -214,7 +214,7 @@ class TiffSequence:
 					
 				if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
 					self.threadLock.acquire()
-					self.tifHandlers[i].SetDirectory(n)
+					self.tifHandlers[i].SetDirectory(p)
 					if self.options['rebin'] is not None:
 						if self.options['LineCorrection']:
 							img = self.tifHandlers[i].read_image()
