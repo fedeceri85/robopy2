@@ -333,6 +333,13 @@ class ImageDisplayWidget(QGLWidget):
 			glBindTexture(GL_TEXTURE_RECTANGLE, 0)
 			self.doneCurrent()
 			return outData
+		if returnType == "uint8RGB":
+			self.makeCurrent()
+			glBindTexture(GL_TEXTURE_RECTANGLE, tex)
+			outData = glGetTexImageub(GL_TEXTURE_RECTANGLE, 0, GL_RGB)
+			glBindTexture(GL_TEXTURE_RECTANGLE, 0)
+			self.doneCurrent()
+			return outData
 			
 		return None
 		

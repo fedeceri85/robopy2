@@ -179,7 +179,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">
@@ -236,6 +236,7 @@
      <string>Output</string>
     </property>
     <addaction name="actionSave_raw_sequence"/>
+    <addaction name="actionSave_as_avi"/>
    </widget>
    <addaction name="menuRois"/>
    <addaction name="menuStacks"/>
@@ -336,6 +337,11 @@
   <action name="actionSave_traces">
    <property name="text">
     <string>Save traces</string>
+   </property>
+  </action>
+  <action name="actionSave_as_avi">
+   <property name="text">
+    <string>Save as avi</string>
    </property>
   </action>
  </widget>

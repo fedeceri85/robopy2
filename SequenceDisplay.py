@@ -17,6 +17,9 @@ from mplot import MPlot
 from ProcessOptions import ProcessOptions
 from Worker import Worker
 
+from AviSettings import AviSettings
+from AviWriter import AviWriter
+
 from SequenceProcessor import ProcessedSequence
 import Plugins
 
@@ -155,6 +158,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)
 
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
+		self.connect(self.actionSave_as_avi, SIGNAL("triggered()"), self.saveSequenceAsAvi)
 		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.processedWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
@@ -461,6 +465,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 		return None, None
 		
+	def getSequenceFrameAsRgb(self, n):
+		tex, f = self.getSequenceFrame(n)
+		if self.ImageTabWidget.currentIndex() == 0:
+			self.imWidget.makeCurrent()
+			data = self.imWidget.textureToArray(tex, "uint8RGB")
+			self.imWidget.doneCurrent()
+		else:
+			self.processedWidget.makeCurrent()
+			data = self.processedWidget.textureToArray(tex, "uint8RGB")
+			self.processedWidget.doneCurrent()
+			
+		return data
+			
+		
 	def getViewType(self):
 		return self.ImageTabWidget.currentIndex()
 		
@@ -680,6 +698,31 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fname = QFileDialog.getSaveFileName(self, "Save tif sequence to file", QString(), "Images (*.tif)")
 		if not fname.isEmpty():
 			self.tiffSequence.saveSequence(fname.toAscii())
+	
+	def saveSequenceAsAvi(self):
+		fps = int(round(1.0/(self.tiffSequence.timesDict.dt())))
+		self.aviOptions={'fps':fps,'width':self.tiffSequence.getWidth(),'height':self.tiffSequence.getHeight(),
+		'fname':'', 'firstFrame':1, 'lastFrame':self.tiffSequence.getFrames()}
+		
+		aviSettings = AviSettings(parent=self, aviOptions=self.aviOptions)
+		aviSettings.exec_()
+		
+		opt = self.aviOptions
+		aviWriter = AviWriter(opt["fname"], (opt["height"], opt["width"]), opt["fps"])
+		
+		for i in range(opt["firstFrame"]-1, opt["lastFrame"]):
+			data = self.getSequenceFrameAsRgb(i)
+
+			h,w,k,z = data.shape
+			data = data.reshape(h*w,z)
+			#data = np.swapaxes(data, 0, 1)
+			data = data.reshape(w,h,z)
+			#data = data[:,:,::-1]
+			
+			aviWriter.addFrame(data)
+			
+		aviWriter.clearAviHandler()
+		
 			
 	def recomputeFalseColorReference(self):
 		#self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)
