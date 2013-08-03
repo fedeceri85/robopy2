@@ -675,11 +675,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"CSV Files (*.csv)")
 		
 		roiFile = fname.toAscii().data()
-		print(fname)
-		print(roiFile)
-		times,rdata = self.computeRoisCb()
 
-		np.savetxt(roiFile, np.hstack((times.reshape(rdata.shape),rdata)), delimiter="\t")
+		times,rdata = self.computeRoisCb()
+		if times.ndim < 2:
+			times = np.expand_dims(times,1)
+		
+		np.savetxt(roiFile, np.hstack((times,rdata)), delimiter="\t")
 
 	def loadROISCb(self):
 		

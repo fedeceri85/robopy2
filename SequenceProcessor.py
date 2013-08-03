@@ -1181,5 +1181,5 @@ class ProcessedSequence:
 		return tex
 	
 	def drawTimeStamp(self,to):
-		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", to.xOffset, to.yOffset, [1.0, 1.0, 1.0],fontsize=to.fontSize)
+		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]).zfill(3) + " s", to.xOffset, to.yOffset, [1.0, 1.0, 1.0],fontsize=to.fontSize)
 		
