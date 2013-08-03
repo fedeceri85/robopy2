@@ -198,9 +198,11 @@
     <addaction name="separator"/>
     <addaction name="actionLoad_from_file"/>
     <addaction name="actionSave_to_file"/>
+    <addaction name="actionSave_traces"/>
     <addaction name="separator"/>
     <addaction name="actionDelete_Last"/>
-    <addaction name="actionSave_traces"/>
+    <addaction name="separator"/>
+    <addaction name="actionForce_recomputation"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -344,12 +346,17 @@
   </action>
   <action name="actionSave_traces">
    <property name="text">
-    <string>Save traces</string>
+    <string>Export traces</string>
    </property>
   </action>
   <action name="actionSave_as_avi">
    <property name="text">
     <string>Save as avi</string>
+   </property>
+  </action>
+  <action name="actionForce_recomputation">
+   <property name="text">
+    <string>Force roi recomputation</string>
    </property>
   </action>
  </widget>

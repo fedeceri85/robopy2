@@ -156,7 +156,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISCb)
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)
-
+		self.connect(self.actionForce_recomputation,SIGNAL("triggered()"),self.forceRoiRecomputation)
+		
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
 		self.connect(self.actionSave_as_avi, SIGNAL("triggered()"), self.saveSequenceAsAvi)
 		
@@ -687,19 +688,31 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if self.FrameImage == None:
 			return
 		
-		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging Roi file",QString(),"Mat Files (*.mat)")
+		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging Roi file",QString(),"Vimmaging roi file (*.mat);;Roi and traces data (*.npy)")
 		
 		roiFile = fname.toAscii().data()
-		rois = SequenceProcessor.loadRoisFromFile(roiFile, self.frameWidth, self.frameHeight)
+		rois,self.displayParameters.roiProfile = SequenceProcessor.loadRoisFromFile(roiFile, self.frameWidth, self.frameHeight)
 		for roi in rois:
 			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
-		self.displayParameters.roiAverageRecomputeNeeded = True
+		if self.displayParameters.roiProfile is None:
+			self.displayParameters.roiAverageRecomputeNeeded = True
+		else:
+			try:
+				self.displayParameters.roiAverageRecomputeNeeded = False
+				self.computeRoisCb()
+			except:
+				print("Traces data not valid, ignoring")
+				self.displayParameters.roiAverageRecomputeNeeded = True
 	
 	def saveROISCb(self):
-		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Mat Files (*.mat)")
+		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Vimmaging roi file (*.mat);;Roi and traces data (*.npy)")
 		
 		roiFile = fname.toAscii().data()
-		rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois)
+		rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois,self.displayParameters.roiProfile)
+	
+	def forceRoiRecomputation(self):
+		self.displayParameters.roiAverageRecomputeNeeded = True
+		self.displayParameters.roiProfile = None
 		
 	def saveRawSequence(self):
 		if self.tiffSequence == None:

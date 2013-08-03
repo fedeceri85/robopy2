@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Sat Aug  3 00:28:48 2013
+# Created: Sat Aug  3 23:32:07 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -186,13 +186,17 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_traces.setObjectName(_fromUtf8("actionSave_traces"))
         self.actionSave_as_avi = QtGui.QAction(SequenceDisplayWnd)
         self.actionSave_as_avi.setObjectName(_fromUtf8("actionSave_as_avi"))
+        self.actionForce_recomputation = QtGui.QAction(SequenceDisplayWnd)
+        self.actionForce_recomputation.setObjectName(_fromUtf8("actionForce_recomputation"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
         self.menuRois.addAction(self.actionSave_to_file)
+        self.menuRois.addAction(self.actionSave_traces)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionDelete_Last)
-        self.menuRois.addAction(self.actionSave_traces)
+        self.menuRois.addSeparator()
+        self.menuRois.addAction(self.actionForce_recomputation)
         self.menuMath_2.addAction(self.actionAdd)
         self.menuMath_2.addAction(self.actionSubtract)
         self.menuMath_2.addAction(self.actionDivide)
@@ -255,6 +259,7 @@ class Ui_SequenceDisplayWnd(object):
         self.actionGaussian_filter.setText(_translate("SequenceDisplayWnd", "Gaussian filter", None))
         self.actionTemporal_Smoothing.setText(_translate("SequenceDisplayWnd", "Temporal Smoothing", None))
         self.actionSave_raw_sequence.setText(_translate("SequenceDisplayWnd", "Save raw sequence", None))
-        self.actionSave_traces.setText(_translate("SequenceDisplayWnd", "Save traces", None))
+        self.actionSave_traces.setText(_translate("SequenceDisplayWnd", "Export traces", None))
         self.actionSave_as_avi.setText(_translate("SequenceDisplayWnd", "Save as avi", None))
+        self.actionForce_recomputation.setText(_translate("SequenceDisplayWnd", "Force roi recomputation", None))
 

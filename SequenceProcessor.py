@@ -1,4 +1,5 @@
 from PyQt4.QtGui import QImage, QColor
+import os
 import numpy as np
 import colorconv
 from scipy.misc import imresize
@@ -1013,32 +1014,55 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 		
 
 def loadRoisFromFile(filename, w, h):
-	ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']
+	roiprofile = None
+	if os.path.splitext(filename)[1] == '.mat':
+		ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']
 	#try to solve issue when rois is composed of just one roi
-	try:
-		len(ROIS)
-	except TypeError:
-		ROIS = [ROIS,]
-		
-	roboRois = []
-	for roi in ROIS:
-		r = Roi.Roi()
-		c = roi.Coordinates
-		
-		isValidRoi = True
-		
-		for x,y in zip(c[0],c[1]):
-			if w < x or x < 0 or h < y or y < 0:
-				isValidRoi = False
-			r.addPoint(x,y)
+		try:
+			len(ROIS)
+		except TypeError:
+			ROIS = [ROIS,]
+		roboRois = []
+		for roi in ROIS:
+			r = Roi.Roi()
+			c = roi.Coordinates
 			
-		if isValidRoi:
-			r.computePointMap()
-			roboRois.append(r)
-		
-	return roboRois
+			isValidRoi = True
+			
+			for x,y in zip(c[0],c[1]):
+				if w < x or x < 0 or h < y or y < 0:
+					isValidRoi = False
+				r.addPoint(x,y)
+				
+			if isValidRoi:
+				r.computePointMap()
+				roboRois.append(r)
+	elif os.path.splitext(filename)[1] == '.npy':
+		R = np.load(filename)
+		R = np.expand_dims(R,1)[0]
+		ROIS = R['ROIS']
+		roiprofile = R['traces']
+		roboRois = []
+		for roi in ROIS:
+			r = Roi.Roi()
+			c = roi['Coordinates']
+			
+			isValidRoi = True
+			
+			for x,y in zip(c[0],c[1]):
+				if w < x or x < 0 or h < y or y < 0:
+					isValidRoi = False
+				r.addPoint(x,y)
+				
+			if isValidRoi:
+				r.computePointMap()
+				roboRois.append(r)
+			
 
-def saveRoisToFile(filename,rois):
+		
+	return roboRois, roiprofile
+
+def saveRoisToFile(filename,rois,roiprofile = None):
 	roilist=[]
 	for roi in rois:
 		color = np.array(roi.color.getRgb()[:3])
@@ -1053,10 +1077,12 @@ def saveRoisToFile(filename,rois):
 		roisdict={'Color': color, 'Coordinates':coordinates, 'LineType':u'-','Map':np.array([], dtype=np.float64),'Rectangular':0, 'h_MovieLine':0,'h_MovieTxt':0,'h_line':0,'h_text':0}
 		
 		roilist.append(roisdict)
+	if os.path.splitext(filename)[1] == '.mat':
+		savemat(filename,{'ROIS':roilist})
+	elif os.path.splitext(filename)[1] == '.npy':
+		d = {'ROIS':roilist, 'traces':roiprofile}
+		np.save(filename, d)
 		
-	savemat(filename,{'ROIS':roilist})
-
-
 def HSVtoRGB(arr):
 	code = """
 	#include <stdlib.h>
