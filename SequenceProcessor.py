@@ -1015,6 +1015,7 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 
 def loadRoisFromFile(filename, w, h):
 	roiprofile = None
+	times = None
 	if os.path.splitext(filename)[1] == '.mat':
 		ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']
 	#try to solve issue when rois is composed of just one roi
@@ -1042,7 +1043,9 @@ def loadRoisFromFile(filename, w, h):
 		R = np.expand_dims(R,1)[0]
 		ROIS = R['ROIS']
 		roiprofile = R['traces']
+		times = R['times']
 		roboRois = []
+
 		for roi in ROIS:
 			r = Roi.Roi()
 			c = roi['Coordinates']
@@ -1060,9 +1063,9 @@ def loadRoisFromFile(filename, w, h):
 			
 
 		
-	return roboRois, roiprofile
+	return roboRois, roiprofile, times
 
-def saveRoisToFile(filename,rois,roiprofile = None):
+def saveRoisToFile(filename,rois,roiprofile = None,times = None):
 	roilist=[]
 	for roi in rois:
 		color = np.array(roi.color.getRgb()[:3])
@@ -1080,7 +1083,7 @@ def saveRoisToFile(filename,rois,roiprofile = None):
 	if os.path.splitext(filename)[1] == '.mat':
 		savemat(filename,{'ROIS':roilist})
 	elif os.path.splitext(filename)[1] == '.npy':
-		d = {'ROIS':roilist, 'traces':roiprofile}
+		d = {'ROIS':roilist, 'traces':roiprofile, 'times':times}
 		np.save(filename, d)
 		
 def HSVtoRGB(arr):
