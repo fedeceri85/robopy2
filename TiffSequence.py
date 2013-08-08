@@ -186,16 +186,16 @@ class TiffSequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
-				if self.cachedFrames.has_key(n-2):
-					self.cachedFrames.pop(n-2)
-				elif self.cachedFrames.has_key(n+2):
-					self.cachedFrames.pop(n+2)
-				elif len(self.cachedFrames) > 2:
-					self.cachedFrames.popitem()
-				self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
+			#if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
+				#if self.cachedFrames.has_key(n-2):
+					#self.cachedFrames.pop(n-2)
+				#elif self.cachedFrames.has_key(n+2):
+					#self.cachedFrames.pop(n+2)
+				#elif len(self.cachedFrames) > 2:
+					#self.cachedFrames.popitem()
+				#self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
 				
-			return self.cachedFrames[n]
+			return self.arraySequence[:, :, n].copy()
 		else:
 			if self.tifHandlers[0] != None:
 				i,p = self.getFileIndexes(n)
