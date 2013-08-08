@@ -275,7 +275,7 @@ class TiffSequence:
 	def getFramesFromList(self,listOfFrames):
 		 #Ensure listOfFrames is actually a list, not a tuple
 		listOfFrames = list(listOfFrames)
-		outArray = zeros((self.height,self.width,len(listOfFrames)))
+		outArray = zeros((self.height,self.width,len(listOfFrames)), dtype=uint16)
 		for n in range(len(listOfFrames)):
 			outArray[:,:,n]=self.getFrame(listOfFrames[n])
 		return outArray
@@ -315,14 +315,14 @@ class TiffSequence:
 		th = TIFF.open(str(f), 'w')
 		return th
 	
-	def addSequenceFrame(self, th, frame, w, h):
+	def addSequenceFrame(self, th, f, w, h):
 		th.SetField(256, w)
 		th.SetField(257, h)
 		th.SetField(277, 1) #phtometric interpretation black is minimum
 		th.SetField(258, 16) #bits per sample
 		th.SetField(262, 1) #samples per pixel
 		
-		th.write_image(frame, "lzw", False)
+		th.write_image(f, "lzw", False)
 		
 	def closeWriteSequence(self, th):
 		th.close()
