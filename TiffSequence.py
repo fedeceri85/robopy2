@@ -310,8 +310,23 @@ class TiffSequence:
 			th.SetField(262, 1) #samples per pixel
 			
 			th.write_image(self.getFrame(i), "lzw", False)
+			
+	def openWriteSequence(self, f):
+		th = TIFF.open(str(f), 'w')
+		return th
+	
+	def addSequenceFrame(self, th, frame, w, h):
+		th.SetField(256, w)
+		th.SetField(257, h)
+		th.SetField(277, 1) #phtometric interpretation black is minimum
+		th.SetField(258, 16) #bits per sample
+		th.SetField(262, 1) #samples per pixel
 		
+		th.write_image(frame, "lzw", False)
 		
+	def closeWriteSequence(self, th):
+		th.close()
+	
 	def initTimesDict(self,filename=None):
 		if filename is None:
 			#if (size(self.SequenceFiles))==1:
