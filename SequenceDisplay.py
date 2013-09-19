@@ -74,7 +74,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.plugins.pop()
 				
 				
-		self.optionsDlg = ProcessOptions(self)		
+		self.optionsDlg = ProcessOptions(self,saveFolder=os.path.split(files[0])[0])		
 		self.tiffSequence = None
 		self.processedSequence = None
 		if os.path.splitext(files[0])[1] == '.tif':

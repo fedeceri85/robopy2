@@ -3,7 +3,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from ProcessOptionsGui import Ui_ProcessOptionsDlg
-
+import cPickle
 class Properties(object):
 	
 	def __init__(self, parent = None):
@@ -44,7 +44,7 @@ class Properties(object):
 		obj = getattr(self, '_obj_' + name)
 		if obj != None:
 			obj.blockSignals(True)
-		
+
 			if hasattr(obj, "setValue"):
 				obj.setValue(value)
 			elif hasattr(obj, "setCurrentIndex"):
@@ -56,6 +56,9 @@ class Properties(object):
 					obj.setChecked(True)
 				
 			obj.blockSignals(False)
+			self.parentWidget.valueDict[name] = value
+
+
 			
 	def _get_property(self, name):
 		return getattr(self, '_' + name)
@@ -76,34 +79,53 @@ class Properties(object):
 		elif obj.__class__.__name__ == "QSlider":
 			value = obj.value()
 					
-		
+		self.parentWidget.valueDict[name] = value
+
+		cPickle.dump(self.parentWidget.valueDict,open(self.parentWidget.saveFile,'w'))
+
 		setattr(self, '_' + name, value)
 		#print("widget " + str(obj) + " changed value to " + str(value))
 			
 
 class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
-	def __init__(self, parent=None):
+	def __init__(self, parent=None,saveFolder=None):
 		QDialog.__init__(self, parent=parent)
 		self.setupUi(self)
-		
+		self.valueDict = {}	
+		self.saveFile = os.path.join(saveFolder,'roboPySave')
 		self.frameOptions = self.initFrameOptions()
 		self.timeOptions = self.initTimeOptions()
 		self.displayOptions = self.initDisplayOptions()
+
        
 	def sequenceChangedTab(self, idx):
 		self.PO_TabWidget.setCurrentIndex(idx)
-		
+	
+	
 	def initFrameOptions(self):
 		fo = Properties(self)
-		fo.add('firstFrame', 1, self.FirstFrameSpinBox)
-		fo.add('lastFrame', 1, self.LastFrameSpinBox)
-		fo.add('cycleSize', 1, self.CycleSizeSpinBox)
-		fo.add('firstWavelength', 1, self.FirstWavelengthSpinBox)
-		fo.add('secondWavelength', 0, self.SecondWavelengthSpinBox)
-		fo.add('processType', 0, self.ProcessTypeComboBox)
-		fo.add('displayType', 0, self.DisplayTypeComboBox)
-		fo.add('referenceFrames', 1, self.referenceFrameSpinBox)
-		
+		try:
+			d=cPickle.load(open(self.saveFile,'r'))
+			fo.add('firstFrame', d['firstFrame'], self.FirstFrameSpinBox)
+			fo.add('lastFrame', d['lastFrame'], self.LastFrameSpinBox)
+			fo.add('cycleSize', d['cycleSize'], self.CycleSizeSpinBox)
+			fo.add('firstWavelength', d['firstWavelength'], self.FirstWavelengthSpinBox)
+			fo.add('secondWavelength', d['secondWavelength'], self.SecondWavelengthSpinBox)
+			fo.add('processType', d['processType'], self.ProcessTypeComboBox)
+			fo.add('displayType', d['displayType'], self.DisplayTypeComboBox)
+			fo.add('referenceFrames', d['referenceFrames'], self.referenceFrameSpinBox)
+			
+		except:	
+			fo.add('firstFrame', 1, self.FirstFrameSpinBox)
+			fo.add('lastFrame', 1, self.LastFrameSpinBox)
+			fo.add('cycleSize', 1, self.CycleSizeSpinBox)
+			fo.add('firstWavelength', 1, self.FirstWavelengthSpinBox)
+			fo.add('secondWavelength', 0, self.SecondWavelengthSpinBox)
+			fo.add('processType', 0, self.ProcessTypeComboBox)
+			fo.add('displayType', 0, self.DisplayTypeComboBox)
+			fo.add('referenceFrames', 1, self.referenceFrameSpinBox)
+			
+
 		self.connect(self.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.processTypeChangedCb)
 		
 		return fo
@@ -128,38 +150,76 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		
 	def initTimeOptions(self):
 		fo = Properties(self)
-		fo.add('useAssociatedTimes', 1, self.associatedTimesRadioButton)
-		fo.add('useInterframeInverval', 0, self.userInterframeRadioButton)
-		fo.add('interframeInterval', 40.0, self.interframeIntervalSpinBox)
-		fo.add('frameBasedTimes', 0, self.FrameBasedRadioButton)
-		fo.add('time0Frame', 0, self.time0SpinBox)
-		fo.add('displayTimeStamp',1,self.displayTimesCheckBox)
-		fo.add('fontSize',12,self.fontSizeSpinBox)
-		fo.add('xOffset',50,self.xOffsetSpinBox)
-		fo.add('yOffset',50,self.yOffsetSpinBox)
+		try:
+			d=cPickle.load(open(self.saveFile,'r'))
+			fo.add('useAssociatedTimes', d['useAssociatedTimes'], self.associatedTimesRadioButton)
+			fo.add('useInterframeInverval', d['useInterframeInverval'], self.userInterframeRadioButton)
+			fo.add('interframeInterval', d['interframeInterval'], self.interframeIntervalSpinBox)
+			fo.add('frameBasedTimes', d['frameBasedTimes'], self.FrameBasedRadioButton)
+			fo.add('time0Frame',d['time0Frame'], self.time0SpinBox)
+			fo.add('displayTimeStamp',d['displayTimeStamp'],self.displayTimesCheckBox)
+			fo.add('fontSize',d['fontSize'],self.fontSizeSpinBox)
+			fo.add('xOffset',d['xOffset'],self.xOffsetSpinBox)
+			fo.add('yOffset',d['yOffset'],self.yOffsetSpinBox)
+			
+		except:	
+			fo.add('useAssociatedTimes', 1, self.associatedTimesRadioButton)
+			fo.add('useInterframeInverval', 0, self.userInterframeRadioButton)
+			fo.add('interframeInterval', 40.0, self.interframeIntervalSpinBox)
+			fo.add('frameBasedTimes', 0, self.FrameBasedRadioButton)
+			fo.add('time0Frame', 0, self.time0SpinBox)
+			fo.add('displayTimeStamp',1,self.displayTimesCheckBox)
+			fo.add('fontSize',12,self.fontSizeSpinBox)
+			fo.add('xOffset',50,self.xOffsetSpinBox)
+			fo.add('yOffset',50,self.yOffsetSpinBox)
 		return fo
 	
 	def initDisplayOptions(self):
 		fo = Properties(self)
-		fo.add('useLUT', 1, self.LUTradioButton)
-		fo.add('lutMapId', 0, self.ColorMapcomboBox)
-		fo.add('useHSV', 0, self.HSVradioButton)
-		fo.add('hsvSaturation', 1.0, self.saturationSpinBox)
-		fo.add('enlargeToBackground', 0, self.enlargeToBckCheckBox)
-		fo.add('medianFilterOn', 0, self.medianFilterCheckbox)
-		fo.add('gaussianFilterOn', 0, self.gaussianFilterCheckbox)
-		fo.add('FrameByFrameBackground',1,self.FrameByFrameRadioButton)
-		fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
+		try:
+			d=cPickle.load(open(self.saveFile,'r'))
+			fo.add('useLUT', d['useLUT'], self.LUTradioButton)
+			fo.add('lutMapId',  d['lutMapId'], self.ColorMapcomboBox)
+			fo.add('useHSV',  d['useHSV'], self.HSVradioButton)
+			fo.add('hsvSaturation',  d['hsvSaturation'], self.saturationSpinBox)
+			fo.add('enlargeToBackground', d['enlargeToBackground'], self.enlargeToBckCheckBox)
+			fo.add('medianFilterOn',  d['medianFilterOn'], self.medianFilterCheckbox)
+			fo.add('gaussianFilterOn',  d['gaussianFilterOn'], self.gaussianFilterCheckbox)
+			fo.add('FrameByFrameBackground', d['FrameByFrameBackground'],self.FrameByFrameRadioButton)
+			fo.add('NomarskiBackground', d['NomarskiBackground'],self.NomarskiRadioButton)
+			
+			fo.add('displayScalebar', d['displayScalebar'],self.scalebarCheckBox)
+			fo.add('scaleBarScaleFactor', d['scaleBarScaleFactor'],self.sbScaleFactorSpinBox)
+			fo.add('scaleBarLength', d['scaleBarLength'],self.sbLengthSpinBox)
+			fo.add('scaleBarFontSize', d['scaleBarFontSize'],self.sbFontSizeSpinBox)
+			fo.add('scaleBarXOffset', d['scaleBarXOffset'],self.sbXOffsetSpinBox)
+			fo.add('scaleBarYOffset', d['scaleBarYOffset'],self.sbYOffsetSpinBox)
+			fo.add('scaleBarLineSize', d['scaleBarLineSize'],self.lineSizeSpinBox)
+			fo.add('hsvcutoff', d['hsvcutoff'],self.hsvcutoffSpinBox)
+			
+			
+		except:
+			fo.add('useLUT', 1, self.LUTradioButton)
+			fo.add('lutMapId', 0, self.ColorMapcomboBox)
+			fo.add('useHSV', 0, self.HSVradioButton)
+			fo.add('hsvSaturation', 1.0, self.saturationSpinBox)
+			fo.add('enlargeToBackground', 0, self.enlargeToBckCheckBox)
+			fo.add('medianFilterOn', 0, self.medianFilterCheckbox)
+			fo.add('gaussianFilterOn', 0, self.gaussianFilterCheckbox)
+			fo.add('FrameByFrameBackground',1,self.FrameByFrameRadioButton)
+			fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
+			
+			fo.add('displayScalebar',0,self.scalebarCheckBox)
+			fo.add('scaleBarScaleFactor',0.47,self.sbScaleFactorSpinBox)
+			fo.add('scaleBarLength',25.0,self.sbLengthSpinBox)
+			fo.add('scaleBarFontSize',12.0,self.sbFontSizeSpinBox)
+			fo.add('scaleBarXOffset',50,self.sbXOffsetSpinBox)
+			fo.add('scaleBarYOffset',50,self.sbYOffsetSpinBox)
+			fo.add('scaleBarLineSize',10,self.lineSizeSpinBox)
+			fo.add('hsvcutoff',0.47,self.hsvcutoffSpinBox)
+			
 		self.connect(self.HSVradioButton,SIGNAL('toggled(bool)'),self.HSVchanged)
-		
-		fo.add('displayScalebar',0,self.scalebarCheckBox)
-		fo.add('scaleBarScaleFactor',0.47,self.sbScaleFactorSpinBox)
-		fo.add('scaleBarLength',25.0,self.sbLengthSpinBox)
-		fo.add('scaleBarFontSize',12.0,self.sbFontSizeSpinBox)
-		fo.add('scaleBarXOffset',50,self.sbXOffsetSpinBox)
-		fo.add('scaleBarYOffset',50,self.sbYOffsetSpinBox)
-		fo.add('scaleBarLineSize',10,self.lineSizeSpinBox)
-		fo.add('hsvcutoff',0.47,self.hsvcutoffSpinBox)
+
 		return fo
 	
 	def HSVchanged(self):

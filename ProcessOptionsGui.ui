@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="PO_TabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="FrameOptionsTab">
       <attribute name="title">
@@ -241,10 +241,13 @@
           <property name="geometry">
            <rect>
             <x>210</x>
-            <y>150</y>
+            <y>160</y>
             <width>54</width>
             <height>24</height>
            </rect>
+          </property>
+          <property name="maximum">
+           <number>1000000</number>
           </property>
          </widget>
          <widget class="QLabel" name="label_3">

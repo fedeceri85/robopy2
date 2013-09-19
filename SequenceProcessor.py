@@ -1191,8 +1191,10 @@ class ProcessedSequence:
 		#data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0,70.0,10.0]).astype(np.float32)*2.0
 		#self.processedWidget.drawTraces(data, 5, self.currentProcessedFrame, self.currentProcessedFrame,lineWidth=4)
 		if self.timeOptions.displayTimeStamp:
-			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", self.timeOptions.xOffset,
+			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
+			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0).zfill(3) + " s", self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+
 		
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
@@ -1203,12 +1205,17 @@ class ProcessedSequence:
 		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, hsvcutoff=self.displayOptions.hsvcutoff)
 		
 		if self.timeOptions.displayTimeStamp:
-			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", self.timeOptions.xOffset,
+			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
+			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0).zfill(3) + " s", self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 		
 		
+		if self.displayOptions.displayScalebar:
+			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
+			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
 		return tex
 	
 	def drawTimeStamp(self,to):
-		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]).zfill(3) + " s", to.xOffset, to.yOffset, [1.0, 1.0, 1.0],fontsize=to.fontSize)
+		t0 = self.tiffSequence.timesDict[to.time0Frame]
+		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0).zfill(3) + " s", to.xOffset, to.yOffset, [1.0, 1.0, 1.0],fontsize=to.fontSize)
 		

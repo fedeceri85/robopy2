@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Sat Aug  3 00:17:34 2013
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Thu Sep 19 14:51:36 2013
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -129,7 +129,8 @@ class Ui_ProcessOptionsDlg(object):
         self.timesGroupBox.setTitle(_fromUtf8(""))
         self.timesGroupBox.setObjectName(_fromUtf8("timesGroupBox"))
         self.time0SpinBox = QtGui.QSpinBox(self.timesGroupBox)
-        self.time0SpinBox.setGeometry(QtCore.QRect(210, 150, 54, 24))
+        self.time0SpinBox.setGeometry(QtCore.QRect(210, 160, 54, 24))
+        self.time0SpinBox.setMaximum(1000000)
         self.time0SpinBox.setObjectName(_fromUtf8("time0SpinBox"))
         self.label_3 = QtGui.QLabel(self.timesGroupBox)
         self.label_3.setGeometry(QtCore.QRect(70, 160, 111, 16))
@@ -388,7 +389,7 @@ class Ui_ProcessOptionsDlg(object):
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
         self.retranslateUi(ProcessOptionsDlg)
-        self.PO_TabWidget.setCurrentIndex(0)
+        self.PO_TabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(ProcessOptionsDlg)
 
     def retranslateUi(self, ProcessOptionsDlg):
