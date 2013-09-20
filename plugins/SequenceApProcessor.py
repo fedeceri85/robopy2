@@ -1,14 +1,46 @@
 import sys
 sys.path.append('/home/federico/Desktop/robopy')
+sys.path.append('./plugins')
 from SequenceProcessor import *
-
+from ProcessOptions import Properties
 import os
 sys.path.append('/usr/local/lib/python2.7/dist-packages/stfio/')
 import stfio
 import numpy as np
 import pickle
 from TiffSequence import TiffSequence
+from SequenceApOptions import Ui_Dialog
 associatedFileType = '.cap'
+import sys, os
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+
+class calciumApDialog(Ui_Dialog, QDialog):
+	def __init__(self, parent=None,saveFile=None):
+		QDialog.__init__(self, parent=parent)		
+		self.setupUi(self)
+		self.valueDict = {}	
+		self.saveFile = saveFile
+		fo = Properties(self)
+		try:
+			d=cPickle.load(open(self.saveFile,'r'))
+			fo.add('timeScale', d['timeScale'], self.timeScaleSpinBox)
+			fo.add('dataScale', d['dataScale'], self.dataScaleFactor)
+			fo.add('xoff', d['xoff'], self.xSpinBox)
+			fo.add('yoff', d['yoff'], self.ySpinBox)
+			fo.add('lineWidth', d['lineWidth'], self.lwSpinBox)
+			fo.add('frameSpan', d['frameSpan'], self.frameSpanSpinBox)
+			
+		except:	
+			fo.add('timeScale', 0.05, self.timeScaleSpinBox)
+			fo.add('dataScale', 3.0, self.dataScaleFactor)
+			fo.add('xoff', 0, self.xSpinBox)
+			fo.add('yoff', 400, self.ySpinBox)
+			fo.add('lineWidth', 1, self.lwSpinBox)
+			fo.add('frameSpan', 25, self.frameSpanSpinBox)
+		self.options = fo
+			
 class calciumAPProcessor(ProcessedSequence):
 	def __init__(self,tiffSequence,abfFile,time0=0,processedWidget=None,displayParameters=None,frameOptions=None,displayOptions=None,timeOptions=None):
 		ProcessedSequence.__init__(self,tiffSequence,processedWidget,displayParameters,frameOptions,displayOptions,timeOptions)
@@ -23,11 +55,12 @@ class calciumAPProcessor(ProcessedSequence):
 		self.cameraTrigger = None
 		self.expStartingIndexes = None
 		self.time0 = time0
+		self.dialog = calciumApDialog(saveFile='/dev/null')
 		self.loadTraces()
 		self.alignTraces()
 		self.createTracesList()
-		self.createTracesToDisplay()
-		
+		self.createTracesToDisplay(self.dialog.options.frameSpan)
+		self.dialog.show()
 		
 	def loadTraces(self):
 		record = stfio.read(self.abfFile)
@@ -99,12 +132,12 @@ class calciumAPProcessor(ProcessedSequence):
 		np.save(f+'.ap',data)
 		
 	def drawTrace(self):
-		x = np.arange(len(self.displayTracesList[self.currentProcessedFrame]))*0.05
-		y = self.displayTracesList[self.currentProcessedFrame]/3.0
+		x = np.arange(len(self.displayTracesList[self.currentProcessedFrame]))*self.dialog.options.timeScale
+		y = self.displayTracesList[self.currentProcessedFrame]/self.dialog.options.dataScale
 		data = np.empty(x.size+y.size)
 		data[::2] = x
 		data[1::2] = y
-		self.processedWidget.drawTraces(data, y.size,0.0,400.0,lineWidth=1.0)
+		self.processedWidget.drawTraces(data, y.size,self.dialog.options.xoff,self.dialog.options.yoff,lineWidth=self.dialog.options.lineWidth)
 
 
 
