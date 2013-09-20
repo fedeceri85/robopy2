@@ -166,7 +166,44 @@ class VideoProcessor(QGLFramebufferObject):
 		self.release()
 			
 		self.checkGLError()
-		self.openglContext.doneCurrent()	
+		self.openglContext.doneCurrent()
+		
+	def niceNumber(self, value, round_=False):
+		exponent = math.floor(math.log(value,10))
+		fraction = value / 10 ** exponent
+		
+		if round_:
+			if fraction < 1.5:
+				niceFraction = 1.
+			elif fraction < 3.:
+				niceFraction = 2.
+			elif fraction < 7.:
+				niceFraction = 5.
+			else:
+				niceFraction = 10.
+		else:
+			if fraction <= 1:
+				niceFraction = 1.
+			elif fraction <= 2:
+				niceFraction = 2.
+			elif fraction <= 5:
+				niceFraction = 5.
+			else:
+				niceFraction = 10.
+		
+		return niceFraction * 10 ** exponent
+	
+	def niceBounds(self, axisStart, axisEnd, numTicks= 10):
+		axisWidth = axisEnd - axisStart
+		if axisWidth == 0:
+			niceTick = 0
+		else:
+			niceRange = niceNumber(axisWidth)
+			niceTick = niceNumber(niceRange / (numTicks - 1), round_=True)
+			axisStart = math.floor(axisStart / niceTick) * niceTick
+			axisEnd = math.ceil(axisEnd / niceTick) * niceTick
+		return axisStart, axisEnd, niceTick
+	
 		
 	def addText(self, s, x, y, color,fontsize=12.0):
 		

@@ -65,7 +65,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		for i in Plugins.getPlugins():
 			print("Loading plugin " + i["name"])
-			self.plugins.append(Plugins.loadPlugin(i))
+			plug = Plugins.loadPlugin(i)
+			if (plug == None):
+				continue
+			
+			self.plugins.append(plug)
 			try:
 				#Try to execute load method of the plugin
 				self.plugins[-1].load(self)

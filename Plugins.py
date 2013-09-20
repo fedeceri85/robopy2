@@ -16,4 +16,9 @@ def getPlugins():
     return plugins
 
 def loadPlugin(plugin):
-    return imp.load_module(MainModule, *plugin["info"])
+    ans = None
+    try:
+	ans = imp.load_module(MainModule, *plugin["info"])
+    except:
+	pass
+    return ans
