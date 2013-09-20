@@ -28,13 +28,15 @@ class TiffSequence:
 		self.width = -1
 		self.height = -1
 		self.frames = 0
-		
+		self.origWidth = -1
+		self.origHeight = -1
 		self.SequenceFiles = fNames
 		self.options = options
 		if self.options is None:
 			self.options = {}
 			self.options['rebin'] = None
 			self.options['LineCorrection'] = False
+			self.options['crop'] = False
 		self.FramesPerFile = list()
 		
 		self.tifHandlers = list()
@@ -108,6 +110,8 @@ class TiffSequence:
 		if self.options['rebin'] is not None:
 			width = width/self.options['rebin']
 			height = height/self.options['rebin']
+		self.origWidth = width
+		self.origHeight = height
 		if self.options['crop']:
 			width = self.options['rightMargin'] - self.options['leftMargin']
 			height = self.options['bottomMargin'] - self.options['topMargin']
@@ -149,10 +153,11 @@ class TiffSequence:
 					
 				self.tifHandlers[i].SetDirectory(p)
 				img = self.tifHandlers[i].read_image()
-				lm = self.options['leftMargin']
-				rm = self.options['rightMargin']
-				tm = self.options['topMargin']
-				bm = self.options['bottomMargin']
+				if self.options['crop']:
+					lm = self.options['leftMargin']
+					rm = self.options['rightMargin']
+					tm = self.options['topMargin']
+					bm = self.options['bottomMargin']
 				if self.options['rebin'] is not None:
 					if self.options['LineCorrection']:
 						
@@ -166,15 +171,17 @@ class TiffSequence:
 						
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 						if self.options['crop']:
-							img = img[lm:rm,tm:bm]
-						self.cachedFrames[n] = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
-						
+							img = img[tm:bm,lm:rm]
+						self.cachedFrames[n] = img
 						
 					else:	
+						img = zoom(img,1.0/self.options['rebin'],order=0)
+
 						if self.options['crop']:
-							img = img[lm:rm,tm:bm]
-						self.cachedFrames[n] = zoom(img,1.0/self.options['rebin'],order=0)
+							img = img[tm:bm,lm:rm]
+						self.cachedFrames[n] = img
 				else:
 					if self.options['LineCorrection']:
 						#img = self.tifHandlers[i].read_image()
@@ -189,13 +196,14 @@ class TiffSequence:
 							
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 						if self.options['crop']:
-							img = img[lm:rm,tm:bm]
+							img = img[tm:bm,lm:rm]
 						self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 						
 					else:	
 						if self.options['crop']:
-							img = img[lm:rm,tm:bm]
+							img = img[tm:bm,lm:rm]
 						self.cachedFrames[n] = img
 				#print("Cached frame " + str(n) + " from file ")
 		
@@ -232,10 +240,11 @@ class TiffSequence:
 					self.threadLock.acquire()
 					self.tifHandlers[i].SetDirectory(p)
 					img = self.tifHandlers[i].read_image()
-					lm = self.options['leftMargin']
-					rm = self.options['rightMargin']
-					tm = self.options['topMargin']
-					bm = self.options['bottomMargin']
+					if self.options['crop']:
+						lm = self.options['leftMargin']
+						rm = self.options['rightMargin']
+						tm = self.options['topMargin']
+						bm = self.options['bottomMargin']
 					if self.options['rebin'] is not None:
 						if self.options['LineCorrection']:
 							
@@ -249,16 +258,19 @@ class TiffSequence:
 							
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+							img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 							if self.options['crop']:
-								img = img[lm:rm,tm:bm]
+								img = img[tm:bm,lm:rm]
 	
-							self.cachedFrames[n] = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
+							self.cachedFrames[n] = img
 							
 							
 						else:
+							img = zoom(img,1.0/self.options['rebin'],order=0)
 							if self.options['crop']:
-								img = img[lm:rm,tm:bm]
-							self.cachedFrames[n] = zoom(img,1.0/self.options['rebin'],order=0)
+								img = img[tm:bm,lm:rm]
+							self.cachedFrames[n] = img
+							
 					else:
 						if self.options['LineCorrection']:
 							#img = self.tifHandlers[i].read_image()
@@ -274,12 +286,12 @@ class TiffSequence:
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
 							if self.options['crop']:
-								img = img[lm:rm,tm:bm]
+								img = img[tm:bm,lm:rm]
 							self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 							
 						else:	
 							if self.options['crop']:
-								img = img[lm:rm,tm:bm]
+								img = img[tm:bm,lm:rm]
 							self.cachedFrames[n] = img
 					self.threadLock.release()	
 				

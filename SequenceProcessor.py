@@ -75,11 +75,14 @@ def convert16Bitto8Bit(img,vmin,vmax,returnQimage=False):
 		h,w = img.shape
 		return QImage(im2.data,w,h,QImage.Format_Indexed8)
 
-def computeValue(background,shape=None):
+def computeValue(background,shape=None,crop = None):
+	
 	if shape is not None and shape != background.shape:
 		bckgrn2=imresize(background,(shape[0],shape[1]))
 	else:
 		bckgrn2=background.copy()
+	if crop is not None:
+		bckgrn2 = bckgrn2[crop[0]:crop[1],crop[2]:crop[3]]
 	value = (bckgrn2-bckgrn2.min())/(bckgrn2.max()*1.0-bckgrn2.min()*1.0)
 	return value.astype(np.float32)
 
@@ -1181,7 +1184,11 @@ class ProcessedSequence:
 		#return self.falseColorRefFrame
 	
 	def computeValue(self,ValueFrame):
-		self.HSVvalue = computeValue(ValueFrame,(self.tiffSequence.height,self.tiffSequence.width))
+		if self.tiffSequence.options['crop']:
+			crop = [self.tiffSequence.options['topMargin'],self.tiffSequence.options['bottomMargin'],self.tiffSequence.options['leftMargin'],self.tiffSequence.options['rightMargin']]
+		else:
+			crop = None
+		self.HSVvalue = computeValue(ValueFrame,(self.tiffSequence.origHeight,self.tiffSequence.origWidth),crop)
 		#return self.HSVvalue
 	
 	def applyColormap(self,f,w,h,returnType = "texture"):
