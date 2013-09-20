@@ -96,7 +96,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		self.frameOptions = self.initFrameOptions()
 		self.timeOptions = self.initTimeOptions()
 		self.displayOptions = self.initDisplayOptions()
-
+	
        
 	def sequenceChangedTab(self, idx):
 		self.PO_TabWidget.setCurrentIndex(idx)
