@@ -1,3 +1,4 @@
+# coding: utf-8
 from PyQt4.QtGui import QImage, QColor
 import os
 import numpy as np
@@ -1206,9 +1207,9 @@ class ProcessedSequence:
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
-			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor))/2
-			textY = self.displayOptions.scaleBarYOffset + 20
-			self.processedWidget.drawText(str(self.displayOptions.scaleBarLength)+' um',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-2.5*float(self.timeOptions.fontSize)
+			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.5
+			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 		
 		return tex
 		
@@ -1224,9 +1225,9 @@ class ProcessedSequence:
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
-			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor))/2
-			textY = self.displayOptions.scaleBarYOffset + 20
-			self.processedWidget.drawText(str(self.displayOptions.scaleBarLength)+' um',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-2.5*float(self.timeOptions.fontSize)
+			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.5
+			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 		return tex
 	
 	def drawTimeStamp(self,to):
