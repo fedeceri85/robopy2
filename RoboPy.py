@@ -20,7 +20,8 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 		PyQt4.QtGui.QDialog.__init__(self,parent)
 		self.setupUi(self)
 		self.connect(self.LCcheckBox,SIGNAL("stateChanged(int)"),self.LCstateChanged)
-
+		self.connect(self.cropCheckBox,SIGNAL("stateChanged(int)"),self.cropStateChanged)
+		
 		self.show()
 	
 	def LCstateChanged(self):
@@ -34,6 +35,26 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			self.label_3.setEnabled(False)
 			self.leftLCSpinBox.setEnabled(False)
 			self.rightLCSpinBox.setEnabled(False)
+	
+	def cropStateChanged(self):
+		if self.cropCheckBox.isChecked():
+			self.label_4.setEnabled(True)
+			self.label_5.setEnabled(True)
+			self.label_6.setEnabled(True)
+			self.label_7.setEnabled(True)
+			self.leftCropSpinBox.setEnabled(True)
+			self.rightCropSpinBox.setEnabled(True)
+			self.topCropSpinBox.setEnabled(True)
+			self.bottomCropSpinBox.setEnabled(True)
+		else:
+			self.label_4.setEnabled(False)
+			self.label_5.setEnabled(False)
+			self.label_6.setEnabled(False)
+			self.label_7.setEnabled(False)
+			self.leftCropSpinBox.setEnabled(False)
+			self.rightCropSpinBox.setEnabled(False)
+			self.topCropSpinBox.setEnabled(False)
+			self.bottomCropSpinBox.setEnabled(False)
 			
 	def getValues(self):
 		options = {}
@@ -52,8 +73,25 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			options['LineCorrection'] = False
 			options['RightLC'] = 0
 			options['LeftLC'] = 0
+		options['leftMargin'] = self.leftCropSpinBox.value()
+		options['rightMargin'] = self.rightCropSpinBox.value()
+		options['topMargin'] = self.topCropSpinBox.value()
+		options['bottomMargin'] = self.bottomCropSpinBox.value()
+		if self.cropCheckBox.isChecked():
+			options['crop'] = True
+			options['leftMargin'] = self.leftCropSpinBox.value()
+			options['rightMargin'] = self.rightCropSpinBox.value()
+			options['topMargin'] = self.topCropSpinBox.value()
+			options['bottomMargin'] = self.bottomCropSpinBox.value()
+		else:
+			options['crop'] = False
+			options['leftMargin'] = None
+			options['rightMargin'] = None
+			options['topMargin'] = None
+			options['bottomMargin'] = None
 			
 		return options
+	
 class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)

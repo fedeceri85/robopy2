@@ -108,6 +108,10 @@ class TiffSequence:
 		if self.options['rebin'] is not None:
 			width = width/self.options['rebin']
 			height = height/self.options['rebin']
+		if self.options['crop']:
+			width = self.options['rightMargin'] - self.options['leftMargin']
+			height = self.options['bottomMargin'] - self.options['topMargin']
+		
 		return width, height, frames
 		
 	def getFileIndexes(self, n):
@@ -144,9 +148,13 @@ class TiffSequence:
 					return None
 					
 				self.tifHandlers[i].SetDirectory(p)
+				img = self.tifHandlers[i].read_image()
+				lm = self.options['leftMargin']
+				rm = self.options['rightMargin']
+				tm = self.options['topMargin']
+				bm = self.options['bottomMargin']
 				if self.options['rebin'] is not None:
 					if self.options['LineCorrection']:
-						img = self.tifHandlers[i].read_image()
 						
 						lsub = img[:,:self.options['LeftLC']]
 						if self.options['RightLC']!=0:
@@ -158,14 +166,18 @@ class TiffSequence:
 						
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						if self.options['crop']:
+							img = img[lm:rm,tm:bm]
 						self.cachedFrames[n] = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 						
 						
-					else:
-						self.cachedFrames[n] = zoom(self.tifHandlers[i].read_image(),1.0/self.options['rebin'],order=0)
+					else:	
+						if self.options['crop']:
+							img = img[lm:rm,tm:bm]
+						self.cachedFrames[n] = zoom(img,1.0/self.options['rebin'],order=0)
 				else:
 					if self.options['LineCorrection']:
-						img = self.tifHandlers[i].read_image()
+						#img = self.tifHandlers[i].read_image()
 						
 						lsub = img[:,:self.options['LeftLC']]
 						if self.options['RightLC']!=0:
@@ -177,10 +189,14 @@ class TiffSequence:
 							
 						lrsub = lrsub.reshape((lrsub.shape[0],1))
 						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						if self.options['crop']:
+							img = img[lm:rm,tm:bm]
 						self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 						
 					else:	
-						self.cachedFrames[n] = self.tifHandlers[i].read_image()
+						if self.options['crop']:
+							img = img[lm:rm,tm:bm]
+						self.cachedFrames[n] = img
 				#print("Cached frame " + str(n) + " from file ")
 		
 	def getFrame(self, n):
@@ -215,9 +231,13 @@ class TiffSequence:
 				if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
 					self.threadLock.acquire()
 					self.tifHandlers[i].SetDirectory(p)
+					img = self.tifHandlers[i].read_image()
+					lm = self.options['leftMargin']
+					rm = self.options['rightMargin']
+					tm = self.options['topMargin']
+					bm = self.options['bottomMargin']
 					if self.options['rebin'] is not None:
 						if self.options['LineCorrection']:
-							img = self.tifHandlers[i].read_image()
 							
 							lsub = img[:,:self.options['LeftLC']]
 							if self.options['RightLC']!=0:
@@ -229,14 +249,19 @@ class TiffSequence:
 							
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+							if self.options['crop']:
+								img = img[lm:rm,tm:bm]
+	
 							self.cachedFrames[n] = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 							
 							
 						else:
-							self.cachedFrames[n] = zoom(self.tifHandlers[i].read_image(),1.0/self.options['rebin'],order=0)
+							if self.options['crop']:
+								img = img[lm:rm,tm:bm]
+							self.cachedFrames[n] = zoom(img,1.0/self.options['rebin'],order=0)
 					else:
 						if self.options['LineCorrection']:
-							img = self.tifHandlers[i].read_image()
+							#img = self.tifHandlers[i].read_image()
 							
 							lsub = img[:,:self.options['LeftLC']]
 							if self.options['RightLC']!=0:
@@ -248,10 +273,14 @@ class TiffSequence:
 								
 							lrsub = lrsub.reshape((lrsub.shape[0],1))
 							sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+							if self.options['crop']:
+								img = img[lm:rm,tm:bm]
 							self.cachedFrames[n] = img-sub+uint16(lrsub.mean())
 							
 						else:	
-							self.cachedFrames[n] = self.tifHandlers[i].read_image()
+							if self.options['crop']:
+								img = img[lm:rm,tm:bm]
+							self.cachedFrames[n] = img
 					self.threadLock.release()	
 				
 					
