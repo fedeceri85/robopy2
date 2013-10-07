@@ -24,7 +24,7 @@ class ThreadedRead(threading.Thread):
 class TiffSequence:
 	def __init__(self, fNames,options = None):
 		
-		self.fileName = None
+		self.fileName = fNames
 		self.width = -1
 		self.height = -1
 		self.frames = 0

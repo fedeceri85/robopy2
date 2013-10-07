@@ -1234,3 +1234,6 @@ class ProcessedSequence:
 		t0 = self.tiffSequence.timesDict[to.time0Frame]
 		self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0).zfill(3) + " s", to.xOffset, to.yOffset, [1.0, 1.0, 1.0],fontsize=to.fontSize)
 		
+	def saveRoisToFile(self,filename):
+		saveRoisToFile(filename,self.processedWidget.rois,self.displayParameters.roiProfile, self.tiffSequence.timesDict.times() )
+		

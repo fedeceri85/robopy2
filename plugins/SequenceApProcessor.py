@@ -47,8 +47,11 @@ class calciumAPProcessor(ProcessedSequence):
 		if os.path.exists(abfFile):
 			self.abfFile = abfFile
 		else:
-			fold = abfFile[7:]
-			self.abfFile = os.path.join('/run/media/federico/',fold)
+			#fold = abfFile[7:]
+			abfFileName = os.path.split(abfFile)[1]
+			fold = os.path.split(self.tiffSequence.fileName[0])[0]
+			#self.abfFile = os.path.join('/run/media/federico/',fold)
+			self.abfFile = os.path.join(fold,abfFileName)
 		self.times =None
 		self.vTrace=None
 		self.cameraExp = None
@@ -125,6 +128,7 @@ class calciumAPProcessor(ProcessedSequence):
 		return tex
 		
 	def saveRoisToFile(self,filename):
+
 		ProcessedSequence.saveRoisToFile(self,filename)
 		data = np.vstack((self.times[self.expStartingIndexes[0]:],self.vTrace[self.expStartingIndexes[0]:]))
 		f=os.path.splitext(filename)[0]

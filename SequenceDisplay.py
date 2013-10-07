@@ -698,9 +698,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		rois, self.displayParameters.roiProfile, times = SequenceProcessor.loadRoisFromFile(roiFile, self.frameWidth, self.frameHeight)
 		for roi in rois:
 			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
-		if self.displayParameters.roiProfile is None:
+		if self.displayParameters.roiProfile is None or self.displayParameters.roiProfile.shape[0]!=self.tiffSequence.getFrames():
+
 			self.displayParameters.roiAverageRecomputeNeeded = True
-		else:
+		else:	
+			
 			try:
 				self.displayParameters.roiAverageRecomputeNeeded = False
 				self.computeRoisCb()
@@ -710,10 +712,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	
 	def saveROISCb(self):
 		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Vimmaging roi file (*.mat);;Roi and traces data (*.npy)")
-		
 		roiFile = fname.toAscii().data()
-		rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois, self.displayParameters.roiProfile, self.tiffSequence.timesDict.times())
-	
+		#rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois, self.displayParameters.roiProfile, self.tiffSequence.timesDict.times())
+		self.processedSequence.saveRoisToFile(roiFile)
+		
 	def forceRoiRecomputation(self):
 		self.displayParameters.roiAverageRecomputeNeeded = True
 		self.displayParameters.roiProfile = None
