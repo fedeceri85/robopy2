@@ -4,7 +4,7 @@ sys.path.append('./plugins')
 from SequenceProcessor import *
 from ProcessOptions import Properties
 import os
-sys.path.append('/usr/local/lib/python2.7/dist-packages/stfio/')
+sys.path.append('/usr/local/lib/python2.7/site-packages/stfio/')
 import stfio
 import numpy as np
 import pickle

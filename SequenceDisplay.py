@@ -77,7 +77,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				#If it fails, delete the plugin, 
 				self.plugins.pop()
 				
-				
+	
 		self.optionsDlg = ProcessOptions(self,saveFolder=os.path.split(files[0])[0])		
 		self.tiffSequence = None
 		self.processedSequence = None
@@ -766,8 +766,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.optionsDlg.backgroundLineEdit.setText(fname)
 			nomarski = TiffSequence([fname,])
 			#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
-			self.processedSequence.computeValue(nomarski.getFrame(1))
-
+			#Try loading the second frame of the nomarski stack (the first one is usually black). If it fails, it may be possible 
+			#that the nomarski is a single image
+			try:
+				self.processedSequence.computeValue(nomarski.getFrame(1))
+			except AttributeError:
+				self.processedSequence.computeValue(nomarski.getFrame(0))
+				
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()
