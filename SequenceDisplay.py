@@ -81,6 +81,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.optionsDlg = ProcessOptions(self,saveFolder=os.path.split(files[0])[0])		
 		self.tiffSequence = None
 		self.processedSequence = None
+
 		if os.path.splitext(files[0])[1] == '.tif':
 			self.tiffSequence = TiffSequence(files,self.rawTiffOptions)
 			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
@@ -89,6 +90,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			for plugin in self.plugins:
 				if plugin.associatedFileType == os.path.splitext(files[0])[1]:
 					plugin.run(self)
+					print('HERE')
 		
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()

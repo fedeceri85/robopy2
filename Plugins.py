@@ -18,7 +18,7 @@ def getPlugins():
 def loadPlugin(plugin):
     ans = None
     try:
-	ans = imp.load_module(MainModule, *plugin["info"])
+	ans = imp.load_module('MainModule', *plugin["info"])
     except:
 	pass
     return ans
