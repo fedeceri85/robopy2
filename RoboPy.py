@@ -130,9 +130,13 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def roboActionLoadInRamCb(self):
 		
 		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
-
+		optDlg = RawSequenceOptions(parent=self)
+		options = None
+		if optDlg.exec_():
+			options = optDlg.getValues()
+			print(options)
 		
-		sd = SequenceDisplay(self, files,loadInRam = True)
+		sd = SequenceDisplay(self, files,loadInRam = True,rawTiffOptions=options)
 		#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))

@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Sat Aug  3 23:32:07 2013
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Mon Mar  3 18:43:28 2014
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -128,7 +128,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 17))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
@@ -188,6 +188,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_as_avi.setObjectName(_fromUtf8("actionSave_as_avi"))
         self.actionForce_recomputation = QtGui.QAction(SequenceDisplayWnd)
         self.actionForce_recomputation.setObjectName(_fromUtf8("actionForce_recomputation"))
+        self.actionSave_as_hd5_table = QtGui.QAction(SequenceDisplayWnd)
+        self.actionSave_as_hd5_table.setObjectName(_fromUtf8("actionSave_as_hd5_table"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -216,6 +218,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuDisplay.addAction(self.menuFilters.menuAction())
         self.menuOutput.addAction(self.actionSave_raw_sequence)
         self.menuOutput.addAction(self.actionSave_as_avi)
+        self.menuOutput.addAction(self.actionSave_as_hd5_table)
         self.menubar.addAction(self.menuRois.menuAction())
         self.menubar.addAction(self.menuStacks.menuAction())
         self.menubar.addAction(self.menuDisplay.menuAction())
@@ -262,4 +265,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_traces.setText(_translate("SequenceDisplayWnd", "Export traces", None))
         self.actionSave_as_avi.setText(_translate("SequenceDisplayWnd", "Save as avi", None))
         self.actionForce_recomputation.setText(_translate("SequenceDisplayWnd", "Force roi recomputation", None))
+        self.actionSave_as_hd5_table.setText(_translate("SequenceDisplayWnd", "Save as hd5 table", None))
 

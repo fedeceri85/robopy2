@@ -166,6 +166,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
 		self.connect(self.actionSave_as_avi, SIGNAL("triggered()"), self.saveSequenceAsAvi)
+		self.connect(self.actionSave_as_hd5_table, SIGNAL("triggered()"), self.saveSequenceAsTable)
 		
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.processedWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
@@ -756,6 +757,31 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 		aviWriter.clearAviHandler()
 		
+	def saveSequenceAsTable(self):
+		import tables as tb
+		
+		fname = QFileDialog.getSaveFileName(self, "Save processed sequence to table", QString(), "Table (*.h5)")
+		if not fname.isEmpty():
+			fname= str(fname.toAscii())
+
+		first, step = self.getSequenceStartAndStep()
+		last = self.optionsDlg.frameOptions.lastFrame-1
+		nframes = int(np.floor((last-first)/step))
+		t,data=self.getSequenceFrame(0)
+		h5file = tb.openFile(fname, mode='w')
+		root = h5file.root
+		atom = tb.Atom.from_dtype(data.dtype)
+		filters = tb.Filters(complevel=5, complib='zlib')
+
+		x = h5file.createCArray(root,'x',atom,shape=((self.tiffSequence.getHeight(),self.tiffSequence.getWidth(),nframes)),filters=filters)
+		
+		for i in xrange(first,last,step):
+			print i
+			t,data=self.getSequenceFrame(i)
+			ind =  int(np.floor((i-first)/step))
+			x[:,:,ind] = data
+		
+		h5file.close()
 			
 	def recomputeFalseColorReference(self):
 		#self.displayParameters.falseColorRefFrame = SequenceProcessor.computeReference(self.tiffSequence, self.optionsDlg.frameOptions)

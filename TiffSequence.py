@@ -2,7 +2,7 @@ from libtiff import TIFF
 from numpy import zeros,loadtxt,array,uint16,argwhere
 import numpy as np
 import Roi
-from os.path import splitext
+from os.path import splitext, getsize
 import threading
 from scipy.ndimage import zoom
 
@@ -43,7 +43,10 @@ class TiffSequence:
 		self.rois = list()
 		self.arraySequence = None
 		self.timesDict = TimesDict()
-		self.open()
+		try:
+			self.open()
+		except TypeError:
+			print("Not able to open image file. Trying to continue..")
 		for i in self.tifHandlers:
 			width, height, frames = self.getTifInfo(i)
 			print(str(width) + " " + str(height) + " " + str(frames))
@@ -139,7 +142,59 @@ class TiffSequence:
 					pass
 				
 				self.tifHandlers[i].SetDirectory(n)
-				self.arraySequence[:,:,index]=self.tifHandlers[i].read_image()
+				img = self.tifHandlers[i].read_image()
+				if self.options['crop']:
+					lm = self.options['leftMargin']
+					rm = self.options['rightMargin']
+					tm = self.options['topMargin']
+					bm = self.options['bottomMargin']
+				if self.options['rebin'] is not None:
+					if self.options['LineCorrection']:
+						
+						lsub = img[:,:self.options['LeftLC']]
+						if self.options['RightLC']!=0:
+							rsub = img[:,-self.options['RightLC']::]
+							lrsub = np.hstack((lsub,rsub)).mean(1)
+
+						else:
+							lrsub = lsub.mean(1)
+						
+						lrsub = lrsub.reshape((lrsub.shape[0],1))
+						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
+						if self.options['crop']:
+							img = img[tm:bm,lm:rm]
+						self.arraySequence[:,:,index] = img
+						
+					else:	
+						img = zoom(img,1.0/self.options['rebin'],order=0)
+
+						if self.options['crop']:
+							img = img[tm:bm,lm:rm]
+						self.arraySequence[:,:,index] = img
+				else:
+					if self.options['LineCorrection']:
+						#img = self.tifHandlers[i].read_image()
+						
+						lsub = img[:,:self.options['LeftLC']]
+						if self.options['RightLC']!=0:
+							rsub = img[:,-self.options['RightLC']::]
+							lrsub = np.hstack((lsub,rsub)).mean(1)
+
+						else:
+							lrsub=lsub.mean(1)
+							
+						lrsub = lrsub.reshape((lrsub.shape[0],1))
+						sub = uint16(np.tile(lrsub,(1,img.shape[1])))
+						self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
+						if self.options['crop']:
+							img = img[tm:bm,lm:rm]
+						self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
+						
+					else:	
+						if self.options['crop']:
+							img = img[tm:bm,lm:rm]	
+						self.arraySequence[:,:,index] = img
 
 	def loadFrameInCache(self, n):
 		if self.arraySequence is not None:
@@ -341,8 +396,10 @@ class TiffSequence:
 		return roiProfile
 		
 	def saveSequence(self, f):
-		th = TIFF.open(str(f), 'w')
-		
+		if getsize(f)<2.274032144*1E9:
+			th = TIFF.open(str(f), 'w')
+		else:
+			th = TIFF.open(str(f)+'_2','w')
 		for i in range(self.frames):
 			th.SetField(256, self.width)
 			th.SetField(257, self.height)
@@ -364,6 +421,10 @@ class TiffSequence:
 		th.SetField(262, 1) #samples per pixel
 		
 		th.write_image(f, "lzw", False)
+		if getsize(th.FileName()) > 2.274032144*1E9:
+			return 1
+		else:
+			return 0
 		
 	def closeWriteSequence(self, th):
 		th.close()
@@ -373,8 +434,10 @@ class TiffSequence:
 			#if (size(self.SequenceFiles))==1:
 		#		filename=splitext(self.SequenceFiles)+'_times.txt'
 		#	else:
-			filename=splitext(self.SequenceFiles[0])[0]+'_times.txt'
-		
+			try:
+				filename=splitext(self.SequenceFiles[0])[0]+'_times.txt'
+			except TypeError:
+				return
 		try:
 			self.timesDict = loadTimes(filename,firstFrameIndex = 0, firstTimeValue = 0.0,scaleFactor=1000.0)
 			self.timesDict.setLabel('Time (s)')
