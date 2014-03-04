@@ -22,7 +22,7 @@ class ThreadedRead(threading.Thread):
 		self.tifSequence.threadLock.release()
 class Sequence:
 	"""
-	Abstract sequence class from which other classes should inherit. Every derived class must override the open, getImage and (possibly) 
+	Abstract sequence class from which other classes should inherit. Every derived class must override the open, getRawImage and (possibly) 
 	saveSequence methods
 	"""
 	def __init__(self,fNames,options=None):
@@ -55,7 +55,7 @@ class Sequence:
 	def open(self):
 		pass
 	
-	def getImage(self,n):
+	def getRawImage(self,n):
 		pass	
 	
 	def saveSequence(self, f):
@@ -188,7 +188,7 @@ class Sequence:
 	def loadWholeTiff(self):
 		self.arraySequence = zeros((self.height,self.width,self.frames))
 		for index in xrange(self.frames):
-			img = self.getImage(index)
+			img = self.getRawImage(index)
 			self.applyOptions(img)
 			self.arraySequence[:,:,index] = img
 			
@@ -196,7 +196,7 @@ class Sequence:
 		if self.arraySequence is not None:
 			self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
 		else:
-			img = self.getImage(n)
+			img = self.getRawImage(n)
 			self.applyOptions(img)
 			self.cachedFrames[n] = img
 			
@@ -218,7 +218,7 @@ class Sequence:
 				
 			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
 				self.threadLock.acquire()
-				img = self.getImage(n)
+				img = self.getRawImage(n)
 				self.applyOptions(img)
 				self.cachedFrames[n] = img
 
@@ -332,7 +332,7 @@ class TiffSequence(Sequence):
 			
 		return (i,n)
 	
-	def getImage(self,index):
+	def getRawImage(self,index):
 		if self.tifHandlers[0] != None:
 			i,n = self.getFileIndexes(index)
 		
@@ -349,20 +349,28 @@ class TiffSequence(Sequence):
 					
 
 		
-	def saveSequence(self, f):
-		if getsize(f)<2.274032144*1E9:
-			th = TIFF.open(str(f), 'w')
-		else:
-			th = TIFF.open(str(f)+'_2','w')
-		for i in range(self.frames):
-			th.SetField(256, self.width)
-			th.SetField(257, self.height)
+	def saveSequence(self, f,sequence=None):
+		if sequence == None:
+			sequence = self
+			
+	
+		th = TIFF.open(str(f), 'w')
+		count = 0
+		
+		for i in range(sequence.frames):
+			th.SetField(256, sequence.width)
+			th.SetField(257, sequence.height)
 			th.SetField(277, 1) #phtometric interpretation black is minimum
 			th.SetField(258, 16) #bits per sample
 			th.SetField(262, 1) #samples per pixel
 			
-			th.write_image(self.getFrame(i), "lzw", False)
-			
+			th.write_image(sequence.getFrame(i), "lzw", False)
+			if getsize(f)>2.274032144*1E9:
+				count = count +1 
+				fname2,ext = splitext(str(f))
+				f = fname2+'_part'+str(count).zfill(2)+ext
+				th = TIFF.open(f,'w')
+				
 	def openWriteSequence(self, f):
 		th = TIFF.open(str(f), 'w')
 		return th
@@ -393,9 +401,10 @@ class HDF5Sequence(Sequence):
 		#self.tifHandlers = list()	
 		self.hdf5Handler = None
 		Sequence.__init__(self,fNames,options)
-		
-		height,width, frames = self.hdf5Handler.shape
-		
+		try:
+			height,width, frames = self.hdf5Handler.shape
+		except:
+			height,width,frames = 0,0,1
 		if self.options['rebin'] is not None:
 			width = width/self.options['rebin']
 			height = height/self.options['rebin']
@@ -417,8 +426,29 @@ class HDF5Sequence(Sequence):
 		fi = tb.openFile(self.SequenceFiles[0])
 		self.hdf5Handler = fi.root.x
 	
-	def getImage(self,n):
+	def getRawImage(self,n):
 		return self.hdf5Handler[:,:,n]	
+	
+	
+	def saveSequence(self, f,sequence=None):
+		if sequence == None:
+			sequence = self
+			
+		data = sequence.getFrame(0)
+		
+		h5file = tb.openFile(f, mode='w')
+		root = h5file.root
+		atom = tb.Atom.from_dtype(data.dtype)
+		#filters = tb.Filters(complevel=9, complib='lzo',shuffle=True)
+
+		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames)
+
+		for i in xrange(sequence.frames):
+			data = sequence.getFrame(i)
+			x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
+		
+		h5file.flush()
+		h5file.close()
 	
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	

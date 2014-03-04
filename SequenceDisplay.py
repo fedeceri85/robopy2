@@ -731,10 +731,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if self.tiffSequence == None:
 			return
 			
-		fname = QFileDialog.getSaveFileName(self, "Save tif sequence to file", QString(), "Images (*.tif)")
+		fname = QFileDialog.getSaveFileName(self,"Save file","", "Tiff images (*.tif);; HDF5 images (*.h5) ")
+		
 		if not fname.isEmpty():
-			self.tiffSequence.saveSequence(fname.toAscii())
-	
+			ext = os.path.splitext(str(fname))[1]
+			if ext == '.tif' or ext=='.tiff' or ext =='.TIF' or ext == '.TIFF':
+				tiff = TiffSequence(None)
+				tiff.saveSequence(fname.toAscii(),sequence=self.tiffSequence)
+			if ext == '.h5' or ext == 'h5f' or ext == '.H5' or ext == '.H5F':
+				tiff = HDF5Sequence(None)
+			tiff.saveSequence(str(fname.toAscii()),sequence=self.tiffSequence)	
 	def saveSequenceAsAvi(self):
 		first, step = self.getSequenceStartAndStep()
 		fps = int(round(1.0/(self.tiffSequence.timesDict.dt())))
