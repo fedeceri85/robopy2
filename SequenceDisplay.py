@@ -731,7 +731,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if self.tiffSequence == None:
 			return
 			
-		fname = QFileDialog.getSaveFileName(self,"Save file","", "Tiff images (*.tif);; HDF5 images (*.h5) ")
+		fname = QFileDialog.getSaveFileName(self,"Save file",QString(), "Tiff images (*.tif);; HDF5 images (*.h5) ")
 		
 		if not fname.isEmpty():
 			ext = os.path.splitext(str(fname))[1]
@@ -769,6 +769,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def saveSequenceAsTable(self):
 		import tables as tb
+		self.ImageTabWidget.setCurrentIndex(1)
 		
 		fname = QFileDialog.getSaveFileName(self, "Save processed sequence to table", QString(), "Table (*.h5)")
 		if not fname.isEmpty():
