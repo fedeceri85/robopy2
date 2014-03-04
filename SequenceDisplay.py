@@ -10,7 +10,7 @@ from OpenGL import GL
 import DisplayParameters
 from SequenceDisplayGui import Ui_SequenceDisplayWnd
 from ImageDisplayWidget import ImageDisplayWidget
-from TiffSequence import TiffSequence
+from TiffSequence import TiffSequence, HDF5Sequence
 import SequenceProcessor
 from mplot import MPlot
 
@@ -86,6 +86,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.tiffSequence = TiffSequence(files,self.rawTiffOptions)
 			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
 				self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)
+		elif os.path.splitext(files[0])[1] == '.h5':
+			self.tiffSequence = HDF5Sequence(files,self.rawTiffOptions)
+			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
+				self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)			
 		else:
 			for plugin in self.plugins:
 				if plugin.associatedFileType == os.path.splitext(files[0])[1]:
@@ -771,7 +775,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		h5file = tb.openFile(fname, mode='w')
 		root = h5file.root
 		atom = tb.Atom.from_dtype(data.dtype)
-		filters = tb.Filters(complevel=9, complib='zlib',shuffle=True)
+		filters = tb.Filters(complevel=9, complib='lzo',shuffle=True)
 
 		x = h5file.createEArray(root,'x',atom,shape=(self.tiffSequence.getHeight(),self.tiffSequence.getWidth(),0),expectedrows=nframes)
 

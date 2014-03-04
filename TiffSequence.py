@@ -5,7 +5,7 @@ import Roi
 from os.path import splitext, getsize
 import threading
 from scipy.ndimage import zoom
-
+import tables as tb
 #from pubTools import oneColumnFigure
 
 class ThreadedRead(threading.Thread):
@@ -385,9 +385,41 @@ class TiffSequence(Sequence):
 	
 
 
-
+class HDF5Sequence(Sequence):
+	def __init__(self, fNames,options = None):
+		
 
 		
+		#self.tifHandlers = list()	
+		self.hdf5Handler = None
+		Sequence.__init__(self,fNames,options)
+		
+		height,width, frames = self.hdf5Handler.shape
+		
+		if self.options['rebin'] is not None:
+			width = width/self.options['rebin']
+			height = height/self.options['rebin']
+		self.origWidth = width
+		self.origHeight = height
+		if self.options['crop']:
+			width = self.options['rightMargin'] - self.options['leftMargin']
+			height = self.options['bottomMargin'] - self.options['topMargin']
+		
+		self.width=width
+		self.height=height
+		self.frames=frames - 1
+		
+		self.origWidth = self.width 
+		self.origHeight = self.height
+		self.initTimesDict()
+	
+	def open(self):
+		fi = tb.openFile(self.SequenceFiles[0])
+		self.hdf5Handler = fi.root.x
+	
+	def getImage(self,n):
+		return self.hdf5Handler[:,:,n]	
+	
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
 	#times=numpy.loadtxt(splitext(filename)[0]+'_times.txt',delimiter='\t',skiprows=1,usecols=(0,1))

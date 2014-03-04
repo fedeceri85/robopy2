@@ -116,7 +116,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		
 	def roboActionOpenCb(self):
 		
-		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
+		files = self.getFileNamesGui("Select sequence", QString(), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
 		options = None
 		if optDlg.exec_():
@@ -129,7 +129,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 
 	def roboActionLoadInRamCb(self):
 		
-		files = self.getFileNamesGui("Select tiff sequence", QString(), "Images (*.tif)")
+		files = self.getFileNamesGui("Select sequence", QString(), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
 		options = None
 		if optDlg.exec_():
