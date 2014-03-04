@@ -771,16 +771,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		h5file = tb.openFile(fname, mode='w')
 		root = h5file.root
 		atom = tb.Atom.from_dtype(data.dtype)
-		filters = tb.Filters(complevel=5, complib='zlib')
+		filters = tb.Filters(complevel=9, complib='zlib',shuffle=True)
 
-		x = h5file.createCArray(root,'x',atom,shape=((self.tiffSequence.getHeight(),self.tiffSequence.getWidth(),nframes)),filters=filters)
-		
+		x = h5file.createEArray(root,'x',atom,shape=(self.tiffSequence.getHeight(),self.tiffSequence.getWidth(),0),expectedrows=nframes)
+
 		for i in xrange(first,last,step):
 			print i
 			t,data=self.getSequenceFrame(i)
 			ind =  int(np.floor((i-first)/step))
-			x[:,:,ind] = data
-		
+			#x[:,:,ind] = data
+			x.append(data.reshape((self.tiffSequence.getHeight(),self.tiffSequence.getWidth(),1)))
+		h5file.flush()
 		h5file.close()
 			
 	def recomputeFalseColorReference(self):
