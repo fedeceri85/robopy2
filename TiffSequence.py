@@ -149,14 +149,15 @@ class Sequence:
 					
 					lrsub = lrsub.reshape((lrsub.shape[0],1))
 					sub = uint16(np.tile(lrsub,(1,img.shape[1])))
-					img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
+					#img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
+					img = rebin(img-sub+uint16(lrsub.mean()),(img.shape[0]/self.options['rebin'],img.shape[0]/self.options['rebin']))
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
 					
 				else:	
-					img = zoom(img,1.0/self.options['rebin'],order=0)
-
+					#img = zoom(img,1.0/self.options['rebin'],order=0)
+					img = rebin(img,(img.shape[0]/self.options['rebin'],img.shape[0]/self.options['rebin']))
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -458,7 +459,9 @@ def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	times = loadtxt(filename,delimiter='\t',skiprows=1,usecols=(0,1))
 	return TimesDict(zip(list((times[:,0]+firstFrameIndex).astype(uint16)),list((times[:,1]+firstTimeValue)/scaleFactor)))
 
-
+def rebin(a, shape):
+    sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
+    return a.reshape(sh).sum(-1).sum(1)
 
 class TimesDict(dict):
 	"""

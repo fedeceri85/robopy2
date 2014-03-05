@@ -8,7 +8,7 @@ sys.path.append('/usr/local/lib/python2.7/site-packages/stfio/')
 import stfio
 import numpy as np
 import pickle
-from TiffSequence import TiffSequence
+from TiffSequence import TiffSequence, HDF5Sequence
 from SequenceApOptions import Ui_Dialog
 associatedFileType = '.cap'
 import sys, os
@@ -157,11 +157,16 @@ def run(sd):
 	except KeyError:
 		time0=0
 	folder = os.path.split(sd.tiffFiles[0])[0]
+	ext = os.path.splitext(tiffFiles[0])[1]
 	tiffFilesOut=[]
 	for f in tiffFiles:
 		tiffFilesOut.append(os.path.join(folder,f))
 	
-	
-	sd.tiffSequence = TiffSequence(tiffFilesOut,sd.rawTiffOptions)
+	if ext == '.tif' or ext=='.tiff' or ext =='.TIF' or ext == '.TIFF':
+		sd.tiffSequence = TiffSequence(tiffFilesOut,sd.rawTiffOptions)
+
+	if ext == '.h5' or ext == 'h5f' or ext == '.H5' or ext == '.H5F':
+		sd.tiffSequence = HDF5Sequence(tiffFilesOut,sd.rawTiffOptions)
+		
 	sd.processedSequence = calciumAPProcessor(sd.tiffSequence,abfFile,time0,sd.processedWidget,sd.displayParameters,sd.optionsDlg.frameOptions,
 						sd.optionsDlg.displayOptions,sd.optionsDlg.timeOptions)

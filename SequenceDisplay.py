@@ -771,6 +771,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		import tables as tb
 		self.ImageTabWidget.setCurrentIndex(1)
 		
+		
 		fname = QFileDialog.getSaveFileName(self, "Save processed sequence to table", QString(), "Table (*.h5)")
 		if not fname.isEmpty():
 			fname= str(fname.toAscii())
@@ -778,6 +779,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		first, step = self.getSequenceStartAndStep()
 		last = self.optionsDlg.frameOptions.lastFrame-1
 		nframes = int(np.floor((last-first)/step))
+		
+		#Ensure that autoAdjust = True in order to get the array image, not just the texture
+		autoAdj = self.displayParameters.autoAdjust
+		if self.displayParameters.autoAdjust == False:
+			self.displayParameters.autoAdjust = True
+		
 		t,data=self.getSequenceFrame(0)
 		h5file = tb.openFile(fname, mode='w')
 		root = h5file.root
@@ -792,6 +799,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			ind =  int(np.floor((i-first)/step))
 			#x[:,:,ind] = data
 			x.append(data.reshape((self.tiffSequence.getHeight(),self.tiffSequence.getWidth(),1)))
+		
+		self.displayParameters.autoAdjust = autoAdj
+		
 		h5file.flush()
 		h5file.close()
 			
