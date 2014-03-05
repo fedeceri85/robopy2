@@ -183,13 +183,15 @@ class Sequence:
 				else:	
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]	
+						
+			return img
 					#self.arraySequence[:,:,index] = img
 
 	def loadWholeTiff(self):
 		self.arraySequence = zeros((self.height,self.width,self.frames))
 		for index in xrange(self.frames):
 			img = self.getRawImage(index)
-			self.applyOptions(img)
+			img = self.applyOptions(img)
 			self.arraySequence[:,:,index] = img
 			
 	def loadFrameInCache(self, n):
@@ -197,7 +199,7 @@ class Sequence:
 			self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
 		else:
 			img = self.getRawImage(n)
-			self.applyOptions(img)
+			img = self.applyOptions(img)
 			self.cachedFrames[n] = img
 			
 
@@ -219,7 +221,7 @@ class Sequence:
 			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
 				self.threadLock.acquire()
 				img = self.getRawImage(n)
-				self.applyOptions(img)
+				img = self.applyOptions(img)
 				self.cachedFrames[n] = img
 
 				self.threadLock.release()	

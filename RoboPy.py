@@ -161,8 +161,8 @@ if __name__== "__main__":
 	robopy = RoboPy()
 	robopy.show()
 
-	ipshell = InteractiveShellEmbed()
-	ipshell()
+	#ipshell = InteractiveShellEmbed()
+	#ipshell()
 	
 	ans = app.exec_()
 
