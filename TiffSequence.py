@@ -150,14 +150,14 @@ class Sequence:
 					lrsub = lrsub.reshape((lrsub.shape[0],1))
 					sub = uint16(np.tile(lrsub,(1,img.shape[1])))
 					#img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
-					img = rebin(img-sub+uint16(lrsub.mean()),(img.shape[0]/self.options['rebin'],img.shape[0]/self.options['rebin']))
+					img = rebin(img-sub+uint16(lrsub.mean()),(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
 					
 				else:	
 					#img = zoom(img,1.0/self.options['rebin'],order=0)
-					img = rebin(img,(img.shape[0]/self.options['rebin'],img.shape[0]/self.options['rebin']))
+					img = rebin(img,(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>515</width>
-    <height>380</height>
+    <height>415</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="PO_TabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="FrameOptionsTab">
       <attribute name="title">
@@ -527,7 +527,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Tags</string>
+       <string>Playback</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
@@ -609,6 +609,40 @@
           <size>
            <width>20</width>
            <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_18">
+         <item>
+          <widget class="QLabel" name="yOffsetLabel_3">
+           <property name="text">
+            <string>Interframe interval (ms) </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="PlayInterframeSpinBox">
+           <property name="maximum">
+            <number>2560</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>45</height>
           </size>
          </property>
         </spacer>
@@ -774,6 +808,9 @@
       <zorder>displayTimesCheckBox</zorder>
       <zorder>verticalSpacer_2</zorder>
       <zorder>scalebarCheckBox</zorder>
+      <zorder>layoutWidget_2</zorder>
+      <zorder>verticalSpacer_3</zorder>
+      <zorder>PlayInterframeSpinBox</zorder>
      </widget>
      <widget class="QWidget" name="FiltersTab">
       <attribute name="title">

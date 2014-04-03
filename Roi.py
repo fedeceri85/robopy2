@@ -37,7 +37,7 @@ class Roi(QPolygon):
 					
 			if len(lPointsX) > 0:
 				self.pointMap.append([np.array(lPointsX), i])
-				
+		
 	def addPoint(self, x, y):
 		self.append(QPoint(x,y))
 		

@@ -43,7 +43,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.roiProfile = None
 		#self.roiAverageRecomputeNeeded = False
 		
-		self.PlayInterframe = 50
+		#self.PlayInterframe = 50
 		self.IsPlaying = False
 		self.timer = QBasicTimer()
 		self.FrameImage = None
@@ -609,7 +609,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def playButtonCb(self):
 		if self.IsPlaying == False:
-			self.timer.start(self.PlayInterframe, self)
+			self.timer.start(self.optionsDlg.timeOptions.PlayInterframe, self)
 			self.IsPlaying = True
 		else:
 			self.timer.stop()

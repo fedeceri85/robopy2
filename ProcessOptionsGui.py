@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Thu Sep 19 14:51:36 2013
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Mon Mar 31 14:49:40 2014
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_ProcessOptionsDlg(object):
     def setupUi(self, ProcessOptionsDlg):
         ProcessOptionsDlg.setObjectName(_fromUtf8("ProcessOptionsDlg"))
-        ProcessOptionsDlg.resize(515, 380)
+        ProcessOptionsDlg.resize(515, 415)
         self.verticalLayout = QtGui.QVBoxLayout(ProcessOptionsDlg)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.PO_TabWidget = QtGui.QTabWidget(ProcessOptionsDlg)
@@ -300,6 +300,19 @@ class Ui_ProcessOptionsDlg(object):
         self.verticalLayout_9.addLayout(self.horizontalLayout_10)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_9.addItem(spacerItem1)
+        self.horizontalLayout_18 = QtGui.QHBoxLayout()
+        self.horizontalLayout_18.setObjectName(_fromUtf8("horizontalLayout_18"))
+        self.yOffsetLabel_3 = QtGui.QLabel(self.tab)
+        self.yOffsetLabel_3.setObjectName(_fromUtf8("yOffsetLabel_3"))
+        self.horizontalLayout_18.addWidget(self.yOffsetLabel_3)
+        self.PlayInterframeSpinBox = QtGui.QSpinBox(self.tab)
+        self.PlayInterframeSpinBox.setMaximum(2560)
+        self.PlayInterframeSpinBox.setProperty("value", 50)
+        self.PlayInterframeSpinBox.setObjectName(_fromUtf8("PlayInterframeSpinBox"))
+        self.horizontalLayout_18.addWidget(self.PlayInterframeSpinBox)
+        self.verticalLayout_9.addLayout(self.horizontalLayout_18)
+        spacerItem2 = QtGui.QSpacerItem(20, 45, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_9.addItem(spacerItem2)
         self.scalebarCheckBox = QtGui.QCheckBox(self.tab)
         self.scalebarCheckBox.setChecked(True)
         self.scalebarCheckBox.setObjectName(_fromUtf8("scalebarCheckBox"))
@@ -389,7 +402,7 @@ class Ui_ProcessOptionsDlg(object):
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
         self.retranslateUi(ProcessOptionsDlg)
-        self.PO_TabWidget.setCurrentIndex(1)
+        self.PO_TabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(ProcessOptionsDlg)
 
     def retranslateUi(self, ProcessOptionsDlg):
@@ -431,6 +444,7 @@ class Ui_ProcessOptionsDlg(object):
         self.fontSizeLabel.setText(_translate("ProcessOptionsDlg", "Font Size", None))
         self.xOffsetLabel.setText(_translate("ProcessOptionsDlg", "X offset", None))
         self.yOffsetLabel.setText(_translate("ProcessOptionsDlg", "Y offset", None))
+        self.yOffsetLabel_3.setText(_translate("ProcessOptionsDlg", "Interframe interval (ms) ", None))
         self.scalebarCheckBox.setText(_translate("ProcessOptionsDlg", "Display scalebar on the video", None))
         self.label_2.setText(_translate("ProcessOptionsDlg", "Scale Factor (um/pixel)", None))
         self.label_4.setText(_translate("ProcessOptionsDlg", "Length (um)", None))
@@ -438,6 +452,6 @@ class Ui_ProcessOptionsDlg(object):
         self.fontSizeLabel_2.setText(_translate("ProcessOptionsDlg", "Font Size", None))
         self.xOffsetLabel_2.setText(_translate("ProcessOptionsDlg", "X offset", None))
         self.yOffsetLabel_2.setText(_translate("ProcessOptionsDlg", "Y offset", None))
-        self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.tab), _translate("ProcessOptionsDlg", "Tags", None))
+        self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.tab), _translate("ProcessOptionsDlg", "Playback", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.FiltersTab), _translate("ProcessOptionsDlg", "Filters", None))
 

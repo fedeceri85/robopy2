@@ -1081,7 +1081,7 @@ def saveRoisToFile(filename,rois,roiprofile = None,times = None):
 			y.append(p.y())
 		coordinates=np.vstack((np.array(x),np.array(y)))
 		
-		roisdict={'Color': color, 'Coordinates':coordinates, 'LineType':u'-','Map':np.array([], dtype=np.float64),'Rectangular':0, 'h_MovieLine':0,'h_MovieTxt':0,'h_line':0,'h_text':0}
+		roisdict={'Color': color, 'Coordinates':coordinates, 'LineType':u'-','Map':roi.pointMap,'Rectangular':0, 'h_MovieLine':0,'h_MovieTxt':0,'h_line':0,'h_text':0}
 		
 		roilist.append(roisdict)
 	if os.path.splitext(filename)[1] == '.mat':
