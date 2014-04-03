@@ -1160,7 +1160,14 @@ def HSVtoRGB(arr):
 	return weave.inline(code,['arr'])
 
 
-
+def computeAverage(tiffSequence,framesInd):
+	img = tiffSequence.getFrame(framesInd[0])
+	img = img.astype(np.float32)
+	for f in framesInd[1:]:
+		img = img + tiffSequence.getFrame(f)
+		
+	img = img/len(framesInd)
+	return img
 
 
 class ProcessedSequence:

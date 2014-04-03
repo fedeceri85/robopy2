@@ -352,15 +352,16 @@ class TiffSequence(Sequence):
 					
 
 		
-	def saveSequence(self, f,sequence=None):
+	def saveSequence(self, f,sequence=None,framesInd = None):
 		if sequence == None:
 			sequence = self
 			
 	
 		th = TIFF.open(str(f), 'w')
 		count = 0
-		
-		for i in range(sequence.frames):
+		if framesInd is None:
+			framesInd = range(sequence.frames)
+		for i in framesInd:
 			th.SetField(256, sequence.width)
 			th.SetField(257, sequence.height)
 			th.SetField(277, 1) #phtometric interpretation black is minimum
@@ -433,11 +434,14 @@ class HDF5Sequence(Sequence):
 		return self.hdf5Handler[:,:,n]	
 	
 	
-	def saveSequence(self, f,sequence=None):
+	def saveSequence(self, f,sequence=None,framesInd = None):
 		if sequence == None:
 			sequence = self
 			
 		data = sequence.getFrame(0)
+		
+		if framesInd is None:
+			framesInd = range(sequence.frames)
 		
 		h5file = tb.openFile(f, mode='w')
 		root = h5file.root
@@ -446,7 +450,7 @@ class HDF5Sequence(Sequence):
 
 		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames)
 
-		for i in xrange(sequence.frames):
+		for i in framesInd:		
 			data = sequence.getFrame(i)
 			x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
 		

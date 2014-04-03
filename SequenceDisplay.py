@@ -20,8 +20,11 @@ from Worker import Worker
 from AviSettings import AviSettings
 from AviWriter import AviWriter
 
+from SaveRawSequenceOptions import SaveRawSequenceOptions
+
 from SequenceProcessor import ProcessedSequence
 import Plugins
+from scipy.misc import imsave
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
@@ -186,6 +189,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.colorMaxSlider, SIGNAL("sliderMoved(int)"), self.displayMaxChangedSlider)
 		self.connect(self.colorAutoRadioButton, SIGNAL("toggled(bool)"), self.displayAutoAdjustChanged)
 		
+		self.connect(self.actionAverage,SIGNAL("triggered()"),self.averageCb)
 		
 		
 		#menus
@@ -634,6 +638,18 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			if imy > y and y >= 0 and imx > x and x >= 0:
 				self.showStatusMessage(str(x) + ":" + str(y) + "=" + str(self.FrameData[y][x]))
 	
+	def averageCb(self):
+		optDlg = SaveRawSequenceOptions([1,self.tiffSequence.frames],parent=self)
+		
+		if optDlg.exec_():
+			framesInd = optDlg.getFrameInterval()
+		img = SequenceProcessor.computeAverage(self.tiffSequence,framesInd)
+		fig = MPlot(self)
+		fig.imshow(img)
+		fig.show()
+		fname = os.path.splitext(self.tiffFiles[0])[0]+'_average.tif'
+		imsave(fname,img)
+		
 	def computeRoisCb(self):
 		ff = 0
 		lf = self.tiffSequence.getFrames()
@@ -732,15 +748,19 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			return
 			
 		fname = QFileDialog.getSaveFileName(self,"Save file",QString(), "Tiff images (*.tif);; HDF5 images (*.h5) ")
+		optDlg = SaveRawSequenceOptions([1,self.tiffSequence.frames],parent=self)
 		
 		if not fname.isEmpty():
+			if optDlg.exec_():
+				framesInd = optDlg.getFrameInterval()
+				
 			ext = os.path.splitext(str(fname))[1]
 			if ext == '.tif' or ext=='.tiff' or ext =='.TIF' or ext == '.TIFF':
 				tiff = TiffSequence(None)
-				tiff.saveSequence(fname.toAscii(),sequence=self.tiffSequence)
+				tiff.saveSequence(fname.toAscii(),sequence=self.tiffSequence,framesInd=framesInd)
 			if ext == '.h5' or ext == 'h5f' or ext == '.H5' or ext == '.H5F':
 				tiff = HDF5Sequence(None)
-			tiff.saveSequence(str(fname.toAscii()),sequence=self.tiffSequence)	
+			tiff.saveSequence(str(fname.toAscii()),sequence=self.tiffSequence,framesInd=framesInd)	
 	def saveSequenceAsAvi(self):
 		first, step = self.getSequenceStartAndStep()
 		fps = int(round(1.0/(self.tiffSequence.timesDict.dt())))
