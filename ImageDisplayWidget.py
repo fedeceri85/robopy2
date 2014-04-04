@@ -25,6 +25,8 @@ class ImageDisplayWidget(QGLWidget):
 		self.textures = {'rawData':list(), 'toDraw':list(), 'texId': list(), 'texShape':list(), 
 		'internalType':list(), 'dataType':list()}
 		
+		self.setFocusPolicy(Qt.StrongFocus)
+		
 		self.shadePrograms = list()
 		self.videoBuffers = list()
 		
@@ -460,6 +462,10 @@ class ImageDisplayWidget(QGLWidget):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"
 			self.addRoi(self.rois[-1])
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_Delete:
+			self.deleteRoi()
+	
 			
 	def addRoi(self,roi,fromImageDisplayWidget = True):
 		if not fromImageDisplayWidget:
