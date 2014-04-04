@@ -481,3 +481,19 @@ class ImageDisplayWidget(QGLWidget):
 		self.updateGL()
 		
 		self.emit(QtCore.SIGNAL("roiAdded(int)"), id(self))
+		
+	def deleteRoi(self, n = -1):
+		nRoi = len(self.rois)
+		if n == -1 and nRoi > 0:
+			n = nRoi - 1
+		
+		if n < 0 or n >= nRoi:
+			return
+		
+		del self.rois[n]
+		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+		del self.SequenceDisplay.tiffSequence.rois[n]
+		self.updateGL()
+		
+		self.emit(QtCore.SIGNAL("roiDeleted(int)"), id(self))
+	

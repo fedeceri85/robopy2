@@ -182,6 +182,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.connect(self.imWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
 		self.connect(self.processedWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
+		self.connect(self.imWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
+		self.connect(self.processedWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
 		
 		self.connect(self.colorMinSpinBox, SIGNAL("valueChanged(float)"), self.displayMinChangedBox)
 		self.connect(self.colorMaxSpinBox, SIGNAL("valueChanged(float)"), self.displayMaxChangedBox)
@@ -195,6 +197,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
+		self.connect(self.actionDelete_Last, SIGNAL("triggered()"), self.deleteRoi)
 		
 	
 	def makeProcessReferenceConnections(self, dlg):
@@ -687,6 +690,24 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fig.show()
 		return times,rdata
 	
+	def deleteRoi(self, n = -1):
+		nRoi = len(self.imWidget.rois)
+		if n == -1 and nRoi > 0:
+			n = nRoi - 1
+		
+		if n < 0 or n >= nRoi:
+			return
+		
+		del self.imWidget.rois[n]
+		del self.processedWidget.rois[n]
+		self.displayParameters.roiAverageRecomputeNeeded = True
+		self.roiAverageRecomputeNeeded = True
+		
+		del self.tiffSequence.rois[n]
+		self.imWidget.updateGL()
+		self.processedWidget.updateGL()
+		
+	
 	def roiRecomputeNeeded(self, isNeeded):
 		self.roiAverageRecomputeNeeded = isNeeded
 		#print("roiRecompute is needed " + str(isNeeded))
@@ -696,6 +717,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.processedWidget.rois.append(self.imWidget.rois[-1])
 		else:
 			self.imWidget.rois.append(self.processedWidget.rois[-1])
+			
+		self.displayParameters.roiAverageRecomputeNeeded = True
+		
+	def roiDeleted(self, objId):
+		if objId == id(self.imWidget):
+			self.processedWidget.rois = self.imWidget.rois
+		else:
+			self.imWidget.rois = self.processedWidget.rois
 			
 		self.displayParameters.roiAverageRecomputeNeeded = True
 	
