@@ -808,14 +808,43 @@
       <zorder>displayTimesCheckBox</zorder>
       <zorder>verticalSpacer_2</zorder>
       <zorder>scalebarCheckBox</zorder>
-      <zorder>layoutWidget_2</zorder>
       <zorder>verticalSpacer_3</zorder>
-      <zorder>PlayInterframeSpinBox</zorder>
      </widget>
      <widget class="QWidget" name="FiltersTab">
       <attribute name="title">
        <string>Filters</string>
       </attribute>
+     </widget>
+     <widget class="QWidget" name="RoiOptionsTab">
+      <attribute name="title">
+       <string>Roi Options</string>
+      </attribute>
+      <widget class="QCheckBox" name="rectangularRoisCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>153</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Rectangular Rois</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="roiSameSizeCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>45</y>
+         <width>153</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Rois same size</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>

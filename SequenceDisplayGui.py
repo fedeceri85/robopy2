@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Mon Mar  3 18:43:28 2014
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Wed May 14 12:12:27 2014
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -128,7 +128,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 17))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
@@ -190,6 +190,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionForce_recomputation.setObjectName(_fromUtf8("actionForce_recomputation"))
         self.actionSave_as_hd5_table = QtGui.QAction(SequenceDisplayWnd)
         self.actionSave_as_hd5_table.setObjectName(_fromUtf8("actionSave_as_hd5_table"))
+        self.actionRoi_options = QtGui.QAction(SequenceDisplayWnd)
+        self.actionRoi_options.setObjectName(_fromUtf8("actionRoi_options"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -266,4 +268,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_as_avi.setText(_translate("SequenceDisplayWnd", "Save as avi", None))
         self.actionForce_recomputation.setText(_translate("SequenceDisplayWnd", "Force roi recomputation", None))
         self.actionSave_as_hd5_table.setText(_translate("SequenceDisplayWnd", "Save as hd5 table", None))
+        self.actionRoi_options.setText(_translate("SequenceDisplayWnd", "Roi options", None))
 

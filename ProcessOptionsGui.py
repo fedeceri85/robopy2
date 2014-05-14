@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Mon Mar 31 14:49:40 2014
+# Created: Wed May 14 13:20:09 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -399,6 +399,15 @@ class Ui_ProcessOptionsDlg(object):
         self.FiltersTab = QtGui.QWidget()
         self.FiltersTab.setObjectName(_fromUtf8("FiltersTab"))
         self.PO_TabWidget.addTab(self.FiltersTab, _fromUtf8(""))
+        self.RoiOptionsTab = QtGui.QWidget()
+        self.RoiOptionsTab.setObjectName(_fromUtf8("RoiOptionsTab"))
+        self.rectangularRoisCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.rectangularRoisCheckBox.setGeometry(QtCore.QRect(30, 20, 153, 21))
+        self.rectangularRoisCheckBox.setObjectName(_fromUtf8("rectangularRoisCheckBox"))
+        self.roiSameSizeCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.roiSameSizeCheckBox.setGeometry(QtCore.QRect(30, 45, 153, 21))
+        self.roiSameSizeCheckBox.setObjectName(_fromUtf8("roiSameSizeCheckBox"))
+        self.PO_TabWidget.addTab(self.RoiOptionsTab, _fromUtf8(""))
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
         self.retranslateUi(ProcessOptionsDlg)
@@ -454,4 +463,7 @@ class Ui_ProcessOptionsDlg(object):
         self.yOffsetLabel_2.setText(_translate("ProcessOptionsDlg", "Y offset", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.tab), _translate("ProcessOptionsDlg", "Playback", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.FiltersTab), _translate("ProcessOptionsDlg", "Filters", None))
+        self.rectangularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Rectangular Rois", None))
+        self.roiSameSizeCheckBox.setText(_translate("ProcessOptionsDlg", "Rois same size", None))
+        self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.RoiOptionsTab), _translate("ProcessOptionsDlg", "Roi Options", None))
 

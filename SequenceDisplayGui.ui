@@ -187,7 +187,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>17</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">
@@ -363,6 +363,11 @@
   <action name="actionSave_as_hd5_table">
    <property name="text">
     <string>Save as hd5 table</string>
+   </property>
+  </action>
+  <action name="actionRoi_options">
+   <property name="text">
+    <string>Roi options</string>
    </property>
   </action>
  </widget>
