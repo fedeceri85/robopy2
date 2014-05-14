@@ -252,7 +252,7 @@ class Shader():
 				v1 -= mapMn;
 				v1 /= (mapMx - mapMn);
 				
-				v1 = clamp(v1, 0.0, 0.9);
+				v1 = clamp(v1, 0.0, 0.9); // 0.9 to exclude "redder" colors
 				
 				v1 *= 4.0;
 				float r = min(v1 - 1.5, -v1 + 4.5);

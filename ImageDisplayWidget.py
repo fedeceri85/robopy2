@@ -37,11 +37,15 @@ class ImageDisplayWidget(QGLWidget):
 		self.setMouseTracking(True)
 		
 		self.ImagePositionX = 0
+		self.lastImagePositionX = 0
 		self.ImagePositionY = 0
+		self.lastImagePositionY = 0
 		
 		self.ImageZoom = 1.0
 		self.ImageZoomSteps = 1
-		
+
+		self.mouseFirstPosition = (0,0)
+
 		self.IsMouseDown = 0
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
@@ -150,7 +154,7 @@ class ImageDisplayWidget(QGLWidget):
 			h = self.currentDrawData["height"]
 			
 			glScalef(self.ImageZoom, self.ImageZoom, 1.0)
-				
+			glTranslatef(self.ImagePositionX,self.ImagePositionY,0);
 			glBegin(GL_QUADS)
 			glTexCoord2d(0,0)
 			glVertex2d(0,0)
@@ -181,7 +185,7 @@ class ImageDisplayWidget(QGLWidget):
 		nPoints = r.size()
 		glBegin(GL_LINE_LOOP)
 		for i in range(0,nPoints):
-			glVertex2f(r.point(i).x(), r.point(i).y())
+			glVertex2f(r.point(i).x() , r.point(i).y())
 			
 		glEnd()
 
@@ -191,7 +195,7 @@ class ImageDisplayWidget(QGLWidget):
 			
 			fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
 			fontScale = 12.0/fontWidth
-			glTranslatef(x, y, 1.0)
+			glTranslatef(x, y , 1.0)
 			glScalef(fontScale, -fontScale, 1.0)
 			#glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
 			
@@ -428,7 +432,10 @@ class ImageDisplayWidget(QGLWidget):
 			self.RightMouseButtonClicked = 1
 		else:
 			self.RightMouseButtonClicked = 0
-			
+			self.mouseFirstPosition = self.screenToImageNoTraslate(event.x(),event.y())
+			self.lastImagePositionX = self.ImagePositionX
+			self.lastImagePositionY = self.ImagePositionY
+
 	def mouseReleaseEvent(self, event):
 		
 		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1:
@@ -449,15 +456,27 @@ class ImageDisplayWidget(QGLWidget):
 		self.IsMouseDown = 0
 	
 	def screenToImage(self,x,y):
+		a = x / self.ImageZoom - self.ImagePositionX
+		b = y / self.ImageZoom - self.ImagePositionY
+		
+		return a,b
+	
+	def screenToImageNoTraslate(self,x,y):
 		a = x / self.ImageZoom
 		b = y / self.ImageZoom
 		
 		return a,b
-		
+
 	def mouseMoveEvent(self, event):
 		a,b = self.screenToImage(event.x(), event.y())
+
 		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
-		
+		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 0:
+			x,y = self.screenToImageNoTraslate(event.x(),event.y())
+			self.ImagePositionX = x - self.mouseFirstPosition[0] + self.lastImagePositionX
+			self.ImagePositionY = y - self.mouseFirstPosition[1] + self.lastImagePositionY
+			self.updateGL()
+
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"
