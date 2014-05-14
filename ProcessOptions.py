@@ -229,13 +229,15 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			d=cPickle.load(open(self.saveFile,'r'))
 			fo.add('rectangularRois', d['rectangularRois'], self.rectangularRoisCheckBox)
 			fo.add('roiSameSize', d['roiSameSize'], self.roiSameSizeCheckBox)
+			fo.add('roiSize',d['roiSize'],self.roiSizeSpinBox)
 
 		except:
 			fo.add('rectangularRois', 0, self.rectangularRoisCheckBox)
 			fo.add('roiSameSize', 0, self.roiSameSizeCheckBox)
+			fo.add('roiSize',0,self.roiSizeSpinBox)
 
 		return fo
-		
+
 	def HSVchanged(self):
 		if self.HSVradioButton.isChecked():
 			self.HSVbackGroupBox.setEnabled(True)

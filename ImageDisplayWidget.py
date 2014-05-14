@@ -431,17 +431,36 @@ class ImageDisplayWidget(QGLWidget):
 		if event.button() == Qt.RightButton:
 			self.RightMouseButtonClicked = 1
 			if self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==1 and (self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 0 or len(self.rois)==0):
-				a,b = self.screenToImage(event.x(), event.y())
-				self.mouseFirstPosition = (a,b)
-				w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
-				if w > a and a > 0 and h > b and b > 0:
-					if self.DrawRoiStatus == "idle":
-						self.DrawRoiStatus = "drawing"
-						self.rois.append(Roi())
+				if self.SequenceDisplay.optionsDlg.roiOptions.roiSize == 0:
+					a,b = self.screenToImage(event.x(), event.y())
+					self.mouseFirstPosition = (a,b)
+					w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+					if w > a and a > 0 and h > b and b > 0:
+						if self.DrawRoiStatus == "idle":
+							self.DrawRoiStatus = "drawing"
+							self.rois.append(Roi())
 
-						for i in xrange(4):
-							self.rois[-1].addPoint(a,b)
-						self.repaint()
+							for i in xrange(4):
+								self.rois[-1].addPoint(a,b)
+							self.repaint()
+				else:
+					roiSize = self.SequenceDisplay.optionsDlg.roiOptions.roiSize 
+					a,b = self.screenToImage(event.x(), event.y())
+					self.mouseFirstPosition = (a,b)
+					w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+					if w > a and a > 0 and h > b and b > 0:
+						if self.DrawRoiStatus == "idle":
+							self.DrawRoiStatus = "drawing"
+							self.rois.append(Roi())
+
+							self.rois[-1].addPoint(a - roiSize/2,b-roiSize/2)
+							self.rois[-1].addPoint(a + roiSize/2,b-roiSize/2)
+							self.rois[-1].addPoint(a + roiSize/2,b+roiSize/2)
+							self.rois[-1].addPoint(a - roiSize/2,b+roiSize/2)
+							self.repaint()
+							self.DrawRoiStatus = "idle"
+							self.addRoi(self.rois[-1])
+					
 
 			if self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 1 and len(self.rois)>0:
 				a,b = self.screenToImage(event.x(), event.y())
@@ -509,14 +528,10 @@ class ImageDisplayWidget(QGLWidget):
 
 		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==1:
 			if self.DrawRoiStatus == "drawing":
-				x1 = self.mouseFirstPosition[0]-a
-				x2 = self.mouseFirstPosition[0]+a
-				y1 = self.mouseFirstPosition[0]-b
-				y2 = self.mouseFirstPosition[0]+b
 				x1 = a
 				y1 = b
-				x2 = 2*self.mouseFirstPosition[0]-a
-				y2 = 2*self.mouseFirstPosition[1]-b
+				x2 = self.mouseFirstPosition[0]
+				y2 = self.mouseFirstPosition[1]
 
 				self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
 				self.repaint()
