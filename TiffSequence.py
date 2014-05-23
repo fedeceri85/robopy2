@@ -53,6 +53,7 @@ class Sequence:
 		self.threadLock = threading.Lock()
 	
 	def open(self):
+		print('Opening')
 		pass
 	
 	def getRawImage(self,n):
@@ -87,6 +88,8 @@ class Sequence:
 				return
 		try:
 			self.timesDict = loadTimes(filename,firstFrameIndex = 0, firstTimeValue = 0.0,scaleFactor=1000.0)
+			if self.timesDict == None:
+				raise IOError("Can't read the time file")
 			self.timesDict.setLabel('Time (s)')
 			if len(self.timesDict)< self.frames:
 				print("Warning. More frames than timepoints")
@@ -108,7 +111,7 @@ class Sequence:
 					print('Correcting times mismatch due to autosave')
 					self.timesDict.correctAutoSaveFrameTime()
 		except IOError:
-			print("Warning. No associated time file")
+			print("Warning. No associated time file or corrupt file")
 			kv = range(self.frames)
 			self.timesDict = TimesDict(zip(kv,kv))
 			self.timesDict.setLabel('Frames')
@@ -311,7 +314,7 @@ class TiffSequence(Sequence):
 			while th.SetDirectory(cnt):
 				cnt = cnt + 10000
 				
-			frames = th.CurrentDirectory().value
+			frames = th.CurrentDirectory().value + 1
 			th.SetDirectory(currDir)
 		if self.options['rebin'] is not None:
 			width = width/self.options['rebin']
@@ -424,17 +427,20 @@ class HDF5Sequence(Sequence):
 		
 		self.origWidth = self.width 
 		self.origHeight = self.height
+
 		self.initTimesDict()
 	
 	def open(self):
 		fi = tb.openFile(self.SequenceFiles[0])
 		self.hdf5Handler = fi.root.x
-	
+		self.timesArray = fi.root.times.timesArray.read()
+		self.timesLabel = unicode(fi.root.times.timeLabel.read().tostring(),'utf-8')
+
 	def getRawImage(self,n):
 		return self.hdf5Handler[:,:,n]	
 	
 	
-	def saveSequence(self, f,sequence=None,framesInd = None):
+	def saveSequence(self, f,sequence=None,framesInd = None,filterLevel = 5):
 		if sequence == None:
 			sequence = self
 			
@@ -446,22 +452,47 @@ class HDF5Sequence(Sequence):
 		h5file = tb.openFile(f, mode='w')
 		root = h5file.root
 		atom = tb.Atom.from_dtype(data.dtype)
-		#filters = tb.Filters(complevel=9, complib='lzo',shuffle=True)
+		if filterLevel == 0:
+			filters = None
+		else:
+			filters = tb.Filters(complevel=filterLevel, complib='blosc',shuffle=True)
 
-		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames)
 
+		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames,filters = filters)
 		for i in framesInd:		
 			data = sequence.getFrame(i)
 			x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
 		
+		tGroup = h5file.createGroup(root,'times')
+
+		tA = np.vstack((sequence.timesDict.frames(),sequence.timesDict.times())).T
+		_t = h5file.createCArray(tGroup,'timesArray',tb.Atom.from_dtype(tA.dtype),tA.shape,filters=filters)
+		_t[:] = tA
+		bytes = np.fromstring(sequence.timesDict.label.encode('utf-8'),np.uint8)
+		_tStr = h5file.createCArray(tGroup,'timeLabel',tb.UInt8Atom(),shape=(len(bytes), ),filters=filters)
+		_tStr[:] = bytes
+
 		h5file.flush()
 		h5file.close()
+
+	def initTimesDict(self):
+		try:
+		 	self.timesDict = TimesDict(zip(list((self.timesArray[:,0]).astype(uint16)),list((self.timesArray[:,1]))))
+		 	self.timesDict.label = self.timesLabel
+		except:
+		 	print("Warning: No times loaded")
+
+
 	
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
 	#times=numpy.loadtxt(splitext(filename)[0]+'_times.txt',delimiter='\t',skiprows=1,usecols=(0,1))
-	times = loadtxt(filename,delimiter='\t',skiprows=1,usecols=(0,1))
-	return TimesDict(zip(list((times[:,0]+firstFrameIndex).astype(uint16)),list((times[:,1]+firstTimeValue)/scaleFactor)))
+	try:
+		times = loadtxt(filename,delimiter='\t',skiprows=1,usecols=(0,1))
+		return TimesDict(zip(list((times[:,0]+firstFrameIndex).astype(uint16)),list((times[:,1]+firstTimeValue)/scaleFactor)))
+	except:
+		return None
+	
 
 def rebin(a, shape):
     sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
@@ -474,7 +505,7 @@ class TimesDict(dict):
 	"""
 	def __init__(self,*arg,**kw):
 		super(TimesDict, self).__init__(*arg, **kw)
-		self.label=''
+		self.label=' '
 
 		
 	def times(self):
