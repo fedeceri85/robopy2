@@ -231,7 +231,7 @@ class Sequence:
 				self.threadLock.release()	
 			
 				
-			if not self.cachedFrames.has_key(n+1):
+			if not self.cachedFrames.has_key(n+1) and n+1< self.getFrames():
 				loader1 = ThreadedRead(1, self)
 				loader1.frameToLoad = n+1
 				loader1.start()
@@ -423,7 +423,7 @@ class HDF5Sequence(Sequence):
 		
 		self.width=width
 		self.height=height
-		self.frames=frames - 1
+		self.frames=frames 
 		
 		self.origWidth = self.width 
 		self.origHeight = self.height
@@ -461,8 +461,12 @@ class HDF5Sequence(Sequence):
 		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames,filters = filters)
 		for i in framesInd:		
 			data = sequence.getFrame(i)
-			x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
-		
+			
+			try: 
+				x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
+			except ValueError: 
+				print("Can't add frame "+str(i)+". Wrong dimensions?")
+
 		tGroup = h5file.createGroup(root,'times')
 
 		tA = np.vstack((sequence.timesDict.frames(),sequence.timesDict.times())).T
