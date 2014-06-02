@@ -860,10 +860,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def recomputeHSVvalue(self):
 		if self.optionsDlg.NomarskiRadioButton.isChecked():
-			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff Files (*.tif)")
+
+			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff images (*.tif);; HDF5 images (*.h5 *.hf5)")
 			fname = fname.toAscii().data()
 			self.optionsDlg.backgroundLineEdit.setText(fname)
-			nomarski = TiffSequence([fname,])
+			if os.path.splitext(fname)[1] == '.tif':
+				nomarski = TiffSequence([fname,])
+			elif os.path.splitext(fname)[1] == '.h5':
+				nomarski = HDF5Sequence([fname,])
 			#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
 			#Try loading the second frame of the nomarski stack (the first one is usually black). If it fails, it may be possible 
 			#that the nomarski is a single image
