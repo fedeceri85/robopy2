@@ -97,7 +97,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			for plugin in self.plugins:
 				if plugin.associatedFileType == os.path.splitext(files[0])[1]:
 					plugin.run(self)
-					print('HERE')
+
 		
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
@@ -180,8 +180,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.imWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
 		self.connect(self.processedWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
 		
-		self.connect(self.imWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
-		self.connect(self.processedWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
+		self.connect(self.imWidget, SIGNAL("roiAdded(long)"), self.roiAdded)
+		self.connect(self.processedWidget, SIGNAL("roiAdded(long)"), self.roiAdded)
 		self.connect(self.imWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
 		self.connect(self.processedWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
 		
@@ -713,6 +713,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#print("roiRecompute is needed " + str(isNeeded))
 		
 	def roiAdded(self, objId):
+
 		if objId == id(self.imWidget):
 			self.processedWidget.rois.append(self.imWidget.rois[-1])
 		else:

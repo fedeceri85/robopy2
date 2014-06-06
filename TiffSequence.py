@@ -431,7 +431,7 @@ class HDF5Sequence(Sequence):
 		self.initTimesDict()
 	
 	def open(self):
-		fi = tb.openFile(self.SequenceFiles[0])
+		fi = tb.open_file(self.SequenceFiles[0])
 		self.hdf5Handler = fi.root.x
 		self.timesArray = fi.root.times.timesArray.read()
 		self.timesLabel = unicode(fi.root.times.timeLabel.read().tostring(),'utf-8')
@@ -451,7 +451,7 @@ class HDF5Sequence(Sequence):
 		
 		h5file = tb.openFile(f, mode='w')
 		root = h5file.root
-		atom = tb.Atom.from_dtype(data.dtype)
+		atom = tb.UInt16Atom() #tb.Atom.from_dtype(data.dtype)
 		if filterLevel == 0:
 			filters = None
 		else:

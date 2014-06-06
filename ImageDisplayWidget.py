@@ -452,7 +452,6 @@ class ImageDisplayWidget(QGLWidget):
 						if self.DrawRoiStatus == "idle":
 							self.DrawRoiStatus = "drawing"
 							self.rois.append(Roi())
-
 							self.rois[-1].addPoint(a - roiSize/2,b-roiSize/2)
 							self.rois[-1].addPoint(a + roiSize/2,b-roiSize/2)
 							self.rois[-1].addPoint(a + roiSize/2,b+roiSize/2)
@@ -563,8 +562,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 		self.updateGL()
-		
-		self.emit(QtCore.SIGNAL("roiAdded(int)"), id(self))
+		self.emit(QtCore.SIGNAL("roiAdded(long)"), id(self))
 		
 	def deleteRoi(self, n = -1):
 		nRoi = len(self.rois)
