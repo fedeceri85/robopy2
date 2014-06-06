@@ -182,8 +182,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.connect(self.imWidget, SIGNAL("roiAdded(long)"), self.roiAdded)
 		self.connect(self.processedWidget, SIGNAL("roiAdded(long)"), self.roiAdded)
-		self.connect(self.imWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
-		self.connect(self.processedWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
+		self.connect(self.imWidget, SIGNAL("roiDeleted(long)"), self.roiDeleted)
+		self.connect(self.processedWidget, SIGNAL("roiDeleted(long)"), self.roiDeleted)
 		
 		self.connect(self.colorMinSpinBox, SIGNAL("valueChanged(float)"), self.displayMinChangedBox)
 		self.connect(self.colorMaxSpinBox, SIGNAL("valueChanged(float)"), self.displayMaxChangedBox)
@@ -713,7 +713,6 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#print("roiRecompute is needed " + str(isNeeded))
 		
 	def roiAdded(self, objId):
-
 		if objId == id(self.imWidget):
 			self.processedWidget.rois.append(self.imWidget.rois[-1])
 		else:
@@ -723,9 +722,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def roiDeleted(self, objId):
 		if objId == id(self.imWidget):
-			self.processedWidget.rois = self.imWidget.rois
+			self.processedWidget.rois = self.imWidget.rois[:]
 		else:
-			self.imWidget.rois = self.processedWidget.rois
+			self.imWidget.rois = self.processedWidget.rois[:]
 			
 		self.displayParameters.roiAverageRecomputeNeeded = True
 	

@@ -577,5 +577,5 @@ class ImageDisplayWidget(QGLWidget):
 		del self.SequenceDisplay.tiffSequence.rois[n]
 		self.updateGL()
 		
-		self.emit(QtCore.SIGNAL("roiDeleted(int)"), id(self))
+		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
 	
