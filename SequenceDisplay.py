@@ -38,7 +38,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.RoboMainWnd = parent
 		self.MaxFrames = 0
 		self.CurrentShownFrame = 0
-		self.setGeometry(0, 0,1000, 700)
+		self.setGeometry(0, 0,1300, 1000)
 
 		self.displayParameters = DisplayParameters.DisplayPamrameters()
 		#print(str(self.displayParameters.displayGrayMax))
@@ -114,10 +114,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.colorAutoRadioButton.setChecked(self.displayParameters.autoAdjust)
 		
 
-		#rc = self.frameGeometry()
-		#dlgRc = self.optionsDlg.geometry()
-		#dlgRc.moveTo(rc.right()+5, rc.top())
-		#self.optionsDlg.setGeometry(dlgRc)
+		rc = self.frameGeometry()
+		dlgRc = self.optionsDlg.geometry()
+		dlgRc.moveTo(rc.right()+100, rc.top())
+		self.optionsDlg.setGeometry(dlgRc)
 		self.optionsDlg.show()
 		
 		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
@@ -886,6 +886,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.clipboard.setText(self.tiffSequence.fileName[0])
 		#event = QtCore.QEvent(QtCore.QEvent.Clipboard)
 		#app.sendEvent(clipboard, event)
+	
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_N:
+			self.RoboMainWnd.RoboActionOpen_Next()
 				
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

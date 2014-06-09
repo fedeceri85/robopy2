@@ -172,7 +172,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		with open (self.lastDirFile,'w') as myfile:
 			myfile.write(os.path.split(files[0])[0])
 			myfile.close()
-	
+		files.sort()
 		self.filesList = files
 		self.fileIndex = 0
 		self.RoboActionOpen_Next()
@@ -184,6 +184,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		except:
 			pass
 		options = None
+		self.seqDispList = []
 		if self.fileIndex >= len(self.filesList):
 			self.showStatusMessage("End of the list")
 		else:
