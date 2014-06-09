@@ -123,6 +123,9 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def makeConnections(self):
 		self.connect(self.roboActionOpen, SIGNAL("triggered()"), self.roboActionOpenCb)
 		self.connect(self.roboActionLoadInRam, SIGNAL("triggered()"), self.roboActionLoadInRamCb)
+		self.connect(self.actionLoad_Sequentially, SIGNAL("triggered()"), self.roboActionLoadSequentially)
+		self.connect(self.actionOpen_Next, SIGNAL("triggered()"), self.RoboActionOpen_Next)
+
 		
 	def makeImageOptionsConnections(self, seqDisp, procOpt):
 		seqDisp.ImageTabWidget.currentChanged.connect(procOpt.sequenceChangedTab)
@@ -135,7 +138,6 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		options = None
 		if optDlg.exec_():
 			options = optDlg.getValues()
-			print(options)
 		sd = SequenceDisplay(self, files,rawTiffOptions=options)
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
@@ -152,13 +154,45 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		options = None
 		if optDlg.exec_():
 			options = optDlg.getValues()
-			print(options)
 		
 		sd = SequenceDisplay(self, files,loadInRam = True,rawTiffOptions=options)
 		#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
-		
+		with open (self.lastDirFile,'w') as myfile:
+			myfile.write(os.path.split(files[0])[0])
+			myfile.close()
+			
+			
+	def roboActionLoadSequentially(self):
+		self.initSaveFolders()
+
+		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
+	
+		with open (self.lastDirFile,'w') as myfile:
+			myfile.write(os.path.split(files[0])[0])
+			myfile.close()
+	
+		self.filesList = files
+		self.fileIndex = 0
+		self.RoboActionOpen_Next()
+
+	def RoboActionOpen_Next(self):
+		try:	
+			self.seqDispList[-1].optionsDlg.close()
+			self.seqDispList[-1].close()
+		except:
+			pass
+		options = None
+		if self.fileIndex >= len(self.filesList):
+			self.showStatusMessage("End of the list")
+		else:
+			sd = SequenceDisplay(self,[self.filesList[self.fileIndex],] ,rawTiffOptions=options)
+			#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
+			self.seqDispList.append(sd)
+			self.showStatusMessage("opening file "+str(self.fileIndex+1)+" of "+str(len(self.filesList)))
+			self.fileIndex = self.fileIndex + 1 
+			
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
 		
