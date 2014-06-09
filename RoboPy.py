@@ -128,6 +128,8 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		seqDisp.ImageTabWidget.currentChanged.connect(procOpt.sequenceChangedTab)
 		
 	def roboActionOpenCb(self):
+		self.initSaveFolders()
+
 		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
 		options = None
