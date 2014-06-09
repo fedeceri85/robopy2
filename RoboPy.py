@@ -106,6 +106,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		
 	def initData(self):
 		self.sequences = list();
+		self.filesList = list()
 		
 	def initSaveFolders(self):
 		self.optDir = os.path.join(os.path.expanduser('~'),'.robopy')
@@ -178,6 +179,8 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		self.RoboActionOpen_Next()
 
 	def RoboActionOpen_Next(self):
+		if self.filesList == []:
+			return
 		try:	
 			self.seqDispList[-1].optionsDlg.close()
 			self.seqDispList[-1].close()

@@ -542,7 +542,8 @@ class ImageDisplayWidget(QGLWidget):
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Delete:
 			self.deleteRoi()
-	
+		else:
+			self.SequenceDisplay.keyPressEvent(event)
 			
 	def addRoi(self,roi,fromImageDisplayWidget = True):
 		if not fromImageDisplayWidget:
