@@ -29,7 +29,6 @@ from scipy.misc import imsave
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
-		
 		self.setupUi(self)
 		self.imageWidgetSetup()
 		#l = dir(self.CurrentFrameSlider)
@@ -39,7 +38,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.RoboMainWnd = parent
 		self.MaxFrames = 0
 		self.CurrentShownFrame = 0
-		
+		self.setGeometry(0, 0,1000, 700)
+
 		self.displayParameters = DisplayParameters.DisplayPamrameters()
 		#print(str(self.displayParameters.displayGrayMax))
 		
@@ -682,7 +682,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#fig,ax = oneColumnFigure(addAxes=True)
 		#ax.plot(roiProfile)
 		#fig.show()
-		
+		try:
+			self.fig.close()
+		except:
+			pass
 		fig = MPlot(self)
 		
 		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.timesDict.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
@@ -690,6 +693,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fig.plot(times,rdata,linewidth=0.3)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
+		self.fig = fig
 		return times,rdata
 	
 	def deleteRoi(self, n = -1):
