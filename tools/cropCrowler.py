@@ -265,3 +265,25 @@ def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
 						os.utime(saveDir_orig,(os.path.getatime(f2),os.path.getmtime(f2)))				
 
 	print('Cropped '+str(totalFrames)+' frames')
+	
+	
+def copyFilesfromList(fileList,src,dest):
+	src = os.path.abspath(src)
+	dest = os.path.abspath(dest)
+
+	if src[-1] == os.sep:
+		src = src[:-1]
+	if dest[-1] == os.sep:
+		dest = dest[:-1]
+		
+	
+	for f in fileList:
+		saveFileName = f[len(src)+1:]
+		saveDir = os.path.join(dest,saveFileName)
+		saveDir2 = os.path.split(saveDir)[0]
+		
+		if not os.path.isdir(saveDir2):
+			os.makedirs(saveDir2)
+		
+		shutil.copy(f,saveDir+'_tmp')
+		shutil.move(saveDir+'_tmp',saveDir)
