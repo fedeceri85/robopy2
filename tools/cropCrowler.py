@@ -156,6 +156,8 @@ def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
 
 				shutil.copy(f,savePath+'_tmp')
 				shutil.move(savePath+'_tmp',savePath)
+				os.utime(savePath,(os.path.getatime(f),os.path.getmtime(f)))
+
 		else:
 			saveFileName = f[len(src)+1:]
 			savePath = os.path.join(dest,saveFileName)
@@ -169,7 +171,7 @@ def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
 
 				shutil.copy(f,savePath+'_tmp')
 				shutil.move(savePath+'_tmp',savePath)
-
+				os.utime(savePath,(os.path.getatime(f),os.path.getmtime(f)))
 
 
 
@@ -260,4 +262,6 @@ def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
 						saveDir_orig = os.path.join(dest,saveFileName2)
 						shutil.copyfile(f2,saveDir_orig+'_tmp')
 						shutil.move(saveDir_orig+'_tmp',saveDir_orig)
+						os.utime(saveDir_orig,(os.path.getatime(f2),os.path.getmtime(f2)))				
+
 	print('Cropped '+str(totalFrames)+' frames')

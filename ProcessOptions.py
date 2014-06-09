@@ -232,7 +232,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('roiSize',d['roiSize'],self.roiSizeSpinBox)
 
 		except:
-			fo.add('rectangularRois', 0, self.rectangularRoisCheckBox)
+			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
 			fo.add('roiSameSize', 0, self.roiSameSizeCheckBox)
 			fo.add('roiSize',0,self.roiSizeSpinBox)
 

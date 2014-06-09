@@ -2,7 +2,7 @@ import PyQt4
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
-
+import os
 from RoboPyGui import Ui_RoboMainWnd
 from RawSequenceOptionsGui import Ui_Dialog
 from SequenceDisplay import SequenceDisplay
@@ -97,15 +97,28 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
 		
 		self.setupUi(self)
-		self.initData()
+
 		
+		self.initData()
 		self.makeConnections()
 		self.seqDispList=[]
 		self.show()
 		
 	def initData(self):
 		self.sequences = list();
-		self.lastDirectory = "";
+		
+	def initSaveFolders(self):
+		self.optDir = os.path.join(os.path.expanduser('~'),'.robopy')
+		print self.optDir
+		if not os.path.isdir(self.optDir):
+			os.mkdir(self.optDir)
+		self.lastDirFile = os.path.join(self.optDir,'lastDir')
+		if os.path.isfile(self.lastDirFile):
+			with open (self.lastDirFile,'r') as myfile:
+				self.lastDirectory=myfile.read()
+				myfile.close()
+		else:
+			self.lastDirectory = "";
 		
 	def makeConnections(self):
 		self.connect(self.roboActionOpen, SIGNAL("triggered()"), self.roboActionOpenCb)
@@ -115,8 +128,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		seqDisp.ImageTabWidget.currentChanged.connect(procOpt.sequenceChangedTab)
 		
 	def roboActionOpenCb(self):
-		
-		files = self.getFileNamesGui("Select sequence", QString(), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
+		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
 		options = None
 		if optDlg.exec_():
@@ -126,10 +138,14 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
-
-	def roboActionLoadInRamCb(self):
+		with open (self.lastDirFile,'w') as myfile:
+			myfile.write(os.path.split(files[0])[0])
+			myfile.close()
 		
-		files = self.getFileNamesGui("Select sequence", QString(), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
+		
+	def roboActionLoadInRamCb(self):
+		self.initSaveFolders()
+		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
 		options = None
 		if optDlg.exec_():

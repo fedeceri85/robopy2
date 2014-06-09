@@ -124,6 +124,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.recomputeFalseColorReference()
 		self.makeProcessReferenceConnections(self.optionsDlg)
+		self.clipboard = QApplication.clipboard()
 		
 	def tiffLoad(self):
 		print("entering tiffLoad from worker")
@@ -170,7 +171,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)
 		self.connect(self.actionForce_recomputation,SIGNAL("triggered()"),self.forceRoiRecomputation)
-		
+		self.connect(self.actionCopy_filepath_to_clipboard,SIGNAL("triggered()"),self.copyToClipboard)
+
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
 		self.connect(self.actionSave_as_avi, SIGNAL("triggered()"), self.saveSequenceAsAvi)
 		self.connect(self.actionSave_as_hd5_table, SIGNAL("triggered()"), self.saveSequenceAsTable)
@@ -875,6 +877,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.processedSequence.computeValue(nomarski.getFrame(1))
 			except AttributeError:
 				self.processedSequence.computeValue(nomarski.getFrame(0))
+				
+	def copyToClipboard(self):
+		self.clipboard.setText(self.tiffSequence.fileName[0])
+		#event = QtCore.QEvent(QtCore.QEvent.Clipboard)
+		#app.sendEvent(clipboard, event)
 				
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
