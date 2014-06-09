@@ -685,7 +685,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.timesDict.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		
-		fig.plot(times,rdata)
+		fig.plot(times,rdata,linewidth=0.3)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
 		return times,rdata

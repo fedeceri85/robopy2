@@ -51,8 +51,8 @@ class MPlot(QDialog):
 		
 		self.mplToolbar = NavigationToolbar(self.canvas, self.mainFrame)
 		
-	def plot(self, x,data):
-		self.axes.plot(x,data)
+	def plot(self, x,data,linewidth=1):
+		self.axes.plot(x,data,linewidth=linewidth)
 		
 	def imshow(self,img):
 		self.axes.imshow(img,cmap = cm.gray)
