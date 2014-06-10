@@ -130,7 +130,7 @@ def BatchCropFiles(src,dest,x,y,originalSize=None):
 
 
 
-def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
+def BatchConvertFilesHDF5(src,dest,x=None,y=None,originalSize=None):
 	src = os.path.abspath(src)
 	dest = os.path.abspath(dest)
 
@@ -174,15 +174,17 @@ def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
 				os.utime(savePath,(os.path.getatime(f),os.path.getmtime(f)))
 
 
-
-	options={}
-	options['crop'] = True
-	options['rightMargin'] = x[1]
-	options['leftMargin']  = x[0]
-	options['bottomMargin'] = y[1]
-	options['topMargin'] = y[0]
-	options['rebin'] = None
-	options['LineCorrection'] = False
+	if x == None or y == None:
+		options = None
+	else:
+		options={}
+		options['crop'] = True
+		options['rightMargin'] = x[1]
+		options['leftMargin']  = x[0]
+		options['bottomMargin'] = y[1]
+		options['topMargin'] = y[0]
+		options['rebin'] = None
+		options['LineCorrection'] = False
 	totalFrames = 0
 
 	singleExperiments = []
@@ -264,4 +266,4 @@ def BatchCropFilesHDF5(src,dest,x,y,originalSize=None):
 						shutil.move(saveDir_orig+'_tmp',saveDir_orig)
 						os.utime(saveDir_orig,(os.path.getatime(f2),os.path.getmtime(f2)))				
 
-	print('Cropped '+str(totalFrames)+' frames')
+	print('Converted '+str(totalFrames)+' frames')
