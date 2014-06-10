@@ -287,6 +287,6 @@ def copyFilesfromList(fileList,src,dest):
 		
 		if not os.path.isdir(saveDir2):
 			os.makedirs(saveDir2)
-		
-		shutil.copy(f,saveDir+'_tmp')
-		shutil.move(saveDir+'_tmp',saveDir)
+		if not os.path.isfile(saveDir):
+			shutil.copy(f,saveDir+'_tmp')
+			shutil.move(saveDir+'_tmp',saveDir)

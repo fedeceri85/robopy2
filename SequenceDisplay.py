@@ -893,6 +893,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.RoboMainWnd.RoboActionOpen_Next()
 			except:
 				pass
+		elif event.key() == Qt.Key_P:
+			try:
+				self.RoboMainWnd.RoboActionOpen_Prev()
+			except:
+				pass
 		
 		elif event.key() == Qt.Key_Space:
 			self.playButtonCb()

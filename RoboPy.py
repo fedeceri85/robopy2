@@ -107,6 +107,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def initData(self):
 		self.sequences = list();
 		self.filesList = list()
+		self.options = None
 		
 	def initSaveFolders(self):
 		self.optDir = os.path.join(os.path.expanduser('~'),'.robopy')
@@ -136,10 +137,10 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 
 		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
-		options = None
+
 		if optDlg.exec_():
-			options = optDlg.getValues()
-		sd = SequenceDisplay(self, files,rawTiffOptions=options)
+			self.options = optDlg.getValues()
+		sd = SequenceDisplay(self, files,rawTiffOptions=self.options)
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
@@ -152,11 +153,11 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		self.initSaveFolders()
 		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		optDlg = RawSequenceOptions(parent=self)
-		options = None
-		if optDlg.exec_():
-			options = optDlg.getValues()
 		
-		sd = SequenceDisplay(self, files,loadInRam = True,rawTiffOptions=options)
+		if optDlg.exec_():
+			self.options = optDlg.getValues()
+		
+		sd = SequenceDisplay(self, files,loadInRam = True,rawTiffOptions=self.options)
 		#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
@@ -173,9 +174,15 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		with open (self.lastDirFile,'w') as myfile:
 			myfile.write(os.path.split(files[0])[0])
 			myfile.close()
+		
+		optDlg = RawSequenceOptions(parent=self)
+		
+		if optDlg.exec_():
+			self.options = optDlg.getValues()
+			
 		files.sort()
 		self.filesList = files
-		self.fileIndex = 0
+		self.fileIndex = -1
 		self.RoboActionOpen_Next()
 
 	def RoboActionOpen_Next(self):
@@ -186,16 +193,37 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 			self.seqDispList[-1].close()
 		except:
 			pass
-		options = None
+		self.fileIndex = self.fileIndex + 1 
+
 		self.seqDispList = []
 		if self.fileIndex >= len(self.filesList):
 			self.showStatusMessage("End of the list")
+			self.fileIndex = len(self.fileList)-1
 		else:
-			sd = SequenceDisplay(self,[self.filesList[self.fileIndex],] ,rawTiffOptions=options)
+			sd = SequenceDisplay(self,[self.filesList[self.fileIndex],] ,rawTiffOptions=self.options)
 			#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 			self.seqDispList.append(sd)
 			self.showStatusMessage("opening file "+str(self.fileIndex+1)+" of "+str(len(self.filesList)))
-			self.fileIndex = self.fileIndex + 1 
+	
+	def RoboActionOpen_Prev(self):
+		if self.filesList == []:
+			return
+		try:	
+			self.seqDispList[-1].optionsDlg.close()
+			self.seqDispList[-1].close()
+		except:
+			pass
+
+		self.fileIndex = self.fileIndex -1 
+		self.seqDispList = []
+		if self.fileIndex >= len(self.filesList) or self.fileIndex <0:
+			self.showStatusMessage("End of the list")
+			self.fileIndex = 0
+		else:
+			sd = SequenceDisplay(self,[self.filesList[self.fileIndex],] ,rawTiffOptions=self.options)
+			#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
+			self.seqDispList.append(sd)
+			self.showStatusMessage("opening file "+str(self.fileIndex+1)+" of "+str(len(self.filesList)))
 			
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
