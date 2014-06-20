@@ -196,13 +196,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionBack_Projection,SIGNAL("triggered()"),self.backProjCb)
 
 		
-		
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
 		self.connect(self.actionDelete_Last, SIGNAL("triggered()"), self.deleteRoi)
 		self.connect(self.actionRoi_monitor, SIGNAL("triggered()"), self.showRoiMonitor)
-		
+		self.connect(self.actionDelete_number, SIGNAL("triggered()"), self.deleteRoiN)
+			
 	
 	def makeProcessReferenceConnections(self, dlg):
 		self.connect(dlg.FirstFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
@@ -769,6 +769,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	
 	def roiRecomputeNeeded(self, isNeeded):
+
+		self.displayParameters.roiAverageRecomputeNeeded = isNeeded
+
 		self.roiAverageRecomputeNeeded = isNeeded
 		#print("roiRecompute is needed " + str(isNeeded))
 		
@@ -959,6 +962,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def showRoiMonitor(self):
 		self.roiAnal = rMW(self)
 		self.roiMonitor = True
+
+	
+	def deleteRoiN(self):
+        
+		number, ok = PyQt4.QtGui.QInputDialog.getInt(self, 'Delete Roi','Roi number:',1)
+        
+ 		if ok:
+			self.imWidget.deleteRoi(number-1)
 				
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

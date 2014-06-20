@@ -48,6 +48,7 @@ class ImageDisplayWidget(QGLWidget):
 		self.mouseFirstPosition = (0,0)
 
 		self.IsMouseDown = 0
+		self.isMovingRoi = False
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
 		self.rois = list()
@@ -479,9 +480,22 @@ class ImageDisplayWidget(QGLWidget):
 
 		else:
 			self.RightMouseButtonClicked = 0
-			self.mouseFirstPosition = self.screenToImageNoTraslate(event.x(),event.y())
-			self.lastImagePositionX = self.ImagePositionX
-			self.lastImagePositionY = self.ImagePositionY
+			
+			a,b = self.screenToImage(event.x(), event.y())
+			self.isMovingRoi = False
+			for n,i in enumerate(self.rois):
+				if i.isPointInRoi((a,b)):
+					self.isMovingRoi = True
+					self.nMovingRoi = i.ordinal
+			if self.isMovingRoi:
+
+				self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+				self.mouseFirstPosition = (a,b)#self.screenToImageNoTraslate(event.x(),event.y())
+			else:
+				self.mouseFirstPosition = self.screenToImageNoTraslate(event.x(),event.y())
+				self.lastImagePositionX = self.ImagePositionX
+				self.lastImagePositionY = self.ImagePositionY
 
 	def mouseReleaseEvent(self, event):
 		
@@ -500,7 +514,9 @@ class ImageDisplayWidget(QGLWidget):
 						
 					self.rois[-1].addPoint(a,b)
 					self.repaint()
-		
+		if self.IsMouseDown == 1 and self.isMovingRoi:
+
+			self.isMovingRoi = False
 
 		self.IsMouseDown = 0
 	
@@ -520,7 +536,7 @@ class ImageDisplayWidget(QGLWidget):
 		a,b = self.screenToImage(event.x(), event.y())
 
 		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
-		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 0:
+		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 0 and not self.isMovingRoi:
 			x,y = self.screenToImageNoTraslate(event.x(),event.y())
 			self.ImagePositionX = x - self.mouseFirstPosition[0] + self.lastImagePositionX
 			self.ImagePositionY = y - self.mouseFirstPosition[1] + self.lastImagePositionY
@@ -535,6 +551,18 @@ class ImageDisplayWidget(QGLWidget):
 
 				self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
 				self.repaint()
+		if self.IsMouseDown and self.isMovingRoi:
+			#x2 = self.mouseFirstPosition[0]
+			#y2 = self.mouseFirstPosition[1]
+			x,y = self.rois[self.nMovingRoi].computeMassCenter()
+			self.rois[self.nMovingRoi].move(int(a-x),int(b-y))
+			self.rois[self.nMovingRoi].computePointMap()
+			#self.addRoi(self.rois[self.nMovingRoi],False)
+			self.drawRoi(self.rois[self.nMovingRoi])
+			self.repaint()
+			
+			self.updateGL()
+
 		if self.IsMouseDown ==0 and  self.SequenceDisplay.roiMonitor :
 			try:
 				size = int(self.SequenceDisplay.optionsDlg.roiOptions.roiSize/2)
@@ -597,9 +625,25 @@ class ImageDisplayWidget(QGLWidget):
 			return
 		
 		del self.rois[n]
+		newrois = []
+		for i in self.rois:
+			newrois.append(i)
+		self.rois = []
+		for i in newrois:	
+			self.addRoi(i,False)
+		del newrois
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
-		del self.SequenceDisplay.tiffSequence.rois[n]
+		self.SequenceDisplay.tiffSequence.rois = []
+		for i in self.rois:
+			self.SequenceDisplay.tiffSequence.rois.append(i)
+		
 		self.updateGL()
 		
 		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
 	
+
+	def moveRoi(self,n,x,y):
+		self.rois[n].move(x,y)
+		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+		self.updateGL()

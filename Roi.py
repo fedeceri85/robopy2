@@ -47,7 +47,22 @@ class Roi(QPolygon):
 			avg = avg + im[i[1], i[0]].sum()
 			
 		return avg/self.mapSize
-		
+			
+	def move(self,x,y):
+
+		self.translate(x,y)
+		# for i in self:
+		# 	#print i.x()+x
+		# 	#print i.y() + y
+		# 	i.setX(i.x() + y)
+		# 	i.setY(i.y() + x)
+
+		#self.computePointMap()\
+
+	def isPointInRoi(self,point):
+		pt = QPoint(point[0],point[1])
+		return self.containsPoint(pt,Qt.OddEvenFill)
+
 	def computeMassCenter(self):
 		x = 0.0
 		y = 0.0

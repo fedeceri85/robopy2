@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Fri Jun 20 11:14:47 2014
+# Created: Fri Jun 20 20:23:26 2014
 #      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
@@ -196,6 +196,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionCopy_filepath_to_clipboard.setObjectName(_fromUtf8("actionCopy_filepath_to_clipboard"))
         self.actionRoi_monitor = QtGui.QAction(SequenceDisplayWnd)
         self.actionRoi_monitor.setObjectName(_fromUtf8("actionRoi_monitor"))
+        self.actionDelete_number = QtGui.QAction(SequenceDisplayWnd)
+        self.actionDelete_number.setObjectName(_fromUtf8("actionDelete_number"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -203,6 +205,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.addAction(self.actionSave_traces)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionDelete_Last)
+        self.menuRois.addAction(self.actionDelete_number)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionForce_recomputation)
         self.menuRois.addAction(self.actionRoi_monitor)
@@ -278,4 +281,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRoi_options.setText(_translate("SequenceDisplayWnd", "Roi options", None))
         self.actionCopy_filepath_to_clipboard.setText(_translate("SequenceDisplayWnd", "Copy filepath to clipboard", None))
         self.actionRoi_monitor.setText(_translate("SequenceDisplayWnd", "Roi monitor", None))
+        self.actionDelete_number.setText(_translate("SequenceDisplayWnd", "Delete number", None))
 

@@ -201,6 +201,7 @@
     <addaction name="actionSave_traces"/>
     <addaction name="separator"/>
     <addaction name="actionDelete_Last"/>
+    <addaction name="actionDelete_number"/>
     <addaction name="separator"/>
     <addaction name="actionForce_recomputation"/>
     <addaction name="actionRoi_monitor"/>
@@ -381,6 +382,11 @@
   <action name="actionRoi_monitor">
    <property name="text">
     <string>Roi monitor</string>
+   </property>
+  </action>
+  <action name="actionDelete_number">
+   <property name="text">
+    <string>Delete number</string>
    </property>
   </action>
  </widget>
