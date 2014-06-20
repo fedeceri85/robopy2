@@ -554,11 +554,17 @@ class ImageDisplayWidget(QGLWidget):
 		if self.IsMouseDown and self.isMovingRoi:
 			#x2 = self.mouseFirstPosition[0]
 			#y2 = self.mouseFirstPosition[1]
+
 			x,y = self.rois[self.nMovingRoi].computeMassCenter()
-			self.rois[self.nMovingRoi].move(int(a-x),int(b-y))
-			self.rois[self.nMovingRoi].computePointMap()
-			#self.addRoi(self.rois[self.nMovingRoi],False)
-			self.drawRoi(self.rois[self.nMovingRoi])
+			if self.SequenceDisplay.optionsDlg.roiOptions.lockRoiPositions:
+				for r in self.rois:
+					r.move(int(a-x),int(b-y))
+					r.computePointMap()
+			else:
+				self.rois[self.nMovingRoi].move(int(a-x),int(b-y))
+				self.rois[self.nMovingRoi].computePointMap()
+				#self.addRoi(self.rois[self.nMovingRoi],False)
+				#self.drawRoi(self.rois[self.nMovingRoi])
 			self.repaint()
 			
 			self.updateGL()
@@ -642,8 +648,8 @@ class ImageDisplayWidget(QGLWidget):
 		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
 	
 
-	def moveRoi(self,n,x,y):
-		self.rois[n].move(x,y)
-		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+	# def moveRoi(self,n,x,y):
+	# 	self.rois[n].move(x,y)
+	# 	self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 
-		self.updateGL()
+	# 	self.updateGL()

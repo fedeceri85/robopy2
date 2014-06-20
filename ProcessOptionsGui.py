@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Wed May 14 14:45:19 2014
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Fri Jun 20 23:18:17 2014
+#      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -424,6 +424,9 @@ class Ui_ProcessOptionsDlg(object):
         self.roiSizeSpinBox.setObjectName(_fromUtf8("roiSizeSpinBox"))
         self.horizontalLayout_19.addWidget(self.roiSizeSpinBox)
         self.horizontalLayout_20.addLayout(self.horizontalLayout_19)
+        self.lockRoiPositionCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.lockRoiPositionCheckBox.setGeometry(QtCore.QRect(30, 70, 191, 21))
+        self.lockRoiPositionCheckBox.setObjectName(_fromUtf8("lockRoiPositionCheckBox"))
         self.PO_TabWidget.addTab(self.RoiOptionsTab, _fromUtf8(""))
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
@@ -483,5 +486,6 @@ class Ui_ProcessOptionsDlg(object):
         self.roiSameSizeCheckBox.setText(_translate("ProcessOptionsDlg", "Rois same size", None))
         self.rectangularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Rectangular Rois", None))
         self.label_7.setText(_translate("ProcessOptionsDlg", "Size (0 = dynamic)", None))
+        self.lockRoiPositionCheckBox.setText(_translate("ProcessOptionsDlg", "Lock roi relative positions", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.RoiOptionsTab), _translate("ProcessOptionsDlg", "Roi Options", None))
 
