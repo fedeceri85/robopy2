@@ -13,6 +13,7 @@ import numpy as np
 from Roi import Roi
 import sys
 import matplotlib
+import filterTools
 
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
@@ -534,7 +535,29 @@ class ImageDisplayWidget(QGLWidget):
 
 				self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
 				self.repaint()
+		if self.IsMouseDown ==0 and  self.SequenceDisplay.roiMonitor :
+			try:
+				size = int(self.SequenceDisplay.optionsDlg.roiOptions.roiSize/2)
+				if size ==0:
+					size = 2
+				trace = self.SequenceDisplay.tiffSequence.hdf5Handler[b-size:b+size+1,a-size:a+size+1,self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(1).mean(0)
+				#trace = trace - filterTools.smoothMovingAverage(trace,2)
+				self.SequenceDisplay.roiAnal.makePlot(trace)
+				#self.SequenceDisplay.roiAnal.makePlot2(self.SequenceDisplay.tiffSequence.hdf5Handler[b-1:b+2,a-1:a+2,:].mean(1).mean(0))
+				#self.SequenceDisplay.roiAnal.makePlot3(self.SequenceDisplay.tiffSequence.hdf5Handler[b-5:b+6,a-5:a+6,:].mean(1).mean(0))
+				# roi = Roi()
+				# roi.addPoint(a-size,b-size)
+				# roi.addPoint(a+size,b-size)
+				# roi.addPoint(a+size,b+size)
+				# roi.addPoint(a-size,b+size)
+				# roi.computePointMap()
+				# roi.ordinal = 100
+				# self.drawRoi(roi)
+				# self.repaint()
+				# self.updateGL()
 
+			except:
+				pass
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"

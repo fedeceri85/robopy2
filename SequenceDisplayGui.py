@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Mon Jun  9 10:37:00 2014
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Fri Jun 20 11:14:47 2014
+#      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -128,7 +128,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
@@ -194,6 +194,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRoi_options.setObjectName(_fromUtf8("actionRoi_options"))
         self.actionCopy_filepath_to_clipboard = QtGui.QAction(SequenceDisplayWnd)
         self.actionCopy_filepath_to_clipboard.setObjectName(_fromUtf8("actionCopy_filepath_to_clipboard"))
+        self.actionRoi_monitor = QtGui.QAction(SequenceDisplayWnd)
+        self.actionRoi_monitor.setObjectName(_fromUtf8("actionRoi_monitor"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -203,6 +205,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.addAction(self.actionDelete_Last)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionForce_recomputation)
+        self.menuRois.addAction(self.actionRoi_monitor)
         self.menuMath_2.addAction(self.actionAdd)
         self.menuMath_2.addAction(self.actionSubtract)
         self.menuMath_2.addAction(self.actionDivide)
@@ -274,4 +277,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_as_hd5_table.setText(_translate("SequenceDisplayWnd", "Save as hd5 table", None))
         self.actionRoi_options.setText(_translate("SequenceDisplayWnd", "Roi options", None))
         self.actionCopy_filepath_to_clipboard.setText(_translate("SequenceDisplayWnd", "Copy filepath to clipboard", None))
+        self.actionRoi_monitor.setText(_translate("SequenceDisplayWnd", "Roi monitor", None))
 

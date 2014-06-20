@@ -7,7 +7,7 @@ from RoboPyGui import Ui_RoboMainWnd
 from RawSequenceOptionsGui import Ui_Dialog
 from SequenceDisplay import SequenceDisplay
 from IPython.frontend.terminal.embed import InteractiveShellEmbed
-
+import cPickle
 from OpenGL.GLUT import *
 
 '''
@@ -16,12 +16,18 @@ Launches various windows and tools
 
 '''
 class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
-	def __init__(self,parent=None):
+	def __init__(self,parent=None,cropL=None):
 		PyQt4.QtGui.QDialog.__init__(self,parent)
 		self.setupUi(self)
 		self.connect(self.LCcheckBox,SIGNAL("stateChanged(int)"),self.LCstateChanged)
 		self.connect(self.cropCheckBox,SIGNAL("stateChanged(int)"),self.cropStateChanged)
-		
+		if cropL is not None:
+			self.cropCheckBox.setChecked(True)
+			self.leftCropSpinBox.setValue(cropL[0])
+			self.rightCropSpinBox.setValue(cropL[1])
+			self.topCropSpinBox.setValue(cropL[2])
+			self.bottomCropSpinBox.setValue(cropL[3])
+
 		self.show()
 	
 	def LCstateChanged(self):
@@ -136,10 +142,24 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		self.initSaveFolders()
 
 		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
-		optDlg = RawSequenceOptions(parent=self)
+		try:
+			f=open(files[0]+'_cropInfo','r')
+			try:
+				cropL = cPickle.load(f)
+			except:
+				cropL = None
+			f.close()
+		except:
+			cropL = None
+		optDlg = RawSequenceOptions(parent=self,cropL=cropL)
 
 		if optDlg.exec_():
 			self.options = optDlg.getValues()
+		if 	self.options['crop']:
+			cropL = [self.options['leftMargin'], self.options['rightMargin'] ,self.options['topMargin'],self.options['bottomMargin']]
+			f=open(files[0]+'_cropInfo','w')
+			cPickle.dump(cropL,f)
+			f.close()
 		sd = SequenceDisplay(self, files,rawTiffOptions=self.options)
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)

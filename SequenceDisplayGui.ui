@@ -187,7 +187,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">
@@ -203,6 +203,7 @@
     <addaction name="actionDelete_Last"/>
     <addaction name="separator"/>
     <addaction name="actionForce_recomputation"/>
+    <addaction name="actionRoi_monitor"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -375,6 +376,11 @@
   <action name="actionCopy_filepath_to_clipboard">
    <property name="text">
     <string>Copy filepath to clipboard</string>
+   </property>
+  </action>
+  <action name="actionRoi_monitor">
+   <property name="text">
+    <string>Roi monitor</string>
    </property>
   </action>
  </widget>

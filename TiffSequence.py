@@ -7,7 +7,6 @@ import threading
 from scipy.ndimage import zoom
 import tables as tb
 #from pubTools import oneColumnFigure
-
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
 		threading.Thread.__init__(self)
@@ -117,22 +116,7 @@ class Sequence:
 			self.timesDict.setLabel('Frames')
 			
 			
-	def computeRois(self,firstIndex = None, lastIndex = None):
-		if firstIndex == None:
-			firstIndex = 0
-		if lastIndex == None:
-			lastIndex = self.getFrames()
-			
-		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)))
-		
-		for ind in xrange(firstIndex,lastIndex):
-			img = self.getFrame(ind)
-			for i,r in enumerate(self.rois):
-				#print str(ind) + " " + str(i) + " " + str(lastIndex)
-				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
-				
-		return roiProfile
-	
+
 	def applyOptions(self,img):
 			if self.options['crop']:
 				lm = self.options['leftMargin']
@@ -352,6 +336,21 @@ class TiffSequence(Sequence):
 			return None
 	
 
+	def computeRois(self,firstIndex = None, lastIndex = None):
+		if firstIndex == None:
+			firstIndex = 0
+		if lastIndex == None:
+			lastIndex = self.getFrames()
+			
+		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)))
+		
+		for ind in xrange(firstIndex,lastIndex):
+			img = self.getFrame(ind)
+			for i,r in enumerate(self.rois):
+				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+				
+		return roiProfile
 					
 
 		
@@ -486,7 +485,34 @@ class HDF5Sequence(Sequence):
 		except:
 		 	print("Warning: No times loaded")
 
+	def computeRois(self,firstIndex = None, lastIndex = None):
+		if firstIndex == None:
+			firstIndex = 0
+		if lastIndex == None:
+			lastIndex = self.getFrames()
+			
+		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)),dtype=np.float)
 
+		if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection']:
+			for ind in xrange(firstIndex,lastIndex):
+				img = self.getFrame(ind)
+				for i,r in enumerate(self.rois):
+					#print str(ind) + " " + str(i) + " " + str(lastIndex)
+					roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+		else:	
+			for i,r in enumerate(self.rois):
+					#print str(ind) + " " + str(i) + " " + str(lastIndex)
+					summ = np.zeros(lastIndex-firstIndex,dtype = np.float)
+					for j in r.pointMap:
+						summ=summ+self.hdf5Handler[j[1],j[0],firstIndex:lastIndex].mean(0)
+						
+					roiProfile[:,i] = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)		
+			
+
+		return roiProfile
+
+
+					
 	
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
