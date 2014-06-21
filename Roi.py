@@ -63,10 +63,10 @@ class Roi(QPolygon):
 		x,y = self.computeMassCenter()
 		mat = np.array([[cos(angle),-sin(angle)],[sin(angle),cos(angle)]])
 		for i,p in enumerate(self):
-			v = np.array([p.x() - x, p.y() - y])
+			v = np.array([p.x() - x, p.y() - y]).astype(np.float)
 			v1= np.dot(mat,v) + np.array([x,y])
-			self.setPoint(i,QPoint(v1[0],v1[1]))
-		
+			self.setPoint(i,QPoint(int(round(v1[0])),int(round(v1[1]))))
+
 	def isPointInRoi(self,point):
 		pt = QPoint(point[0],point[1])
 		return self.containsPoint(pt,Qt.OddEvenFill)
