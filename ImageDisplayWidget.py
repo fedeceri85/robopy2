@@ -43,11 +43,11 @@ class ImageDisplayWidget(QGLWidget):
 		self.ImagePositionY = 0
 		self.lastImagePositionY = 0
 		
-		self.ImageZoom = 1.0
+		self.ImageZoom = 1
 		self.ImageZoomSteps = 1
 
 		self.mouseFirstPosition = (0,0)
-
+		self.computeRoiPointMaps = True
 		self.IsMouseDown = 0
 		self.isMovingRoi = False
 		self.RightMouseButtonClicked = 0
@@ -490,7 +490,7 @@ class ImageDisplayWidget(QGLWidget):
 					self.nMovingRoi = i.ordinal
 			if self.isMovingRoi:
 
-				self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+				#self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 
 				self.mouseFirstPosition = (a,b)#self.screenToImageNoTraslate(event.x(),event.y())
 			else:
@@ -516,6 +516,7 @@ class ImageDisplayWidget(QGLWidget):
 					self.rois[-1].addPoint(a,b)
 					self.repaint()
 		if self.IsMouseDown == 1 and self.isMovingRoi:
+			self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 
 			self.isMovingRoi = False
 
@@ -558,10 +559,12 @@ class ImageDisplayWidget(QGLWidget):
 			if self.SequenceDisplay.optionsDlg.roiOptions.lockRoiPositions:
 				for r in self.rois:
 					r.move(int(a-x),int(b-y))
-					r.computePointMap()
+					if self.computeRoiPointMaps :
+						r.computePointMap()
 			else:
 				self.rois[self.nMovingRoi].move(int(a-x),int(b-y))
-				self.rois[self.nMovingRoi].computePointMap()
+				if self.computeRoiPointMaps :
+					self.rois[self.nMovingRoi].computePointMap()
 
 			self.repaint()
 			
@@ -609,7 +612,8 @@ class ImageDisplayWidget(QGLWidget):
 	def addRoi(self,roi,fromImageDisplayWidget = True):
 		if not fromImageDisplayWidget:
 			self.rois.append(roi)
-		roi.computePointMap()
+		if self.computeRoiPointMaps:
+			roi.computePointMap()
 		roi.ordinal = len(self.rois) - 1
 		
 		colorCycle = matplotlib.rcParams["axes.color_cycle"]

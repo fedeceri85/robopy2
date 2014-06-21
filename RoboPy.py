@@ -9,24 +9,35 @@ from SequenceDisplay import SequenceDisplay
 from IPython.frontend.terminal.embed import InteractiveShellEmbed
 import cPickle
 from OpenGL.GLUT import *
-
+from PreviewDisplay import PreviewDisplay
+import TiffSequence as ts
 '''
 Main window of Robopy project
 Launches various windows and tools
 
 '''
 class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
-	def __init__(self,parent=None,cropL=None):
+	def __init__(self,parent=None,cropL=None,img=None):
 		PyQt4.QtGui.QDialog.__init__(self,parent)
 		self.setupUi(self)
 		self.connect(self.LCcheckBox,SIGNAL("stateChanged(int)"),self.LCstateChanged)
 		self.connect(self.cropCheckBox,SIGNAL("stateChanged(int)"),self.cropStateChanged)
+		self.connect(self,SIGNAL("accepted()"),self.closePreviewDisplay)
+		self.connect(self,SIGNAL("rejected()"),self.closePreviewDisplay)
+
+		if img is not None:
+			self.PreviewDisplay = PreviewDisplay(self,img,cropL)
+			self.connect(self.PreviewDisplay,SIGNAL("roiChanged(int, int, int ,int)"),self.updateCropLimits)
+		else:
+			self.PreviewDisplay = None
+
 		if cropL is not None:
 			self.cropCheckBox.setChecked(True)
-			self.leftCropSpinBox.setValue(cropL[0])
-			self.rightCropSpinBox.setValue(cropL[1])
-			self.topCropSpinBox.setValue(cropL[2])
-			self.bottomCropSpinBox.setValue(cropL[3])
+			self.updateCropLimits(*cropL)
+			# self.leftCropSpinBox.setValue(cropL[0])
+			# self.rightCropSpinBox.setValue(cropL[1])
+			# self.topCropSpinBox.setValue(cropL[2])
+			# self.bottomCropSpinBox.setValue(cropL[3])
 
 		self.show()
 	
@@ -61,7 +72,16 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			self.rightCropSpinBox.setEnabled(False)
 			self.topCropSpinBox.setEnabled(False)
 			self.bottomCropSpinBox.setEnabled(False)
-			
+	def updateCropLimits(self,a,b,c,d):
+		if (b-a)%2 != 0:
+			a = a-1
+		if (c-d)%2 != 0:
+			d = d-1 
+		self.leftCropSpinBox.setValue(a)
+		self.rightCropSpinBox.setValue(b)
+		self.topCropSpinBox.setValue(c)
+		self.bottomCropSpinBox.setValue(d)
+
 	def getValues(self):
 		options = {}
 		rebin = int(str(self.rebinComboBox.currentText()))
@@ -97,7 +117,22 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			options['bottomMargin'] = None
 			
 		return options
-	
+
+	def closeEvent(self, event):
+        # do stuff
+		if self.PreviewDisplay is not None:
+
+			self.PreviewDisplay.close()
+		if self.canExit():
+			event.accept() # let the window close
+		else:
+			event.ignore()
+
+	def closePreviewDisplay(self):
+		if self.PreviewDisplay is not None:
+			self.PreviewDisplay.close()		
+
+
 class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -151,7 +186,17 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 			f.close()
 		except:
 			cropL = None
-		optDlg = RawSequenceOptions(parent=self,cropL=cropL)
+
+#Try to load a sample image
+		tiffSequence = None
+		if os.path.splitext(files[0])[1] == '.tif':
+			tiffSequence = ts.TiffSequence(files,None)
+		elif os.path.splitext(files[0])[1] == '.h5':
+			tiffSequence = ts.HDF5Sequence(files,None)
+
+
+
+		optDlg = RawSequenceOptions(parent=self,cropL=cropL,img=tiffSequence)
 
 		if optDlg.exec_():
 			self.options = optDlg.getValues()
@@ -160,6 +205,8 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 			f=open(files[0]+'_cropInfo','w')
 			cPickle.dump(cropL,f)
 			f.close()
+
+
 		sd = SequenceDisplay(self, files,rawTiffOptions=self.options)
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)

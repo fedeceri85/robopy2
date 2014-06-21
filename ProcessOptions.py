@@ -92,7 +92,10 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		QDialog.__init__(self, parent=parent)
 		self.setupUi(self)
 		self.valueDict = {}	
-		self.saveFile = os.path.join(saveFolder,'roboPySave')
+		if saveFolder is not None:
+			self.saveFile = os.path.join(saveFolder,'roboPySave')
+		else:
+			self.saveFile = None
 		self.frameOptions = self.initFrameOptions()
 		self.timeOptions = self.initTimeOptions()
 		self.displayOptions = self.initDisplayOptions()
