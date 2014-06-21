@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'RawSequenceOptionsGui.ui'
 #
-# Created: Fri Sep 20 08:16:33 2013
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Sat Jun 21 17:47:13 2014
+#      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(226, 266)
+        Dialog.resize(229, 274)
         Dialog.setAutoFillBackground(False)
         self.verticalLayout_5 = QtGui.QVBoxLayout(Dialog)
         self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
@@ -138,6 +138,18 @@ class Ui_Dialog(object):
         self.horizontalLayout_8.addLayout(self.verticalLayout_3)
         self.verticalLayout_4.addLayout(self.horizontalLayout_8)
         self.verticalLayout_5.addLayout(self.verticalLayout_4)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.rotateCheckBox = QtGui.QCheckBox(Dialog)
+        self.rotateCheckBox.setObjectName(_fromUtf8("rotateCheckBox"))
+        self.horizontalLayout.addWidget(self.rotateCheckBox)
+        self.rotateSpinBox = QtGui.QSpinBox(Dialog)
+        self.rotateSpinBox.setEnabled(False)
+        self.rotateSpinBox.setMinimum(0)
+        self.rotateSpinBox.setMaximum(180)
+        self.rotateSpinBox.setObjectName(_fromUtf8("rotateSpinBox"))
+        self.horizontalLayout.addWidget(self.rotateSpinBox)
+        self.verticalLayout_5.addLayout(self.horizontalLayout)
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
         self.buttonBox.setEnabled(True)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -165,4 +177,5 @@ class Ui_Dialog(object):
         self.label_5.setText(_translate("Dialog", "Right", None))
         self.label_7.setText(_translate("Dialog", "Top", None))
         self.label_6.setText(_translate("Dialog", "Bottom", None))
+        self.rotateCheckBox.setText(_translate("Dialog", "Rotate", None))
 

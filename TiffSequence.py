@@ -6,6 +6,7 @@ from os.path import splitext, getsize
 import threading
 from scipy.ndimage import zoom
 import tables as tb
+from scipy.misc import imrotate
 #from pubTools import oneColumnFigure
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
@@ -38,6 +39,7 @@ class Sequence:
 			self.options['rebin'] = None
 			self.options['LineCorrection'] = False
 			self.options['crop'] = False
+			self.options['rotate'] = False
 		self.FramesPerFile = list()
 		self.rois = list()
 		self.arraySequence = None
@@ -138,6 +140,8 @@ class Sequence:
 					sub = uint16(np.tile(lrsub,(1,img.shape[1])))
 					#img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 					img = rebin(img-sub+uint16(lrsub.mean()),(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -145,6 +149,9 @@ class Sequence:
 				else:	
 					#img = zoom(img,1.0/self.options['rebin'],order=0)
 					img = rebin(img,(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
+
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -164,11 +171,16 @@ class Sequence:
 					sub = uint16(np.tile(lrsub,(1,img.shape[1])))
 					#self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
 					img = img-sub+uint16(lrsub.mean())
+
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
 					
-				else:	
+				else:
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]	
 						
@@ -493,7 +505,7 @@ class HDF5Sequence(Sequence):
 			
 		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)),dtype=np.float)
 
-		if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection']:
+		if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection'] or self.options['rotate']:
 			for ind in xrange(firstIndex,lastIndex):
 				img = self.getFrame(ind)
 				for i,r in enumerate(self.rois):

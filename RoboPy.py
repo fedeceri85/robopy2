@@ -24,7 +24,7 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 		self.connect(self.cropCheckBox,SIGNAL("stateChanged(int)"),self.cropStateChanged)
 		self.connect(self,SIGNAL("accepted()"),self.closePreviewDisplay)
 		self.connect(self,SIGNAL("rejected()"),self.closePreviewDisplay)
-
+		self.connect(self.rotateCheckBox,SIGNAL("stateChanged(int)"),self.rotateStateChanged)
 		if img is not None:
 			self.PreviewDisplay = PreviewDisplay(self,img,cropL)
 			self.connect(self.PreviewDisplay,SIGNAL("roiChanged(int, int, int ,int)"),self.updateCropLimits)
@@ -72,6 +72,13 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			self.rightCropSpinBox.setEnabled(False)
 			self.topCropSpinBox.setEnabled(False)
 			self.bottomCropSpinBox.setEnabled(False)
+
+	def rotateStateChanged(self):
+		if self.rotateCheckBox.isChecked():
+			self.rotateSpinBox.setEnabled(True)
+		else:
+			self.rotateSpinBox.setEnabled(False)
+
 	def updateCropLimits(self,a,b,c,d):
 		if (b-a)%2 != 0:
 			a = a-1
@@ -116,6 +123,13 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			options['topMargin'] = None
 			options['bottomMargin'] = None
 			
+		if self.rotateCheckBox.isChecked():
+			options['rotate'] = True
+			options['angle'] = self.rotateSpinBox.value()
+		else:
+			options['rotate'] = False
+			options['angle'] = 0
+
 		return options
 
 	def closeEvent(self, event):
