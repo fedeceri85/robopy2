@@ -14,6 +14,7 @@ from Roi import Roi
 import sys
 import matplotlib
 import filterTools
+from math import atan, pi
 
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
@@ -49,6 +50,7 @@ class ImageDisplayWidget(QGLWidget):
 
 		self.IsMouseDown = 0
 		self.isMovingRoi = False
+		self.isRotatingRoi = False
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
 		self.rois = list()
@@ -482,20 +484,24 @@ class ImageDisplayWidget(QGLWidget):
 			self.RightMouseButtonClicked = 0
 			
 			a,b = self.screenToImage(event.x(), event.y())
-			self.isMovingRoi = False
-			for n,i in enumerate(self.rois):
-				if i.isPointInRoi((a,b)):
-					self.isMovingRoi = True
-					self.nMovingRoi = i.ordinal
-			if self.isMovingRoi:
-
+			if self.isRotatingRoi:
+				self.isRotatingRoi = False
 				self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 
-				self.mouseFirstPosition = (a,b)#self.screenToImageNoTraslate(event.x(),event.y())
 			else:
-				self.mouseFirstPosition = self.screenToImageNoTraslate(event.x(),event.y())
-				self.lastImagePositionX = self.ImagePositionX
-				self.lastImagePositionY = self.ImagePositionY
+				for n,i in enumerate(self.rois):
+					if i.isPointInRoi((a,b)):
+						self.isMovingRoi = True
+						self.nMovingRoi = i.ordinal
+				if self.isMovingRoi:
+
+					self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+					self.mouseFirstPosition = (a,b)#self.screenToImageNoTraslate(event.x(),event.y())
+				else:
+					self.mouseFirstPosition = self.screenToImageNoTraslate(event.x(),event.y())
+					self.lastImagePositionX = self.ImagePositionX
+					self.lastImagePositionY = self.ImagePositionY
 
 	def mouseReleaseEvent(self, event):
 		
@@ -517,7 +523,8 @@ class ImageDisplayWidget(QGLWidget):
 		if self.IsMouseDown == 1 and self.isMovingRoi:
 
 			self.isMovingRoi = False
-
+		#if self.IsMouseDown ==1 and self.isRotatingRoi:
+		#	self.isRotatingRoi = False
 		self.IsMouseDown = 0
 	
 	def screenToImage(self,x,y):
@@ -536,7 +543,7 @@ class ImageDisplayWidget(QGLWidget):
 		a,b = self.screenToImage(event.x(), event.y())
 
 		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
-		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 0 and not self.isMovingRoi:
+		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 0 and not self.isMovingRoi and not self.isRotatingRoi:
 			x,y = self.screenToImageNoTraslate(event.x(),event.y())
 			self.ImagePositionX = x - self.mouseFirstPosition[0] + self.lastImagePositionX
 			self.ImagePositionY = y - self.mouseFirstPosition[1] + self.lastImagePositionY
@@ -569,7 +576,33 @@ class ImageDisplayWidget(QGLWidget):
 			
 			self.updateGL()
 
-		if self.IsMouseDown ==0 and  self.SequenceDisplay.roiMonitor :
+		if self.IsMouseDown==0 and self.isRotatingRoi:
+			x,y = self.rois[self.nMovingRoi].computeMassCenter()
+			x1,y1 = self.mouseFirstPosition
+
+			if x1 != x:
+				angle1 = atan(float(y1-y)/(x1-x))
+			else:
+				if y1>y:
+					angle1 = pi/4
+
+				else:
+					angle1 = -pi/4
+
+			if x != a:
+				angle2 = atan(float(b-y)/(a-x))
+			else:
+				if b>y:
+					angle2 = pi/4
+
+				else:
+					angle2 = -pi/4
+
+			self.rois[self.nMovingRoi].rotate((angle2-angle1)/2.0)
+			self.mouseFirstPosition = (a,b)			
+			self.updateGL()
+
+		if self.IsMouseDown ==0 and  self.SequenceDisplay.roiMonitor and not self.isRotatingRoi :
 			try:
 				size = int(self.SequenceDisplay.optionsDlg.roiOptions.roiSize/2)
 				if size ==0:
@@ -592,16 +625,42 @@ class ImageDisplayWidget(QGLWidget):
 
 			except:
 				pass
+
+
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"
 			self.addRoi(self.rois[-1])
+		else:
+			if event.button() == Qt.LeftButton:
+
+				a,b = self.screenToImage(event.x(), event.y())
+				self.isRotatingRoi = False
+				for n,i in enumerate(self.rois):
+					if i.isPointInRoi((a,b)):
+						self.isRotatingRoi = True
+						self.nMovingRoi = i.ordinal
+			
+						#i.rotate(pi/6.3)
+						#self.updateGL()
+				if self.isRotatingRoi:
+
+					self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+					a,b = self.screenToImage(event.x(), event.y())
+
+					self.mouseFirstPosition = (a,b)#self.screenToImageNoTraslate(event.x(),event.y())
+			#	self.rois[0].rotate(3.14/6)
+			#	self.rois[0].computePointMap()
+
+			#self.updateGL()
+
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Delete:
 			self.deleteRoi()
 		else:
 			self.SequenceDisplay.keyPressEvent(event)
-			
+
+
 	def addRoi(self,roi,fromImageDisplayWidget = True):
 		if not fromImageDisplayWidget:
 			self.rois.append(roi)
