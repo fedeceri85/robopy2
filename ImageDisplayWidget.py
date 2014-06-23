@@ -13,7 +13,6 @@ import numpy as np
 from Roi import Roi
 import sys
 import matplotlib
-import filterTools
 from math import atan, pi
 
 '''
