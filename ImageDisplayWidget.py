@@ -197,6 +197,7 @@ class ImageDisplayWidget(QGLWidget):
 			
 			glutStrokeString(GLUT_STROKE_ROMAN, str(r.ordinal + 1))
 			glPopMatrix()
+	
 			
 		
 	def arrayToTexture(self, data, w, h, nOrd, internalType = GL_LUMINANCE, 
