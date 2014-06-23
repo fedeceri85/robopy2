@@ -808,14 +808,89 @@
       <zorder>displayTimesCheckBox</zorder>
       <zorder>verticalSpacer_2</zorder>
       <zorder>scalebarCheckBox</zorder>
-      <zorder>layoutWidget_2</zorder>
       <zorder>verticalSpacer_3</zorder>
-      <zorder>PlayInterframeSpinBox</zorder>
      </widget>
      <widget class="QWidget" name="FiltersTab">
       <attribute name="title">
        <string>Filters</string>
       </attribute>
+     </widget>
+     <widget class="QWidget" name="RoiOptionsTab">
+      <attribute name="title">
+       <string>Roi Options</string>
+      </attribute>
+      <widget class="QCheckBox" name="roiSameSizeCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>45</y>
+         <width>153</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Rois same size</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>286</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_20">
+        <item>
+         <widget class="QCheckBox" name="rectangularRoisCheckBox">
+          <property name="text">
+           <string>Rectangular Rois</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_19">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Size (0 = dynamic)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="roiSizeSpinBox"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QCheckBox" name="lockRoiPositionCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>70</y>
+         <width>191</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Lock roi relative positions</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>

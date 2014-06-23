@@ -1170,6 +1170,16 @@ def computeAverage(tiffSequence,framesInd):
 	return img
 
 
+def computeMax(tiffSequence,framesInd):
+	img = tiffSequence.getFramesFromList(framesInd)#tiffSequence.getFrame(framesInd[0])
+	#img = img.astype(np.float32)
+	# for f in framesInd[1:]:
+	# 	img = img + tiffSequence.getFrame(f)
+		
+	# img = img/len(framesInd)
+	m = img.max(2)
+	return m
+
 class ProcessedSequence:
 	def __init__(self,tiffSequence,processedWidget,displayParameters,frameOptions,displayOptions,timeOptions):
 		self.tiffSequence = tiffSequence

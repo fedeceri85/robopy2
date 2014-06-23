@@ -13,6 +13,7 @@ import numpy as np
 from Roi import Roi
 import sys
 import matplotlib
+from math import atan, pi
 
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
@@ -37,12 +38,17 @@ class ImageDisplayWidget(QGLWidget):
 		self.setMouseTracking(True)
 		
 		self.ImagePositionX = 0
+		self.lastImagePositionX = 0
 		self.ImagePositionY = 0
+		self.lastImagePositionY = 0
 		
-		self.ImageZoom = 1.0
+		self.ImageZoom = 1
 		self.ImageZoomSteps = 1
-		
+
+		self.mouseFirstPosition = (0,0)
+		self.computeRoiPointMaps = True
 		self.IsMouseDown = 0
+		self.isMovingRoi = False
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
 		self.rois = list()
@@ -150,7 +156,7 @@ class ImageDisplayWidget(QGLWidget):
 			h = self.currentDrawData["height"]
 			
 			glScalef(self.ImageZoom, self.ImageZoom, 1.0)
-				
+			glTranslatef(self.ImagePositionX,self.ImagePositionY,0);
 			glBegin(GL_QUADS)
 			glTexCoord2d(0,0)
 			glVertex2d(0,0)
@@ -181,7 +187,7 @@ class ImageDisplayWidget(QGLWidget):
 		nPoints = r.size()
 		glBegin(GL_LINE_LOOP)
 		for i in range(0,nPoints):
-			glVertex2f(r.point(i).x(), r.point(i).y())
+			glVertex2f(r.point(i).x() , r.point(i).y())
 			
 		glEnd()
 
@@ -191,7 +197,7 @@ class ImageDisplayWidget(QGLWidget):
 			
 			fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
 			fontScale = 12.0/fontWidth
-			glTranslatef(x, y, 1.0)
+			glTranslatef(x, y , 1.0)
 			glScalef(fontScale, -fontScale, 1.0)
 			#glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
 			
@@ -427,51 +433,187 @@ class ImageDisplayWidget(QGLWidget):
 		self.IsMouseDown = 1
 		if event.button() == Qt.RightButton:
 			self.RightMouseButtonClicked = 1
+			if self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==1 and (self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 0 or len(self.rois)==0):
+				if self.SequenceDisplay.optionsDlg.roiOptions.roiSize == 0:
+					a,b = self.screenToImage(event.x(), event.y())
+					self.mouseFirstPosition = (a,b)
+					w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+					if w > a and a > 0 and h > b and b > 0:
+						if self.DrawRoiStatus == "idle":
+							self.DrawRoiStatus = "drawing"
+							self.rois.append(Roi())
+
+							for i in xrange(4):
+								self.rois[-1].addPoint(a,b)
+							self.repaint()
+				else:
+					roiSize = self.SequenceDisplay.optionsDlg.roiOptions.roiSize 
+					a,b = self.screenToImage(event.x(), event.y())
+					self.mouseFirstPosition = (a,b)
+					w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+					if w > a and a > 0 and h > b and b > 0:
+						if self.DrawRoiStatus == "idle":
+							self.DrawRoiStatus = "drawing"
+							self.rois.append(Roi())
+							self.rois[-1].addPoint(a - roiSize/2,b-roiSize/2)
+							self.rois[-1].addPoint(a + roiSize/2,b-roiSize/2)
+							self.rois[-1].addPoint(a + roiSize/2,b+roiSize/2)
+							self.rois[-1].addPoint(a - roiSize/2,b+roiSize/2)
+							self.repaint()
+							self.DrawRoiStatus = "idle"
+							self.addRoi(self.rois[-1])
+					
+
+			if self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 1 and len(self.rois)>0:
+				a,b = self.screenToImage(event.x(), event.y())
+				w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+
+				if w > a and a > 0 and h > b and b > 0:
+					if self.DrawRoiStatus == "idle":
+						self.DrawRoiStatus = "drawing"
+						self.rois.append(Roi())
+						for pnt in self.rois[-2]:
+							oldX,oldY = self.rois[-2].computeMassCenter()
+							self.rois[-1].append(pnt+QPoint(a-oldX,b-oldY))
+						self.repaint()
+						self.DrawRoiStatus = "idle"
+						self.addRoi(self.rois[-1])
+
 		else:
 			self.RightMouseButtonClicked = 0
 			
+			a,b = self.screenToImage(event.x(), event.y())
+
+			for n,i in enumerate(self.rois):
+				if i.isPointInRoi((a,b)):
+					self.isMovingRoi = True
+					self.nMovingRoi = i.ordinal
+			if self.isMovingRoi:
+
+				#self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+				self.mouseFirstPosition = (a,b)#self.screenToImageNoTraslate(event.x(),event.y())
+			else:
+				self.mouseFirstPosition = self.screenToImageNoTraslate(event.x(),event.y())
+				self.lastImagePositionX = self.ImagePositionX
+				self.lastImagePositionY = self.ImagePositionY
+
 	def mouseReleaseEvent(self, event):
 		
-		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1:
-			
-			a,b = self.screenToImage(event.x(), event.y())
-			
-			w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
-			
-			if w > a and a > 0 and h > b and b > 0:
-				if self.DrawRoiStatus == "idle":
-					self.DrawRoiStatus = "drawing"
-					self.rois.append(Roi())
+		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==0:
 
-					
-				self.rois[-1].addPoint(a,b)
-				self.repaint()
-		
+			if self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize==0 or  (len(self.rois)==0 or self.DrawRoiStatus =='drawing'):
+				
+				a,b = self.screenToImage(event.x(), event.y())
+				
+				w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+				if w > a and a > 0 and h > b and b > 0:
+					if self.DrawRoiStatus == "idle":
+						self.DrawRoiStatus = "drawing"
+						self.rois.append(Roi())
+
+						
+					self.rois[-1].addPoint(a,b)
+					self.repaint()
+		if self.IsMouseDown == 1 and self.isMovingRoi:
+			self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+			self.isMovingRoi = False
+
 		self.IsMouseDown = 0
 	
 	def screenToImage(self,x,y):
+		a = x / self.ImageZoom - self.ImagePositionX
+		b = y / self.ImageZoom - self.ImagePositionY
+		
+		return a,b
+	
+	def screenToImageNoTraslate(self,x,y):
 		a = x / self.ImageZoom
 		b = y / self.ImageZoom
 		
 		return a,b
-		
+
 	def mouseMoveEvent(self, event):
 		a,b = self.screenToImage(event.x(), event.y())
+
 		self.emit(QtCore.SIGNAL("mousePositionChanged(int, int)"), a, b)
-		
+		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 0 and not self.isMovingRoi:
+			x,y = self.screenToImageNoTraslate(event.x(),event.y())
+			self.ImagePositionX = x - self.mouseFirstPosition[0] + self.lastImagePositionX
+			self.ImagePositionY = y - self.mouseFirstPosition[1] + self.lastImagePositionY
+			self.updateGL()
+
+		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==1:
+			if self.DrawRoiStatus == "drawing":
+				x1 = a
+				y1 = b
+				x2 = self.mouseFirstPosition[0]
+				y2 = self.mouseFirstPosition[1]
+
+				self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
+				self.repaint()
+		if self.IsMouseDown and self.isMovingRoi:
+
+			x,y = self.rois[self.nMovingRoi].computeMassCenter()
+			if self.SequenceDisplay.optionsDlg.roiOptions.lockRoiPositions:
+				for r in self.rois:
+					r.move(int(a-x),int(b-y))
+					if self.computeRoiPointMaps :
+						r.computePointMap()
+			else:
+				self.rois[self.nMovingRoi].move(int(a-x),int(b-y))
+				if self.computeRoiPointMaps :
+					self.rois[self.nMovingRoi].computePointMap()
+
+			self.repaint()
+			
+			self.updateGL()
+
+
+		if self.IsMouseDown ==0 and  self.SequenceDisplay.roiMonitor:
+			try:
+				size = int(self.SequenceDisplay.optionsDlg.roiOptions.roiSize/2)
+				if size ==0:
+					size = 2
+				trace = self.SequenceDisplay.tiffSequence.hdf5Handler[b-size:b+size+1,a-size:a+size+1,self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(1).mean(0)
+				self.SequenceDisplay.roiAnal.makePlot(trace)
+			except:
+				pass
+
+
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"
 			self.addRoi(self.rois[-1])
+		else:
+			if event.button() == Qt.LeftButton:
+
+				a,b = self.screenToImage(event.x(), event.y())
+				for n,i in enumerate(self.rois):
+					if i.isPointInRoi((a,b)):
+						self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+						modifiers = QtGui.QApplication.keyboardModifiers()
+						if modifiers ==  QtCore.Qt.ControlModifier:
+							i.rotate(-pi/18.0)
+						else:
+							i.rotate(pi/18.0)
+
+						self.updateGL()
+
+
 	def keyPressEvent(self, event):
 		if event.key() == Qt.Key_Delete:
 			self.deleteRoi()
-	
-			
+		else:
+			self.SequenceDisplay.keyPressEvent(event)
+
+
 	def addRoi(self,roi,fromImageDisplayWidget = True):
 		if not fromImageDisplayWidget:
 			self.rois.append(roi)
-		roi.computePointMap()
+		if self.computeRoiPointMaps:
+			roi.computePointMap()
 		roi.ordinal = len(self.rois) - 1
 		
 		colorCycle = matplotlib.rcParams["axes.color_cycle"]
@@ -486,8 +628,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 		self.updateGL()
-		
-		self.emit(QtCore.SIGNAL("roiAdded(int)"), id(self))
+		self.emit(QtCore.SIGNAL("roiAdded(long)"), id(self))
 		
 	def deleteRoi(self, n = -1):
 		nRoi = len(self.rois)
@@ -498,9 +639,25 @@ class ImageDisplayWidget(QGLWidget):
 			return
 		
 		del self.rois[n]
+		newrois = []
+		for i in self.rois:
+			newrois.append(i)
+		self.rois = []
+		for i in newrois:	
+			self.addRoi(i,False)
+		del newrois
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
-		del self.SequenceDisplay.tiffSequence.rois[n]
+		self.SequenceDisplay.tiffSequence.rois = []
+		for i in self.rois:
+			self.SequenceDisplay.tiffSequence.rois.append(i)
+		
 		self.updateGL()
 		
-		self.emit(QtCore.SIGNAL("roiDeleted(int)"), id(self))
+		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
 	
+
+	# def moveRoi(self,n,x,y):
+	# 	self.rois[n].move(x,y)
+	# 	self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+	# 	self.updateGL()

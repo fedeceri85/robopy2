@@ -36,6 +36,9 @@
     </widget>
     <addaction name="menuLoad"/>
     <addaction name="roboActionSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_Sequentially"/>
+    <addaction name="actionOpen_Next"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -58,6 +61,16 @@
   <action name="roboActionOpen">
    <property name="text">
     <string>Read from disk</string>
+   </property>
+  </action>
+  <action name="actionLoad_Sequentially">
+   <property name="text">
+    <string>Load list of Files Sequentially</string>
+   </property>
+  </action>
+  <action name="actionOpen_Next">
+   <property name="text">
+    <string>Open Next</string>
    </property>
   </action>
  </widget>

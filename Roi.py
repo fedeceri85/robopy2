@@ -2,6 +2,7 @@ import PyQt4
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QPolygon, QColor
 import numpy as np
+from math import cos,sin
 #import pdb
 '''
 Module that holds a polygonal roi
@@ -47,7 +48,29 @@ class Roi(QPolygon):
 			avg = avg + im[i[1], i[0]].sum()
 			
 		return avg/self.mapSize
-		
+			
+	def move(self,x,y):
+
+		self.translate(x,y)
+		# for i in self:
+		# 	#print i.x()+x
+		# 	#print i.y() + y
+		# 	i.setX(i.x() + y)
+		# 	i.setY(i.y() + x)
+
+		#self.computePointMap()\
+	def rotate(self,angle):
+		x,y = self.computeMassCenter()
+		mat = np.array([[cos(angle),-sin(angle)],[sin(angle),cos(angle)]])
+		for i,p in enumerate(self):
+			v = np.array([p.x() - x, p.y() - y]).astype(np.float)
+			v1= np.dot(mat,v) + np.array([x,y])
+			self.setPoint(i,QPoint(int(round(v1[0])),int(round(v1[1]))))
+
+	def isPointInRoi(self,point):
+		pt = QPoint(point[0],point[1])
+		return self.containsPoint(pt,Qt.OddEvenFill)
+
 	def computeMassCenter(self):
 		x = 0.0
 		y = 0.0

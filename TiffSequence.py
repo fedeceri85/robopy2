@@ -6,8 +6,8 @@ from os.path import splitext, getsize
 import threading
 from scipy.ndimage import zoom
 import tables as tb
+from scipy.misc import imrotate
 #from pubTools import oneColumnFigure
-
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
 		threading.Thread.__init__(self)
@@ -39,6 +39,7 @@ class Sequence:
 			self.options['rebin'] = None
 			self.options['LineCorrection'] = False
 			self.options['crop'] = False
+			self.options['rotate'] = False
 		self.FramesPerFile = list()
 		self.rois = list()
 		self.arraySequence = None
@@ -53,6 +54,7 @@ class Sequence:
 		self.threadLock = threading.Lock()
 	
 	def open(self):
+		print('Opening')
 		pass
 	
 	def getRawImage(self,n):
@@ -87,6 +89,8 @@ class Sequence:
 				return
 		try:
 			self.timesDict = loadTimes(filename,firstFrameIndex = 0, firstTimeValue = 0.0,scaleFactor=1000.0)
+			if self.timesDict == None:
+				raise IOError("Can't read the time file")
 			self.timesDict.setLabel('Time (s)')
 			if len(self.timesDict)< self.frames:
 				print("Warning. More frames than timepoints")
@@ -108,28 +112,13 @@ class Sequence:
 					print('Correcting times mismatch due to autosave')
 					self.timesDict.correctAutoSaveFrameTime()
 		except IOError:
-			print("Warning. No associated time file")
+			print("Warning. No associated time file or corrupt file")
 			kv = range(self.frames)
 			self.timesDict = TimesDict(zip(kv,kv))
 			self.timesDict.setLabel('Frames')
 			
 			
-	def computeRois(self,firstIndex = None, lastIndex = None):
-		if firstIndex == None:
-			firstIndex = 0
-		if lastIndex == None:
-			lastIndex = self.getFrames()
-			
-		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)))
-		
-		for ind in xrange(firstIndex,lastIndex):
-			img = self.getFrame(ind)
-			for i,r in enumerate(self.rois):
-				#print str(ind) + " " + str(i) + " " + str(lastIndex)
-				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
-				
-		return roiProfile
-	
+
 	def applyOptions(self,img):
 			if self.options['crop']:
 				lm = self.options['leftMargin']
@@ -151,6 +140,8 @@ class Sequence:
 					sub = uint16(np.tile(lrsub,(1,img.shape[1])))
 					#img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 					img = rebin(img-sub+uint16(lrsub.mean()),(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -158,6 +149,9 @@ class Sequence:
 				else:	
 					#img = zoom(img,1.0/self.options['rebin'],order=0)
 					img = rebin(img,(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
+
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -177,11 +171,16 @@ class Sequence:
 					sub = uint16(np.tile(lrsub,(1,img.shape[1])))
 					#self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
 					img = img-sub+uint16(lrsub.mean())
+
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
 					
-				else:	
+				else:
+					if self.options['rotate']:
+						img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]	
 						
@@ -228,7 +227,7 @@ class Sequence:
 				self.threadLock.release()	
 			
 				
-			if not self.cachedFrames.has_key(n+1):
+			if not self.cachedFrames.has_key(n+1) and n+1< self.getFrames():
 				loader1 = ThreadedRead(1, self)
 				loader1.frameToLoad = n+1
 				loader1.start()
@@ -311,7 +310,7 @@ class TiffSequence(Sequence):
 			while th.SetDirectory(cnt):
 				cnt = cnt + 10000
 				
-			frames = th.CurrentDirectory().value
+			frames = th.CurrentDirectory().value + 1
 			th.SetDirectory(currDir)
 		if self.options['rebin'] is not None:
 			width = width/self.options['rebin']
@@ -349,6 +348,21 @@ class TiffSequence(Sequence):
 			return None
 	
 
+	def computeRois(self,firstIndex = None, lastIndex = None):
+		if firstIndex == None:
+			firstIndex = 0
+		if lastIndex == None:
+			lastIndex = self.getFrames()
+			
+		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)))
+		
+		for ind in xrange(firstIndex,lastIndex):
+			img = self.getFrame(ind)
+			for i,r in enumerate(self.rois):
+				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+				
+		return roiProfile
 					
 
 		
@@ -420,21 +434,24 @@ class HDF5Sequence(Sequence):
 		
 		self.width=width
 		self.height=height
-		self.frames=frames - 1
+		self.frames=frames 
 		
 		self.origWidth = self.width 
 		self.origHeight = self.height
+
 		self.initTimesDict()
 	
 	def open(self):
-		fi = tb.openFile(self.SequenceFiles[0])
+		fi = tb.open_file(self.SequenceFiles[0])
 		self.hdf5Handler = fi.root.x
-	
+		self.timesArray = fi.root.times.timesArray.read()
+		self.timesLabel = unicode(fi.root.times.timeLabel.read().tostring(),'utf-8')
+
 	def getRawImage(self,n):
 		return self.hdf5Handler[:,:,n]	
 	
 	
-	def saveSequence(self, f,sequence=None,framesInd = None):
+	def saveSequence(self, f,sequence=None,framesInd = None,filterLevel = 5):
 		if sequence == None:
 			sequence = self
 			
@@ -445,23 +462,79 @@ class HDF5Sequence(Sequence):
 		
 		h5file = tb.openFile(f, mode='w')
 		root = h5file.root
-		atom = tb.Atom.from_dtype(data.dtype)
-		#filters = tb.Filters(complevel=9, complib='lzo',shuffle=True)
+		atom = tb.UInt16Atom() #tb.Atom.from_dtype(data.dtype)
+		if filterLevel == 0:
+			filters = None
+		else:
+			filters = tb.Filters(complevel=filterLevel, complib='blosc',shuffle=True)
 
-		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames)
 
+		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames,filters = filters)
 		for i in framesInd:		
 			data = sequence.getFrame(i)
-			x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
-		
+			
+			try: 
+				x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
+			except ValueError: 
+				print("Can't add frame "+str(i)+". Wrong dimensions?")
+
+		tGroup = h5file.createGroup(root,'times')
+
+		tA = np.vstack((sequence.timesDict.frames(),sequence.timesDict.times())).T
+		_t = h5file.createCArray(tGroup,'timesArray',tb.Atom.from_dtype(tA.dtype),tA.shape,filters=filters)
+		_t[:] = tA
+		bytes = np.fromstring(sequence.timesDict.label.encode('utf-8'),np.uint8)
+		_tStr = h5file.createCArray(tGroup,'timeLabel',tb.UInt8Atom(),shape=(len(bytes), ),filters=filters)
+		_tStr[:] = bytes
+
 		h5file.flush()
 		h5file.close()
+
+	def initTimesDict(self):
+		try:
+		 	self.timesDict = TimesDict(zip(list((self.timesArray[:,0]).astype(uint16)),list((self.timesArray[:,1]))))
+		 	self.timesDict.label = self.timesLabel
+		except:
+		 	print("Warning: No times loaded")
+
+	def computeRois(self,firstIndex = None, lastIndex = None):
+		if firstIndex == None:
+			firstIndex = 0
+		if lastIndex == None:
+			lastIndex = self.getFrames()
+			
+		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)),dtype=np.float)
+
+		if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection'] or self.options['rotate']:
+			for ind in xrange(firstIndex,lastIndex):
+				img = self.getFrame(ind)
+				for i,r in enumerate(self.rois):
+					#print str(ind) + " " + str(i) + " " + str(lastIndex)
+					roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+		else:	
+			for i,r in enumerate(self.rois):
+					#print str(ind) + " " + str(i) + " " + str(lastIndex)
+					summ = np.zeros(lastIndex-firstIndex,dtype = np.float)
+					for j in r.pointMap:
+						summ=summ+self.hdf5Handler[j[1],j[0],firstIndex:lastIndex].mean(0)
+						
+					roiProfile[:,i] = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)		
+			
+
+		return roiProfile
+
+
+					
 	
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
 	#times=numpy.loadtxt(splitext(filename)[0]+'_times.txt',delimiter='\t',skiprows=1,usecols=(0,1))
-	times = loadtxt(filename,delimiter='\t',skiprows=1,usecols=(0,1))
-	return TimesDict(zip(list((times[:,0]+firstFrameIndex).astype(uint16)),list((times[:,1]+firstTimeValue)/scaleFactor)))
+	try:
+		times = loadtxt(filename,delimiter='\t',skiprows=1,usecols=(0,1))
+		return TimesDict(zip(list((times[:,0]+firstFrameIndex).astype(uint16)),list((times[:,1]+firstTimeValue)/scaleFactor)))
+	except:
+		return None
+	
 
 def rebin(a, shape):
     sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
@@ -474,7 +547,7 @@ class TimesDict(dict):
 	"""
 	def __init__(self,*arg,**kw):
 		super(TimesDict, self).__init__(*arg, **kw)
-		self.label=''
+		self.label=' '
 
 		
 	def times(self):

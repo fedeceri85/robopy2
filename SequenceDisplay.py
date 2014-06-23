@@ -25,11 +25,11 @@ from SaveRawSequenceOptions import SaveRawSequenceOptions
 from SequenceProcessor import ProcessedSequence
 import Plugins
 from scipy.misc import imsave
+from  roiAnalysis import MainWindow as rMW
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
-		
 		self.setupUi(self)
 		self.imageWidgetSetup()
 		#l = dir(self.CurrentFrameSlider)
@@ -39,22 +39,21 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.RoboMainWnd = parent
 		self.MaxFrames = 0
 		self.CurrentShownFrame = 0
-		
+		self.setGeometry(0, 0,1300, 1000)
+
 		self.displayParameters = DisplayParameters.DisplayPamrameters()
 		#print(str(self.displayParameters.displayGrayMax))
 		
 		#self.roiProfile = None
 		#self.roiAverageRecomputeNeeded = False
-		
+		self.currentImage = None
 		#self.PlayInterframe = 50
 		self.IsPlaying = False
 		self.timer = QBasicTimer()
 		self.FrameImage = None
 		
 		self.makeConnections()
-		
 		self.show()
-		
 		self.tiffFiles = files
 		self.loadInRam = loadInRam
 		#self.worker = Worker(self, self.tiffLoad, self, True)
@@ -97,7 +96,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			for plugin in self.plugins:
 				if plugin.associatedFileType == os.path.splitext(files[0])[1]:
 					plugin.run(self)
-					print('HERE')
+
 		
 		if loadInRam:
 			self.tiffSequence.loadWholeTiff()
@@ -114,17 +113,18 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.colorAutoRadioButton.setChecked(self.displayParameters.autoAdjust)
 		
 
-		#rc = self.frameGeometry()
-		#dlgRc = self.optionsDlg.geometry()
-		#dlgRc.moveTo(rc.right()+5, rc.top())
-		#self.optionsDlg.setGeometry(dlgRc)
+		rc = self.frameGeometry()
+		dlgRc = self.optionsDlg.geometry()
+		dlgRc.moveTo(rc.right()+100, rc.top())
+		self.optionsDlg.setGeometry(dlgRc)
 		self.optionsDlg.show()
 		
 		self.optionsDlg.frameOptions.lastFrame = self.MaxFrames
 		
 		self.recomputeFalseColorReference()
 		self.makeProcessReferenceConnections(self.optionsDlg)
-		
+		self.clipboard = QApplication.clipboard()
+		self.roiMonitor = False
 	def tiffLoad(self):
 		print("entering tiffLoad from worker")
 		self.tiffSequence = TiffSequence(self.files,self.rawOptions)
@@ -170,7 +170,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)
 		self.connect(self.actionForce_recomputation,SIGNAL("triggered()"),self.forceRoiRecomputation)
-		
+		self.connect(self.actionCopy_filepath_to_clipboard,SIGNAL("triggered()"),self.copyToClipboard)
+
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
 		self.connect(self.actionSave_as_avi, SIGNAL("triggered()"), self.saveSequenceAsAvi)
 		self.connect(self.actionSave_as_hd5_table, SIGNAL("triggered()"), self.saveSequenceAsTable)
@@ -180,10 +181,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.imWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
 		self.connect(self.processedWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
 		
-		self.connect(self.imWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
-		self.connect(self.processedWidget, SIGNAL("roiAdded(int)"), self.roiAdded)
-		self.connect(self.imWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
-		self.connect(self.processedWidget, SIGNAL("roiDeleted(int)"), self.roiDeleted)
+		self.connect(self.imWidget, SIGNAL("roiAdded(long)"), self.roiAdded)
+		self.connect(self.processedWidget, SIGNAL("roiAdded(long)"), self.roiAdded)
+		self.connect(self.imWidget, SIGNAL("roiDeleted(long)"), self.roiDeleted)
+		self.connect(self.processedWidget, SIGNAL("roiDeleted(long)"), self.roiDeleted)
 		
 		self.connect(self.colorMinSpinBox, SIGNAL("valueChanged(float)"), self.displayMinChangedBox)
 		self.connect(self.colorMaxSpinBox, SIGNAL("valueChanged(float)"), self.displayMaxChangedBox)
@@ -192,13 +193,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.colorAutoRadioButton, SIGNAL("toggled(bool)"), self.displayAutoAdjustChanged)
 		
 		self.connect(self.actionAverage,SIGNAL("triggered()"),self.averageCb)
-		
+		self.connect(self.actionBack_Projection,SIGNAL("triggered()"),self.backProjCb)
+
 		
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
 		self.connect(self.actionDelete_Last, SIGNAL("triggered()"), self.deleteRoi)
-		
+		self.connect(self.actionRoi_monitor, SIGNAL("triggered()"), self.showRoiMonitor)
+		self.connect(self.actionDelete_number, SIGNAL("triggered()"), self.deleteRoiN)
+			
 	
 	def makeProcessReferenceConnections(self, dlg):
 		self.connect(dlg.FirstFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
@@ -383,7 +387,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.updateCurrentFrame()
 		
 	def updateCurrentFrame(self):
-		self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
+		if self.getViewType() ==0:
+
+			if self.currentImage == None:
+				self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
+			else:
+				self.FrameImage, self.FrameData = self.loadImageGray(self.currentImage)
+		else:
+			self.FrameImage, self.FrameData = self.loadImageProcessed(self.CurrentShownFrame)
 		self.updateDisplay()
 		
 	def computeRangeParameters(self):
@@ -443,47 +454,63 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	
 	def getSequenceFrame(self, n, needQImage = True):
 			
-		im = self.tiffSequence.getFrame(n)
-		h,w = im.shape
+		self.currentImage = self.tiffSequence.getFrame(n)
+		if self.getViewType() == 0:
+			return self.loadImageGray(self.currentImage,needQImage)
+		elif self.getViewType() == 1:
+			return self.loadImageProcessed(n,needQImage)
+
+	def loadImageGray(self,im,needQImage=True):
+		
+		
 		
 		if im == None:
 			return None
 			
-		viewType = self.getViewType()
-		if viewType == 0:
-			if self.displayParameters.autoAdjust:
-				self.changeDisplayGrayMin(im.min())
-				self.changeDisplayGrayMax(im.max())
-		
+
+		if self.displayParameters.autoAdjust:
+			self.changeDisplayGrayMin(im.min())
+			self.changeDisplayGrayMax(im.max())
+	
 		self.showStatusMessage("Frame " + str(self.CurrentShownFrame+1) + " of " + str(self.MaxFrames))	
-		if viewType == 0:
-			tex = self.imWidget.processData(list([im]), list([0]), list([list([self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax])]))
-			return tex, im
-		elif viewType == 1:
-			if self.displayParameters.autoAdjust:
-				f=self.processedSequence.computeProcessedFrame(n)
-				
-				self.changeDisplayColorMin(f.min())
-				self.changeDisplayColorMax(f.max())
-			else:
-				f=self.processedSequence.computeProcessedFrame(n,returnType ="texture")
+		#if viewType == 0:
+		tex = self.imWidget.processData(list([im]), list([0]), list([list([self.displayParameters.displayGrayMin, self.displayParameters.displayGrayMax])]))
+		return tex, im
+		#else:
+		#	return None, None
+
+	def loadImageProcessed(self,n,needQImage=True):	
+		#elif viewType == 1:
+		if self.displayParameters.autoAdjust:
+			f=self.processedSequence.computeProcessedFrame(n)
 			
-			if self.optionsDlg.displayOptions.useLUT == 1:
-				tex = self.processedSequence.applyColormap(f,w,h)
-				if self.displayParameters.autoAdjust == False:
-					f=None
-				return tex, f
-			elif self.optionsDlg.displayOptions.useHSV == 1:
-				if self.optionsDlg.FrameByFrameRadioButton.isChecked():
-					self.processedSequence.computeValue(im)
-				tex = self.processedSequence.HSVImage(f,w,h)	
-				if self.displayParameters.autoAdjust == False:
-					f=None
-					
-				return tex, f
+			self.changeDisplayColorMin(f.min())
+			self.changeDisplayColorMax(f.max())
+		else:
+			f=self.processedSequence.computeProcessedFrame(n,returnType ="texture")
+		
+		if self.optionsDlg.displayOptions.useLUT == 1:
+			h,w = self.tiffSequence.height,self.tiffSequence.width
+
+			tex = self.processedSequence.applyColormap(f,w,h)
+			if self.displayParameters.autoAdjust == False:
+				f=None
+			return tex, f
+		elif self.optionsDlg.displayOptions.useHSV == 1:
+			if self.optionsDlg.FrameByFrameRadioButton.isChecked():
+				im = self.tiffSequence.getFrame(n)
+				self.processedSequence.computeValue(im)
+
+			h,w = self.tiffSequence.height,self.tiffSequence.width
+			tex = self.processedSequence.HSVImage(f,w,h)	
+			if self.displayParameters.autoAdjust == False:
+				f=None
+				
+			return tex, f
 			
 		return None, None
-		
+
+
 	def getSequenceFrameAsRgb(self, n):
 		tex, f = self.getSequenceFrame(n)
 		if self.ImageTabWidget.currentIndex() == 0:
@@ -623,8 +650,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.IsPlaying = False
 			
 	def isLastFrame(self):
-		if self.CurrentShownFrame >= self.MaxFrames -1:
-			return True
+
+		first, step = self.getSequenceStartAndStep()
+		last = self.optionsDlg.frameOptions.lastFrame-1
+
+		if self.CurrentShownFrame >= last:#self.MaxFrames -1:
+			self.CurrentShownFrame=first
 		
 		return False
 		
@@ -646,14 +677,35 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		if optDlg.exec_():
 			framesInd = optDlg.getFrameInterval()
-		img = SequenceProcessor.computeAverage(self.tiffSequence,framesInd)
+		self.currentImage = SequenceProcessor.computeAverage(self.tiffSequence,framesInd)
+		self.loadImageGray(self.currentImage)
+		self.updateDisplay()
 		fig = MPlot(self)
-		fig.imshow(img)
+		fig.imshow(self.currentImage)
 		fig.show()
 		fname = os.path.splitext(self.tiffFiles[0])[0]+'_average.tif'
-		imsave(fname,img)
+		imsave(fname,self.currentImage)
+		fig.close()
+
+	def backProjCb(self):
 		
+		optDlg = SaveRawSequenceOptions([1,self.tiffSequence.frames],parent=self)
+		
+		if optDlg.exec_():
+			framesInd = optDlg.getFrameInterval()
+		self.currentImage = SequenceProcessor.computeMax(self.tiffSequence,framesInd)
+		self.loadImageGray(self.currentImage)
+		self.updateDisplay()
+		fig = MPlot(self)
+		fig.imshow(self.currentImage)
+		fig.show()
+		fname = os.path.splitext(self.tiffFiles[0])[0]+'_backproj.tif'
+		imsave(fname,self.currentImage)
+		fig.close()
+
+
 	def computeRoisCb(self):
+
 		ff = 0
 		lf = self.tiffSequence.getFrames()
 		
@@ -663,15 +715,19 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		if self.displayParameters.roiAverageRecomputeNeeded:
 			self.displayParameters.roiProfile = np.zeros((lf, nrois))
+			if self.tiffSequence.__class__ == HDF5Sequence:
 		
-			for i in xrange(ff, lf, 100):
-				tlf = i + 100
-				if tlf > lf:
-					tlf = lf
-				self.displayParameters.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)		
-				self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
-				self.update()
-				
+				self.displayParameters.roiProfile[:, 0:nrois] = self.tiffSequence.computeRois()	
+
+			else:	
+				for i in xrange(ff, lf, 100):
+					tlf = i + 100
+					if tlf > lf:
+						tlf = lf
+					self.displayParameters.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)		
+					self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
+					self.update()
+					
 			self.displayParameters.roiAverageRecomputeNeeded = False	
 			
 		
@@ -680,14 +736,18 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#fig,ax = oneColumnFigure(addAxes=True)
 		#ax.plot(roiProfile)
 		#fig.show()
-		
+		try:
+			self.fig.close()
+		except:
+			pass
 		fig = MPlot(self)
 		
 		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.timesDict.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		
-		fig.plot(times,rdata)
+		fig.plot(times,rdata,linewidth=0.3)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
+		self.fig = fig
 		return times,rdata
 	
 	def deleteRoi(self, n = -1):
@@ -709,6 +769,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	
 	def roiRecomputeNeeded(self, isNeeded):
+
+		self.displayParameters.roiAverageRecomputeNeeded = isNeeded
+
 		self.roiAverageRecomputeNeeded = isNeeded
 		#print("roiRecompute is needed " + str(isNeeded))
 		
@@ -722,9 +785,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def roiDeleted(self, objId):
 		if objId == id(self.imWidget):
-			self.processedWidget.rois = self.imWidget.rois
+			self.processedWidget.rois = self.imWidget.rois[:]
 		else:
-			self.imWidget.rois = self.processedWidget.rois
+			self.imWidget.rois = self.processedWidget.rois[:]
 			
 		self.displayParameters.roiAverageRecomputeNeeded = True
 	
@@ -860,10 +923,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def recomputeHSVvalue(self):
 		if self.optionsDlg.NomarskiRadioButton.isChecked():
-			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff Files (*.tif)")
+
+			fname = QFileDialog.getOpenFileName(self, "Select tiff file",QString(),"Tiff images (*.tif);; HDF5 images (*.h5 *.hf5)")
 			fname = fname.toAscii().data()
 			self.optionsDlg.backgroundLineEdit.setText(fname)
-			nomarski = TiffSequence([fname,])
+			if os.path.splitext(fname)[1] == '.tif':
+				nomarski = TiffSequence([fname,])
+			elif os.path.splitext(fname)[1] == '.h5':
+				nomarski = HDF5Sequence([fname,])
 			#self.displayParameters.HSVvalue = SequenceProcessor.computeValue(nomarski.getFrame(1),(self.tiffSequence.height,self.tiffSequence.width))
 			#Try loading the second frame of the nomarski stack (the first one is usually black). If it fails, it may be possible 
 			#that the nomarski is a single image
@@ -872,6 +939,44 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			except AttributeError:
 				self.processedSequence.computeValue(nomarski.getFrame(0))
 				
+	def copyToClipboard(self):
+		self.clipboard.setText(self.tiffSequence.fileName[0])
+		#event = QtCore.QEvent(QtCore.QEvent.Clipboard)
+		#app.sendEvent(clipboard, event)
+	
+	def keyPressEvent(self, event):
+		if event.key() == Qt.Key_N:
+			try:
+				self.RoboMainWnd.RoboActionOpen_Next()
+			except:
+				pass
+		elif event.key() == Qt.Key_P:
+			try:
+				self.RoboMainWnd.RoboActionOpen_Prev()
+			except:
+				pass
+		
+		elif event.key() == Qt.Key_Space:
+			self.playButtonCb()
+
+	def showRoiMonitor(self):
+		self.roiAnal = rMW(self)
+		self.roiMonitor = True
+
+	
+	def deleteRoiN(self):
+        
+		number, ok = PyQt4.QtGui.QInputDialog.getInt(self, 'Delete Roi','Roi number:',1)
+        
+ 		if ok:
+			self.imWidget.deleteRoi(number-1)
+		
+	def closeEvent(self, event):
+        # do stuff
+
+		self.optionsDlg.close()
+		event.accept()
+
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

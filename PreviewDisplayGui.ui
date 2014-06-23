@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SequenceDisplayWnd</class>
- <widget class="QMainWindow" name="SequenceDisplayWnd">
+ <class>PreviewDisplayWnd</class>
+ <widget class="QMainWindow" name="PreviewDisplayWnd">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>628</width>
-    <height>480</height>
+    <width>739</width>
+    <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>SequenceDisplay</string>
+   <string>Preview</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QDoubleSpinBox" name="colorMaxSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="decimals">
            <number>4</number>
           </property>
@@ -30,6 +33,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QSlider" name="colorMinSlider">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -43,6 +49,9 @@
           </item>
           <item>
            <widget class="QSlider" name="colorMaxSlider">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -58,6 +67,9 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="colorMinSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="decimals">
            <number>4</number>
           </property>
@@ -65,6 +77,9 @@
         </item>
         <item>
          <widget class="QRadioButton" name="colorAutoRadioButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Auto</string>
           </property>
@@ -73,36 +88,13 @@
        </layout>
       </item>
       <item>
-       <widget class="QTabWidget" name="ImageTabWidget">
+       <widget class="QWidget" name="ImageFrameWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>2</horstretch>
-          <verstretch>3</verstretch>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="RawTab">
-         <attribute name="title">
-          <string>Raw</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QWidget" name="ImageFrameWidget" native="true"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="ProcessedTab">
-         <attribute name="title">
-          <string>Processed</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QWidget" name="ProcessedFrameWidget" native="true"/>
-          </item>
-         </layout>
-        </widget>
        </widget>
       </item>
      </layout>
@@ -111,6 +103,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QSpinBox" name="CurrentFrameSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="maximum">
          <number>100000</number>
         </property>
@@ -118,6 +113,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="FirstFrameButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>&lt;&lt;</string>
         </property>
@@ -125,6 +123,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="BackFrameButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>&lt;</string>
         </property>
@@ -132,6 +133,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="PlayButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>P</string>
         </property>
@@ -139,6 +143,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="ForwardFrameButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>&gt;</string>
         </property>
@@ -146,6 +153,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="LastFrameButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>&gt;&gt;</string>
         </property>
@@ -153,6 +163,9 @@
       </item>
       <item>
        <widget class="QSlider" name="CurrentFrameSlider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>7</horstretch>
@@ -180,83 +193,10 @@
      </layout>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>628</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuRois">
-    <property name="title">
-     <string>Rois</string>
-    </property>
-    <addaction name="actionCompute_Rois"/>
-    <addaction name="separator"/>
-    <addaction name="actionLoad_from_file"/>
-    <addaction name="actionSave_to_file"/>
-    <addaction name="actionSave_traces"/>
-    <addaction name="separator"/>
-    <addaction name="actionDelete_Last"/>
-    <addaction name="actionDelete_number"/>
-    <addaction name="separator"/>
-    <addaction name="actionForce_recomputation"/>
-    <addaction name="actionRoi_monitor"/>
-   </widget>
-   <widget class="QMenu" name="menuStacks">
-    <property name="title">
-     <string>Stack</string>
-    </property>
-    <widget class="QMenu" name="menuMath_2">
-     <property name="title">
-      <string>Math</string>
-     </property>
-     <addaction name="actionAdd"/>
-     <addaction name="actionSubtract"/>
-     <addaction name="actionDivide"/>
-     <addaction name="actionMultiply"/>
-     <addaction name="separator"/>
-     <addaction name="actionAdd_image"/>
-     <addaction name="actionSubtract_image"/>
-     <addaction name="actionDivide_by_image"/>
-     <addaction name="actionMultiply_by_image"/>
-    </widget>
-    <addaction name="actionBack_Projection"/>
-    <addaction name="actionAverage"/>
-    <addaction name="menuMath_2"/>
-   </widget>
-   <widget class="QMenu" name="menuDisplay">
-    <property name="title">
-     <string>Display</string>
-    </property>
-    <widget class="QMenu" name="menuFilters">
-     <property name="title">
-      <string>Filters</string>
-     </property>
-     <addaction name="actionMedian_filter"/>
-     <addaction name="actionGaussian_filter"/>
-     <addaction name="separator"/>
-     <addaction name="actionTemporal_Smoothing"/>
-    </widget>
-    <addaction name="menuFilters"/>
-   </widget>
-   <widget class="QMenu" name="menuOutput">
-    <property name="title">
-     <string>Output</string>
-    </property>
-    <addaction name="actionSave_raw_sequence"/>
-    <addaction name="actionSave_as_avi"/>
-    <addaction name="actionSave_as_hd5_table"/>
-    <addaction name="separator"/>
-    <addaction name="actionCopy_filepath_to_clipboard"/>
-   </widget>
-   <addaction name="menuRois"/>
-   <addaction name="menuStacks"/>
-   <addaction name="menuDisplay"/>
-   <addaction name="menuOutput"/>
+   <zorder>ImageTabWidget</zorder>
+   <zorder></zorder>
+   <zorder></zorder>
+   <zorder>ImageFrameWidget</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionCompute_Rois">

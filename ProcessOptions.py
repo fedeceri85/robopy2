@@ -92,11 +92,14 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		QDialog.__init__(self, parent=parent)
 		self.setupUi(self)
 		self.valueDict = {}	
-		self.saveFile = os.path.join(saveFolder,'roboPySave')
+		if saveFolder is not None:
+			self.saveFile = os.path.join(saveFolder,'roboPySave')
+		else:
+			self.saveFile = None
 		self.frameOptions = self.initFrameOptions()
 		self.timeOptions = self.initTimeOptions()
 		self.displayOptions = self.initDisplayOptions()
-	
+		self.roiOptions = self.initRoiOptions()
        
 	def sequenceChangedTab(self, idx):
 		self.PO_TabWidget.setCurrentIndex(idx)
@@ -223,7 +226,22 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		self.connect(self.HSVradioButton,SIGNAL('toggled(bool)'),self.HSVchanged)
 
 		return fo
-	
+	def initRoiOptions(self):
+		fo = Properties(self)
+		try:
+			d=cPickle.load(open(self.saveFile,'r'))
+			fo.add('rectangularRois', d['rectangularRois'], self.rectangularRoisCheckBox)
+			fo.add('roiSameSize', d['roiSameSize'], self.roiSameSizeCheckBox)
+			fo.add('roiSize',d['roiSize'],self.roiSizeSpinBox)
+			fo.add('lockRoiPositions',d['lockRoiPositions'],self.lockRoiPositionCheckBox)
+		except:
+			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
+			fo.add('roiSameSize', 0, self.roiSameSizeCheckBox)
+			fo.add('roiSize',0,self.roiSizeSpinBox)
+			fo.add('lockRoiPositions',0,self.lockRoiPositionCheckBox)
+
+		return fo
+
 	def HSVchanged(self):
 		if self.HSVradioButton.isChecked():
 			self.HSVbackGroupBox.setEnabled(True)

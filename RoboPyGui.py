@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'RoboPyGui.ui'
 #
-# Created: Sun May 19 13:52:38 2013
-#      by: PyQt4 UI code generator 4.10
+# Created: Mon Jun  9 11:49:09 2014
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -49,10 +49,17 @@ class Ui_RoboMainWnd(object):
         self.roboActionLoadInRam.setObjectName(_fromUtf8("roboActionLoadInRam"))
         self.roboActionOpen = QtGui.QAction(RoboMainWnd)
         self.roboActionOpen.setObjectName(_fromUtf8("roboActionOpen"))
+        self.actionLoad_Sequentially = QtGui.QAction(RoboMainWnd)
+        self.actionLoad_Sequentially.setObjectName(_fromUtf8("actionLoad_Sequentially"))
+        self.actionOpen_Next = QtGui.QAction(RoboMainWnd)
+        self.actionOpen_Next.setObjectName(_fromUtf8("actionOpen_Next"))
         self.menuLoad.addAction(self.roboActionOpen)
         self.menuLoad.addAction(self.roboActionLoadInRam)
         self.menuFile.addAction(self.menuLoad.menuAction())
         self.menuFile.addAction(self.roboActionSave)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionLoad_Sequentially)
+        self.menuFile.addAction(self.actionOpen_Next)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(RoboMainWnd)
@@ -66,4 +73,6 @@ class Ui_RoboMainWnd(object):
         self.roboActionOpen_2.setText(_translate("RoboMainWnd", "Read from disk", None))
         self.roboActionLoadInRam.setText(_translate("RoboMainWnd", "Load in memory", None))
         self.roboActionOpen.setText(_translate("RoboMainWnd", "Read from disk", None))
+        self.actionLoad_Sequentially.setText(_translate("RoboMainWnd", "Load list of Files Sequentially", None))
+        self.actionOpen_Next.setText(_translate("RoboMainWnd", "Open Next", None))
 
