@@ -488,6 +488,7 @@ class ImageDisplayWidget(QGLWidget):
 				if i.isPointInRoi((a,b)):
 					self.isMovingRoi = True
 					self.nMovingRoi = i.ordinal
+					self.computeRoiPointMaps = False
 			if self.isMovingRoi:
 
 				#self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
@@ -519,7 +520,14 @@ class ImageDisplayWidget(QGLWidget):
 			self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 
 			self.isMovingRoi = False
+			self.computeRoiPointMaps = True
 
+			if self.SequenceDisplay.optionsDlg.roiOptions.lockRoiPositions:
+				for r in self.rois:
+					if self.computeRoiPointMaps :
+						r.computePointMap()
+			else:
+				self.rois[self.nMovingRoi].computePointMap()
 		self.IsMouseDown = 0
 	
 	def screenToImage(self,x,y):
