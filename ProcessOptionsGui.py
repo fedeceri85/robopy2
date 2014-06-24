@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Tue Jun 24 11:37:29 2014
+# Created: Tue Jun 24 13:12:13 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -215,7 +215,7 @@ class Ui_ProcessOptionsDlg(object):
         self.horizontalLayout_21.addWidget(self.label_8)
         self.gammaHSpinBox = QtGui.QDoubleSpinBox(self.widget)
         self.gammaHSpinBox.setDecimals(3)
-        self.gammaHSpinBox.setMaximum(1.0)
+        self.gammaHSpinBox.setMaximum(10.0)
         self.gammaHSpinBox.setSingleStep(0.001)
         self.gammaHSpinBox.setProperty("value", 1.0)
         self.gammaHSpinBox.setObjectName(_fromUtf8("gammaHSpinBox"))
