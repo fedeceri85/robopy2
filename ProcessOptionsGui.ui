@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="PO_TabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="FrameOptionsTab">
       <attribute name="title">
@@ -388,7 +388,7 @@
          <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
-            <x>240</x>
+            <x>210</x>
             <y>33</y>
             <width>106</width>
             <height>49</height>
@@ -406,6 +406,41 @@
             <widget class="QCheckBox" name="gaussianFilterCheckbox">
              <property name="text">
               <string>Gaussian filter</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <property name="geometry">
+           <rect>
+            <x>330</x>
+            <y>40</y>
+            <width>141</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_21">
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Gamma:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="gammaHSpinBox">
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="maximum">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.001000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -838,7 +873,7 @@
          <x>30</x>
          <y>20</y>
          <width>286</width>
-         <height>26</height>
+         <height>27</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_20">

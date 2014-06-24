@@ -965,9 +965,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 
 	
 	def deleteRoiN(self):
-        
 		number, ok = PyQt4.QtGui.QInputDialog.getInt(self, 'Delete Roi','Roi number:',1)
-        
  		if ok:
 			self.imWidget.deleteRoi(number-1)
 		

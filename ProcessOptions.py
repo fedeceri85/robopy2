@@ -190,6 +190,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('enlargeToBackground', d['enlargeToBackground'], self.enlargeToBckCheckBox)
 			fo.add('medianFilterOn',  d['medianFilterOn'], self.medianFilterCheckbox)
 			fo.add('gaussianFilterOn',  d['gaussianFilterOn'], self.gaussianFilterCheckbox)
+			fo.add('gammah',  d['gammah'], self.gammaHSpinBox)
 			fo.add('FrameByFrameBackground', d['FrameByFrameBackground'],self.FrameByFrameRadioButton)
 			fo.add('NomarskiBackground', d['NomarskiBackground'],self.NomarskiRadioButton)
 			
@@ -211,6 +212,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('enlargeToBackground', 0, self.enlargeToBckCheckBox)
 			fo.add('medianFilterOn', 0, self.medianFilterCheckbox)
 			fo.add('gaussianFilterOn', 0, self.gaussianFilterCheckbox)
+			fo.add('gammah',  1.0, self.gammaHSpinBox)
 			fo.add('FrameByFrameBackground',1,self.FrameByFrameRadioButton)
 			fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
 			

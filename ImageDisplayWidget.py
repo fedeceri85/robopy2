@@ -372,7 +372,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		return pingPong
 		
-	def applyColormapGLSL(self, image, w, h, imMin, imMax, returnType="texture"):
+	def applyColormapGLSL(self, image, w, h, imMin, imMax, returnType="texture", gammah=1.0):
 		if str(type(image)) != "<type 'numpy.ndarray'>":
 			tex1= image
 		else:
@@ -381,10 +381,10 @@ class ImageDisplayWidget(QGLWidget):
 			self.buffersToVideo(buffers, bufferType)
 			tex1 = self.textures["texId"][0]
 		
-		self.videoBuffers[2].applyColormapGLSL(tex1, self.shadePrograms[5], w, h, imMin, imMax)
+		self.videoBuffers[2].applyColormapGLSL(tex1, self.shadePrograms[5], w, h, imMin, imMax, gammah=gammah)
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 			
-	def HSVImageGLSL(self, image, value, w, h, hmn, hmx, mn, mx, hsvcutoff=0.47, returnType="texture"):
+	def HSVImageGLSL(self, image, value, w, h, hmn, hmx, mn, mx, hsvcutoff=0.47, returnType="texture", gammah=1.0):
 		
 		if str(type(image)) != "<type 'numpy.ndarray'>":
 			buffers = list([value])
@@ -401,7 +401,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		
 		
-		self.videoBuffers[2].hsv2rgb(self.shadePrograms[3], tex1, tex2, w, h, hmn, hmx, mn, mx, hcutoff=hsvcutoff)
+		self.videoBuffers[2].hsv2rgb(self.shadePrograms[3], tex1, tex2, w, h, hmn, hmx, mn, mx, hcutoff=hsvcutoff, gammah=gammah)
 		
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 		

@@ -270,7 +270,7 @@ class VideoProcessor(QGLFramebufferObject):
                         self.drawTexes(list([tex]), w, h)
                         self.endRender(prg)
                         
-        def hsv2rgb(self, prg, tex, valTex, w, h, hmn, hmx, mn, mx, hcutoff=0.47):
+        def hsv2rgb(self, prg, tex, valTex, w, h, hmn, hmx, mn, mx, hcutoff=0.47, gammah=1.0):
                 if self.isValid():
                         
                         #print("hsv2rgb params: " + str(hmn) + ", " + str(hmx) + ", " + str(mn) + ", " + str(mx))
@@ -281,12 +281,14 @@ class VideoProcessor(QGLFramebufferObject):
                         hmxLoc = prg.uniformLocation("hmx")
                         mnLoc = prg.uniformLocation("mn")
                         mxLoc = prg.uniformLocation("mx")
+			gammahLoc = prg.uniformLocation("gammah")
                         hcutoffLoc = prg.uniformLocation("hcutoff")
-                        prg.setUniformValue(hmnLoc, float(hmn))
+			prg.setUniformValue(hmnLoc, float(hmn))
                         prg.setUniformValue(hmxLoc, float(hmx))
                         prg.setUniformValue(mnLoc, float(mn))
                         prg.setUniformValue(mxLoc, float(mx))
                         prg.setUniformValue(hcutoffLoc,float(hcutoff))
+			prg.setUniformValue(gammahLoc, float(gammah))
                         prg.setUniformValue("view1", 0)
                         prg.setUniformValue("bckView", 1)
                         
@@ -350,14 +352,16 @@ class VideoProcessor(QGLFramebufferObject):
                         self.drawTexes(list([t1, t2, tref]), w, h)
                         self.endRender(prg)
                         
-        def applyColormapGLSL(self, data, prg, w, h, imMin=0.0, imMax=1.0):
+        def applyColormapGLSL(self, data, prg, w, h, imMin=0.0, imMax=1.0, gammah=1.0):
                 if self.isValid():
                         self.prepareRender(prg)
                         
                         mnLoc = prg.uniformLocation("mapMn")
                         mxLoc = prg.uniformLocation("mapMx")
+			gammahLoc = prg.uniformLocation("gammah")
                         prg.setUniformValue(mnLoc, float(imMin))
                         prg.setUniformValue(mxLoc, float(imMax))
+			prg.setUniformValue(gammahLoc, float(gammah))
                         
                         prg.setUniformValue("f1", 0)
                         
