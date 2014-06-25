@@ -16,6 +16,10 @@ class Shader():
 		self.shaderCodes.append(self.getFluorescenceProcessCode())
 		self.shaderCodes.append(self.getJetColormapCode())
 		self.shaderCodes.append(self.getGrayColorMap())
+		self.shaderCodes.append(self.getHotColorMap())
+		self.shaderCodes.append(self.getInverseHotColorMap())
+		self.shaderCodes.append(self.getWinterColorMap())
+		self.shaderCodes.append(self.getBoneColorMap())
 
 
 	def getImadjustCode(self):
@@ -299,7 +303,160 @@ class Shader():
 		
 		return s
 
+	def getHotColorMap(self):
+		s = """
+			#extension GL_ARB_texture_rectangle : enable
+			uniform sampler2DRect f1;
+			uniform float mapMn;
+			uniform float mapMx;
+			uniform float gammah;
 
+			void main() {
+				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
+				v1 -= mapMn;
+				v1 /= (mapMx - mapMn);
+				v1 = clamp(v1, 0.0, 1.0);
+				v1 = pow(v1, gammah);
+				
+				v1 = clamp(v1, 0.0, 1.0); // 0.9 to exclude "redder" colors
+
+				float r  = 1.0;
+				float g  = 1.0;
+				float b  = 1.0;
+				if (v1 <=0.374){
+					r = 1.0/0.374 *v1;
+					g = 0.0;
+					b = 0.0;
+				}
+				if (v1 >0.374 && v1<=0.749){
+					r = 1.0;
+					g = 1.0/0.374 *v1;
+					b = 0.0;
+				}
+				if (v1 >0.749){
+					r = 1.0;
+					g = 1.0;
+					b = 1.0/0.374 *v1;
+				}
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		"""
+		
+		return s
+	
+	def getInverseHotColorMap(self):
+		s = """
+			#extension GL_ARB_texture_rectangle : enable
+			uniform sampler2DRect f1;
+			uniform float mapMn;
+			uniform float mapMx;
+			uniform float gammah;
+
+			void main() {
+				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
+				v1 -= mapMn;
+				v1 /= (mapMx - mapMn);
+				v1 = clamp(v1, 0.0, 1.0);
+				v1 = pow(v1, gammah);
+				
+				v1 = clamp(v1, 0.0, 1.0); // 0.9 to exclude "redder" colors
+
+				float r  = 1.0;
+				float g  = 1.0;
+				float b  = 1.0;
+				if (v1<=0.02){
+					r = 0.374/0.02 * v1;
+					g = 0.0;
+					b = 0.0;
+				}
+				else if (v1>0.02 && v1 <=0.374){
+					r = (1.0-0.374)/(0.374-0.02) *(v1) + 0.33863;
+					g = 0.0;
+					b = 0.0;
+				}
+				else if (v1 >0.374 && v1<=0.749){
+					r = 1.0;
+					g = 1.0/0.374 *v1;
+					b = 0.0;
+				}
+				else if (v1 >0.749){
+					r = 1.0;
+					g = 1.0;
+					b = 1.0/0.374 *v1;
+				}
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		"""
+		
+		return s
+
+	def getWinterColorMap(self):
+		s = """
+			#extension GL_ARB_texture_rectangle : enable
+			uniform sampler2DRect f1;
+			uniform float mapMn;
+			uniform float mapMx;
+			uniform float gammah;
+
+			void main() {
+				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
+				v1 -= mapMn;
+				v1 /= (mapMx - mapMn);
+				v1 = clamp(v1, 0.0, 1.0);
+				v1 = pow(v1, gammah);
+				
+				v1 = clamp(v1, 0.0, 1.0); // 0.9 to exclude "redder" colors
+
+				float r  = 0.0;
+				float g  = v1;
+				float b  = -0.5*v1 + 1.0 ;
+
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		"""
+		return s
+		
+	def getBoneColorMap(self):
+		s = """
+			#extension GL_ARB_texture_rectangle : enable
+			uniform sampler2DRect f1;
+			uniform float mapMn;
+			uniform float mapMx;
+			uniform float gammah;
+
+			void main() {
+				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
+				v1 -= mapMn;
+				v1 /= (mapMx - mapMn);
+				v1 = clamp(v1, 0.0, 1.0);
+				v1 = pow(v1, gammah);
+				
+				v1 = clamp(v1, 0.0, 1.0); // 0.9 to exclude "redder" colors
+
+				float r  = 1.0;
+				float g  = 1.0;
+				float b  = 1.0;
+				if (v1<=0.38){
+					r = 0.3348/0.38* v1;
+					g = 0.3348/0.38* v1;
+					b = v1;
+				}
+				else if (v1>0.38 && v1 <=0.76){
+					r =  0.3348/0.38* v1;
+					g = v1 + 0.03;
+					b =  0.3348/0.38* v1 + 0.1;
+				}
+				else if (v1 >0.374 && v1<=0.749){
+					r = v1;
+					g =0.3348/0.38* v1 + 0.1;
+					b = 0.3348/0.38* v1 + 0.1;
+				}
+	
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		"""
+		
+		return s		
 
 	def getShader(self, code):
 		sh = QGLShader(QGLShader.Fragment)
