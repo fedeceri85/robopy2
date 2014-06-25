@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Tue Jun 24 13:12:13 2014
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Wed Jun 25 12:59:28 2014
+#      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -186,7 +186,6 @@ class Ui_ProcessOptionsDlg(object):
         self.ColorMapcomboBox.setObjectName(_fromUtf8("ColorMapcomboBox"))
         self.ColorMapcomboBox.addItem(_fromUtf8(""))
         self.ColorMapcomboBox.addItem(_fromUtf8(""))
-        self.ColorMapcomboBox.addItem(_fromUtf8(""))
         self.horizontalLayout_4.addWidget(self.ColorMapcomboBox)
         self.verticalLayout_4.addLayout(self.horizontalLayout_4)
         self.HSVradioButton = QtGui.QRadioButton(self.layoutWidget1)
@@ -204,16 +203,16 @@ class Ui_ProcessOptionsDlg(object):
         self.gaussianFilterCheckbox = QtGui.QCheckBox(self.layoutWidget2)
         self.gaussianFilterCheckbox.setObjectName(_fromUtf8("gaussianFilterCheckbox"))
         self.verticalLayout_6.addWidget(self.gaussianFilterCheckbox)
-        self.widget = QtGui.QWidget(self.DOgroupBox)
-        self.widget.setGeometry(QtCore.QRect(330, 40, 141, 25))
-        self.widget.setObjectName(_fromUtf8("widget"))
-        self.horizontalLayout_21 = QtGui.QHBoxLayout(self.widget)
+        self.layoutWidget3 = QtGui.QWidget(self.DOgroupBox)
+        self.layoutWidget3.setGeometry(QtCore.QRect(330, 40, 141, 25))
+        self.layoutWidget3.setObjectName(_fromUtf8("layoutWidget3"))
+        self.horizontalLayout_21 = QtGui.QHBoxLayout(self.layoutWidget3)
         self.horizontalLayout_21.setMargin(0)
         self.horizontalLayout_21.setObjectName(_fromUtf8("horizontalLayout_21"))
-        self.label_8 = QtGui.QLabel(self.widget)
+        self.label_8 = QtGui.QLabel(self.layoutWidget3)
         self.label_8.setObjectName(_fromUtf8("label_8"))
         self.horizontalLayout_21.addWidget(self.label_8)
-        self.gammaHSpinBox = QtGui.QDoubleSpinBox(self.widget)
+        self.gammaHSpinBox = QtGui.QDoubleSpinBox(self.layoutWidget3)
         self.gammaHSpinBox.setDecimals(3)
         self.gammaHSpinBox.setMaximum(10.0)
         self.gammaHSpinBox.setSingleStep(0.001)
@@ -420,23 +419,23 @@ class Ui_ProcessOptionsDlg(object):
         self.roiSameSizeCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
         self.roiSameSizeCheckBox.setGeometry(QtCore.QRect(30, 45, 153, 21))
         self.roiSameSizeCheckBox.setObjectName(_fromUtf8("roiSameSizeCheckBox"))
-        self.layoutWidget3 = QtGui.QWidget(self.RoiOptionsTab)
-        self.layoutWidget3.setGeometry(QtCore.QRect(30, 20, 286, 27))
-        self.layoutWidget3.setObjectName(_fromUtf8("layoutWidget3"))
-        self.horizontalLayout_20 = QtGui.QHBoxLayout(self.layoutWidget3)
+        self.layoutWidget4 = QtGui.QWidget(self.RoiOptionsTab)
+        self.layoutWidget4.setGeometry(QtCore.QRect(30, 20, 286, 27))
+        self.layoutWidget4.setObjectName(_fromUtf8("layoutWidget4"))
+        self.horizontalLayout_20 = QtGui.QHBoxLayout(self.layoutWidget4)
         self.horizontalLayout_20.setMargin(0)
         self.horizontalLayout_20.setObjectName(_fromUtf8("horizontalLayout_20"))
-        self.rectangularRoisCheckBox = QtGui.QCheckBox(self.layoutWidget3)
+        self.rectangularRoisCheckBox = QtGui.QCheckBox(self.layoutWidget4)
         self.rectangularRoisCheckBox.setObjectName(_fromUtf8("rectangularRoisCheckBox"))
         self.horizontalLayout_20.addWidget(self.rectangularRoisCheckBox)
         spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_20.addItem(spacerItem3)
         self.horizontalLayout_19 = QtGui.QHBoxLayout()
         self.horizontalLayout_19.setObjectName(_fromUtf8("horizontalLayout_19"))
-        self.label_7 = QtGui.QLabel(self.layoutWidget3)
+        self.label_7 = QtGui.QLabel(self.layoutWidget4)
         self.label_7.setObjectName(_fromUtf8("label_7"))
         self.horizontalLayout_19.addWidget(self.label_7)
-        self.roiSizeSpinBox = QtGui.QSpinBox(self.layoutWidget3)
+        self.roiSizeSpinBox = QtGui.QSpinBox(self.layoutWidget4)
         self.roiSizeSpinBox.setObjectName(_fromUtf8("roiSizeSpinBox"))
         self.horizontalLayout_19.addWidget(self.roiSizeSpinBox)
         self.horizontalLayout_20.addLayout(self.horizontalLayout_19)
@@ -447,7 +446,7 @@ class Ui_ProcessOptionsDlg(object):
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
         self.retranslateUi(ProcessOptionsDlg)
-        self.PO_TabWidget.setCurrentIndex(2)
+        self.PO_TabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(ProcessOptionsDlg)
 
     def retranslateUi(self, ProcessOptionsDlg):
@@ -473,8 +472,7 @@ class Ui_ProcessOptionsDlg(object):
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.timeOptionsTab), _translate("ProcessOptionsDlg", "Time options", None))
         self.LUTradioButton.setText(_translate("ProcessOptionsDlg", "Look up table", None))
         self.ColorMapcomboBox.setItemText(0, _translate("ProcessOptionsDlg", "Jet", None))
-        self.ColorMapcomboBox.setItemText(1, _translate("ProcessOptionsDlg", "Winter", None))
-        self.ColorMapcomboBox.setItemText(2, _translate("ProcessOptionsDlg", "...", None))
+        self.ColorMapcomboBox.setItemText(1, _translate("ProcessOptionsDlg", "Gray", None))
         self.HSVradioButton.setText(_translate("ProcessOptionsDlg", "HSV", None))
         self.medianFilterCheckbox.setText(_translate("ProcessOptionsDlg", "Median filter", None))
         self.gaussianFilterCheckbox.setText(_translate("ProcessOptionsDlg", "Gaussian filter", None))

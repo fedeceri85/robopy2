@@ -15,6 +15,8 @@ class Shader():
 		self.shaderCodes.append(self.getHsv2RgbCode())
 		self.shaderCodes.append(self.getFluorescenceProcessCode())
 		self.shaderCodes.append(self.getJetColormapCode())
+		self.shaderCodes.append(self.getGrayColorMap())
+
 
 	def getImadjustCode(self):
 		s = """
@@ -255,7 +257,7 @@ class Shader():
 				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
 				v1 -= mapMn;
 				v1 /= (mapMx - mapMn);
-				
+				v1 = clamp(v1, 0.0, 1.0);
 				v1 = pow(v1, gammah);
 				
 				v1 = clamp(v1, 0.0, 0.9); // 0.9 to exclude "redder" colors
@@ -273,7 +275,32 @@ class Shader():
 		"""
 		
 		return s
+	
+	def getGrayColorMap(self):
+		s = """
+			#extension GL_ARB_texture_rectangle : enable
+			uniform sampler2DRect f1;
+			uniform float mapMn;
+			uniform float mapMx;
+			uniform float gammah;
+
+			void main() {
+				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
+				v1 -= mapMn;
+				v1 /= (mapMx - mapMn);
+				v1 = clamp(v1, 0.0, 1.0);
+				v1 = pow(v1, gammah);
+				
+				v1 = clamp(v1, 0.0, 0.9); // 0.9 to exclude "redder" colors
+
+				gl_FragColor = vec4(v1, v1, v1, 1.0);
+			}
+		"""
 		
+		return s
+
+
+
 	def getShader(self, code):
 		sh = QGLShader(QGLShader.Fragment)
 		sh.compileSourceCode(code)

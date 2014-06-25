@@ -380,8 +380,8 @@ class ImageDisplayWidget(QGLWidget):
 			bufferType = list(['float'])
 			self.buffersToVideo(buffers, bufferType)
 			tex1 = self.textures["texId"][0]
-		
-		self.videoBuffers[2].applyColormapGLSL(tex1, self.shadePrograms[5], w, h, imMin, imMax, gammah=gammah)
+		ind = self.SequenceDisplay.optionsDlg.displayOptions.lutMapId
+		self.videoBuffers[2].applyColormapGLSL(tex1, self.shadePrograms[5+ind], w, h, imMin, imMax, gammah=gammah)
 		return self.textureToArray(self.videoBuffers[2].texture(), returnType)
 			
 	def HSVImageGLSL(self, image, value, w, h, hmn, hmx, mn, mx, hsvcutoff=0.47, returnType="texture", gammah=1.0):
