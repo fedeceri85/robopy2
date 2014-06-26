@@ -20,6 +20,8 @@ class Shader():
 		self.shaderCodes.append(self.getInverseHotColorMap())
 		self.shaderCodes.append(self.getWinterColorMap())
 		self.shaderCodes.append(self.getBoneColorMap())
+		self.shaderCodes.append(self.getGoldColorMap())
+
 
 
 	def getImadjustCode(self):
@@ -415,7 +417,7 @@ class Shader():
 			}
 		"""
 		return s
-		
+
 	def getBoneColorMap(self):
 		s = """
 			#extension GL_ARB_texture_rectangle : enable
@@ -439,17 +441,17 @@ class Shader():
 				if (v1<=0.38){
 					r = 0.3348/0.38* v1;
 					g = 0.3348/0.38* v1;
-					b = v1;
+					b =  0.4578/0.38* v1;
 				}
 				else if (v1>0.38 && v1 <=0.76){
 					r =  0.3348/0.38* v1;
-					g = v1 + 0.03;
-					b =  0.3348/0.38* v1 + 0.1;
+					g = 1.1854054054054055*v1 - 0.1061978378;
+					b =  0.8759* v1 + 0.126544;
 				}
-				else if (v1 >0.374 && v1<=0.749){
-					r = v1;
-					g =0.3348/0.38* v1 + 0.1;
-					b = 0.3348/0.38* v1 + 0.1;
+				else if (v1 >0.76){
+					r = 1.3704*v1 - 0.3704;
+					g =0.8759* v1 + 0.126544;
+					b = 0.8759* v1 + 0.126544;
 				}
 	
 				gl_FragColor = vec4(r, g, b, 1.0);
@@ -458,6 +460,47 @@ class Shader():
 		
 		return s		
 
+	def getGoldColorMap(self):
+		s = """
+			#extension GL_ARB_texture_rectangle : enable
+			uniform sampler2DRect f1;
+			uniform float mapMn;
+			uniform float mapMx;
+			uniform float gammah;
+
+			void main() {
+				float v1 = texture2DRect(f1, gl_TexCoord[0].st).r;
+				v1 -= mapMn;
+				v1 /= (mapMx - mapMn);
+				v1 = clamp(v1, 0.0, 1.0);
+				v1 = pow(v1, gammah);
+				
+				v1 = clamp(v1, 0.0, 1.0); // 0.9 to exclude "redder" colors
+
+				float r  = 1.0;
+				float g  = 1.0;
+				float b  = 1.0;
+				if (v1<=0.33){
+					r = 0.35/0.33* v1;
+					g = 0.11/0.33* v1;
+					b =  0.0;
+				}
+				else if (v1>0.33 && v1 <=0.66){
+					r =  0.35/0.33* v1;
+					g = 0.35/0.33*v1 - 0.24;
+					b =  0.0;
+				}
+				else if (v1 >0.66){
+					r = 0.3/0.3333*v1 + 0.1;
+					g =0.54/0.33* v1 - 0.62;
+					b = 0.5/0.33* v1 ;
+				}
+	
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		"""
+		
+		return s	
 	def getShader(self, code):
 		sh = QGLShader(QGLShader.Fragment)
 		sh.compileSourceCode(code)

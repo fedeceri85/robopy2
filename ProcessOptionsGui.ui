@@ -380,6 +380,11 @@
                   <string>Bone</string>
                  </property>
                 </item>
+                <item>
+                 <property name="text">
+                  <string>Gold</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>

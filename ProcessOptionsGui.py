@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Wed Jun 25 14:08:57 2014
+# Created: Wed Jun 25 19:04:54 2014
 #      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
@@ -182,6 +182,7 @@ class Ui_ProcessOptionsDlg(object):
         self.horizontalLayout_4.addWidget(self.LUTradioButton)
         self.ColorMapcomboBox = QtGui.QComboBox(self.DOgroupBox)
         self.ColorMapcomboBox.setObjectName(_fromUtf8("ColorMapcomboBox"))
+        self.ColorMapcomboBox.addItem(_fromUtf8(""))
         self.ColorMapcomboBox.addItem(_fromUtf8(""))
         self.ColorMapcomboBox.addItem(_fromUtf8(""))
         self.ColorMapcomboBox.addItem(_fromUtf8(""))
@@ -474,6 +475,7 @@ class Ui_ProcessOptionsDlg(object):
         self.ColorMapcomboBox.setItemText(3, _translate("ProcessOptionsDlg", "Better Hot", None))
         self.ColorMapcomboBox.setItemText(4, _translate("ProcessOptionsDlg", "Winter", None))
         self.ColorMapcomboBox.setItemText(5, _translate("ProcessOptionsDlg", "Bone", None))
+        self.ColorMapcomboBox.setItemText(6, _translate("ProcessOptionsDlg", "Gold", None))
         self.HSVradioButton.setText(_translate("ProcessOptionsDlg", "HSV", None))
         self.medianFilterCheckbox.setText(_translate("ProcessOptionsDlg", "Median filter", None))
         self.gaussianFilterCheckbox.setText(_translate("ProcessOptionsDlg", "Gaussian filter", None))
