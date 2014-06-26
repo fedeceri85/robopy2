@@ -44,6 +44,7 @@ class Sequence:
 		self.rois = list()
 		self.arraySequence = None
 		self.timesDict = TimesDict()
+		self.framesDict = {}    #dict that hold the correspondence VisualizedFrame:originalFrame
 		try:
 			self.open()
 		except TypeError:
@@ -116,8 +117,9 @@ class Sequence:
 			kv = range(self.frames)
 			self.timesDict = TimesDict(zip(kv,kv))
 			self.timesDict.setLabel('Frames')
-			
-			
+		
+		kv = range(self.frames)	
+		self.framesDict = dict(zip(kv,kv))
 
 	def applyOptions(self,img):
 			if self.options['crop']:
@@ -190,15 +192,15 @@ class Sequence:
 	def loadWholeTiff(self):
 		self.arraySequence = zeros((self.height,self.width,self.frames))
 		for index in xrange(self.frames):
-			img = self.getRawImage(index)
+			img = self.getRawImage(self.framesDict[index])
 			img = self.applyOptions(img)
-			self.arraySequence[:,:,index] = img
+			self.arraySequence[:,:,self.framesDict(index)] = img
 			
 	def loadFrameInCache(self, n):
 		if self.arraySequence is not None:
-			self.cachedFrames[n] = self.arraySequence[:,:,n].copy()
+			self.cachedFrames[n] = self.arraySequence[:,:,self.framesDict(n)].copy()
 		else:
-			img = self.getRawImage(n)
+			img = self.getRawImage(self.framesDict[n])
 			img = self.applyOptions(img)
 			self.cachedFrames[n] = img
 			
@@ -207,7 +209,7 @@ class Sequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:, :, n].copy()
+			return self.arraySequence[:, :, self.framesDict(n)].copy()
 		else:
 			
 
@@ -220,7 +222,7 @@ class Sequence:
 				
 			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
 				self.threadLock.acquire()
-				img = self.getRawImage(n)
+				img = self.getRawImage(self.framesDict[n])
 				img = self.applyOptions(img)
 				self.cachedFrames[n] = img
 
@@ -243,7 +245,24 @@ class Sequence:
 		
 		return None
 	
-		
+	def removeFrame(self,n):
+		try:
+			for i in range(n,len(self.framesDict)-1):
+				self.framesDict[i] = self.framesDict[i+1]
+				self.timesDict[i] = self.timesDict[i+1]
+
+			self.framesDict.pop(len(self.framesDict)-1)
+			self.timesDict.pop(len(self.timesDict)-1)
+
+			self.frames = self.frames - 1
+		except KeyError:
+			pass
+			
+	def removeFramesFromList(self,l):
+		l.sort(reverse = True)
+		for i in l:
+			self.removeFrame(i)
+
 	def getFramesFromList(self,listOfFrames):
 		 #Ensure listOfFrames is actually a list, not a tuple
 		listOfFrames = list(listOfFrames)
@@ -255,8 +274,12 @@ class Sequence:
 	def getFramesInterval(self,firstIndex,lastIndex):
 		return self.getFramesFromList(range(firstIndex,lastIndex))
 		
-		
-	
+	def times(self):
+		t = []
+		for i in self.framesDict.iterkeys():
+			t.append(self.timesDict[i])
+		return t
+
 class TiffSequence(Sequence):
 	def __init__(self, fNames,options = None):
 		self.tifHandlers = list()	
@@ -496,6 +519,10 @@ class HDF5Sequence(Sequence):
 		 	self.timesDict.label = self.timesLabel
 		except:
 		 	print("Warning: No times loaded")
+
+		kv = range(self.frames)	
+		self.framesDict = dict(zip(kv,kv))
+		#print len(self.timesDict.times())
 
 	def computeRois(self,firstIndex = None, lastIndex = None):
 		if firstIndex == None:

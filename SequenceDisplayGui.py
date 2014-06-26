@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Fri Jun 20 20:23:26 2014
+# Created: Thu Jun 26 22:57:19 2014
 #      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
@@ -136,10 +136,6 @@ class Ui_SequenceDisplayWnd(object):
         self.menuStacks.setObjectName(_fromUtf8("menuStacks"))
         self.menuMath_2 = QtGui.QMenu(self.menuStacks)
         self.menuMath_2.setObjectName(_fromUtf8("menuMath_2"))
-        self.menuDisplay = QtGui.QMenu(self.menubar)
-        self.menuDisplay.setObjectName(_fromUtf8("menuDisplay"))
-        self.menuFilters = QtGui.QMenu(self.menuDisplay)
-        self.menuFilters.setObjectName(_fromUtf8("menuFilters"))
         self.menuOutput = QtGui.QMenu(self.menubar)
         self.menuOutput.setObjectName(_fromUtf8("menuOutput"))
         SequenceDisplayWnd.setMenuBar(self.menubar)
@@ -198,6 +194,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRoi_monitor.setObjectName(_fromUtf8("actionRoi_monitor"))
         self.actionDelete_number = QtGui.QAction(SequenceDisplayWnd)
         self.actionDelete_number.setObjectName(_fromUtf8("actionDelete_number"))
+        self.actionRemove_frames = QtGui.QAction(SequenceDisplayWnd)
+        self.actionRemove_frames.setObjectName(_fromUtf8("actionRemove_frames"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -221,11 +219,8 @@ class Ui_SequenceDisplayWnd(object):
         self.menuStacks.addAction(self.actionBack_Projection)
         self.menuStacks.addAction(self.actionAverage)
         self.menuStacks.addAction(self.menuMath_2.menuAction())
-        self.menuFilters.addAction(self.actionMedian_filter)
-        self.menuFilters.addAction(self.actionGaussian_filter)
-        self.menuFilters.addSeparator()
-        self.menuFilters.addAction(self.actionTemporal_Smoothing)
-        self.menuDisplay.addAction(self.menuFilters.menuAction())
+        self.menuStacks.addSeparator()
+        self.menuStacks.addAction(self.actionRemove_frames)
         self.menuOutput.addAction(self.actionSave_raw_sequence)
         self.menuOutput.addAction(self.actionSave_as_avi)
         self.menuOutput.addAction(self.actionSave_as_hd5_table)
@@ -233,7 +228,6 @@ class Ui_SequenceDisplayWnd(object):
         self.menuOutput.addAction(self.actionCopy_filepath_to_clipboard)
         self.menubar.addAction(self.menuRois.menuAction())
         self.menubar.addAction(self.menuStacks.menuAction())
-        self.menubar.addAction(self.menuDisplay.menuAction())
         self.menubar.addAction(self.menuOutput.menuAction())
 
         self.retranslateUi(SequenceDisplayWnd)
@@ -253,8 +247,6 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.setTitle(_translate("SequenceDisplayWnd", "Rois", None))
         self.menuStacks.setTitle(_translate("SequenceDisplayWnd", "Stack", None))
         self.menuMath_2.setTitle(_translate("SequenceDisplayWnd", "Math", None))
-        self.menuDisplay.setTitle(_translate("SequenceDisplayWnd", "Display", None))
-        self.menuFilters.setTitle(_translate("SequenceDisplayWnd", "Filters", None))
         self.menuOutput.setTitle(_translate("SequenceDisplayWnd", "Output", None))
         self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Roi", None))
         self.actionLoad_from_file.setText(_translate("SequenceDisplayWnd", "Load from file...", None))
@@ -282,4 +274,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionCopy_filepath_to_clipboard.setText(_translate("SequenceDisplayWnd", "Copy filepath to clipboard", None))
         self.actionRoi_monitor.setText(_translate("SequenceDisplayWnd", "Roi monitor", None))
         self.actionDelete_number.setText(_translate("SequenceDisplayWnd", "Delete number", None))
+        self.actionRemove_frames.setText(_translate("SequenceDisplayWnd", "Remove frames ...", None))
 

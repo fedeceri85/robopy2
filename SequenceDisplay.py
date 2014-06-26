@@ -125,6 +125,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.makeProcessReferenceConnections(self.optionsDlg)
 		self.clipboard = QApplication.clipboard()
 		self.roiMonitor = False
+
+
 	def tiffLoad(self):
 		print("entering tiffLoad from worker")
 		self.tiffSequence = TiffSequence(self.files,self.rawOptions)
@@ -202,6 +204,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionDelete_Last, SIGNAL("triggered()"), self.deleteRoi)
 		self.connect(self.actionRoi_monitor, SIGNAL("triggered()"), self.showRoiMonitor)
 		self.connect(self.actionDelete_number, SIGNAL("triggered()"), self.deleteRoiN)
+
+		self.connect(self.actionRemove_frames, SIGNAL("triggered()"), self.removeFrames)
 			
 	
 	def makeProcessReferenceConnections(self, dlg):
@@ -742,7 +746,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			pass
 		fig = MPlot(self)
 		
-		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.timesDict.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
+		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		
 		fig.plot(times,rdata,linewidth=0.3)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
@@ -974,6 +978,25 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 
 		self.optionsDlg.close()
 		event.accept()
+
+
+	def removeFrames(self):
+		inStr, ok = QInputDialog.getText(self,'Select frames to be removed','Comma separated, insert interval as start:end')
+		inStr = str(inStr)
+		pieces = inStr.split(',')
+		out = []
+		for piece in pieces:
+
+			if piece.rfind(':') != -1:
+				tbegin,tend = map(int, piece.split(':'))
+				out.extend(range(tbegin,tend))
+			else:
+				piece = [piece,]
+				out.append(map(int,piece)[0])
+
+		self.tiffSequence.removeFramesFromList(out)
+		self.tiffLoadFinished()
+
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

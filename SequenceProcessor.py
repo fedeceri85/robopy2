@@ -250,15 +250,15 @@ def HSVImageByMapSSE(image,value, mp, vmin=None,vmax=None,hsvcutoff=0.45,returnQ
 	else:
 		return QImage(rgbMat,w,h,QImage.Format_ARGB32)
 		
-def applyColormapGLSL(procWdg, image, w, h, imMin, imMax, returnType = "texture", gammah=1.0):
+def applyColormapGLSL(procWdg, image, w, h, imMin, imMax, returnType = "texture"):
 	
-	f = procWdg.applyColormapGLSL(image, w, h, imMin, imMax, returnType, gammah = gammah)	
+	f = procWdg.applyColormapGLSL(image, w, h, imMin, imMax, returnType)	
 	
 	return f
 	
-def HSVImageGLSL(procWdg, image,value, w, h, imMin, imMax, vmin=0.0, vmax=1.0, hsvcutoff=0.45, returnType = "texture", gammah=1.0):
+def HSVImageGLSL(procWdg, image,value, w, h, imMin, imMax, vmin=0.0, vmax=1.0, hsvcutoff=0.45, returnType = "texture"):
 		
-	f = procWdg.HSVImageGLSL(image, value, w, h, imMin, imMax, vmin, vmax, hsvcutoff, returnType, gammah=gammah)
+	f = procWdg.HSVImageGLSL(image, value, w, h, imMin, imMax, vmin, vmax, hsvcutoff, returnType)
 	
 	return f
 		
@@ -1210,7 +1210,7 @@ class ProcessedSequence:
 		#return self.HSVvalue
 	
 	def applyColormap(self,f,w,h,returnType = "texture"):
-		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax,returnType=returnType, gammah=self.displayOptions.gammah)
+		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax,returnType=returnType)
 		
 		#self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", 50, 50, [1.0, 1.0, 1.0],fontsize=24.0)
 		#data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0,70.0,10.0]).astype(np.float32)*2.0
@@ -1231,7 +1231,7 @@ class ProcessedSequence:
 		return tex
 		
 	def HSVImage(self,f,w,h):
-		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, hsvcutoff=self.displayOptions.hsvcutoff, gammah = self.displayOptions.gammah)
+		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, hsvcutoff=self.displayOptions.hsvcutoff)
 		
 		if self.timeOptions.displayTimeStamp:
 			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]

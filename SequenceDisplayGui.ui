@@ -227,21 +227,8 @@
     <addaction name="actionBack_Projection"/>
     <addaction name="actionAverage"/>
     <addaction name="menuMath_2"/>
-   </widget>
-   <widget class="QMenu" name="menuDisplay">
-    <property name="title">
-     <string>Display</string>
-    </property>
-    <widget class="QMenu" name="menuFilters">
-     <property name="title">
-      <string>Filters</string>
-     </property>
-     <addaction name="actionMedian_filter"/>
-     <addaction name="actionGaussian_filter"/>
-     <addaction name="separator"/>
-     <addaction name="actionTemporal_Smoothing"/>
-    </widget>
-    <addaction name="menuFilters"/>
+    <addaction name="separator"/>
+    <addaction name="actionRemove_frames"/>
    </widget>
    <widget class="QMenu" name="menuOutput">
     <property name="title">
@@ -255,7 +242,6 @@
    </widget>
    <addaction name="menuRois"/>
    <addaction name="menuStacks"/>
-   <addaction name="menuDisplay"/>
    <addaction name="menuOutput"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -387,6 +373,11 @@
   <action name="actionDelete_number">
    <property name="text">
     <string>Delete number</string>
+   </property>
+  </action>
+  <action name="actionRemove_frames">
+   <property name="text">
+    <string>Remove frames ...</string>
    </property>
   </action>
  </widget>
