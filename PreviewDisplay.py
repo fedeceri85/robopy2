@@ -93,9 +93,8 @@ class PreviewDisplay(Ui_PreviewDisplayWnd, PyQt4.QtGui.QMainWindow):
 		rf =  self.imWidget.rois[0].boundingRect()
 		[a,b,c,d] = [rf.left(),rf.left()+rf.width(), rf.top(), rf.top()+ rf.height()]
 	#	print [a,b,c,d]
-		 
-
 		self.emit(SIGNAL("roiChanged(int, int, int, int)"),a,b,c,d)
+	
 	def closeEvent(self, event):
         # do stuff
 

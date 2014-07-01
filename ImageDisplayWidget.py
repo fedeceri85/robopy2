@@ -13,7 +13,7 @@ import numpy as np
 from Roi import Roi
 import sys
 import matplotlib
-from math import atan, pi
+from math import atan, pi, sqrt,cos,sin
 
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
@@ -462,7 +462,18 @@ class ImageDisplayWidget(QGLWidget):
 							self.repaint()
 							self.DrawRoiStatus = "idle"
 							self.addRoi(self.rois[-1])
-					
+			
+			elif self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==1 and (self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 0 or len(self.rois)==0):
+
+					a,b = self.screenToImage(event.x(), event.y())
+					self.mouseFirstPosition = (a,b)
+					w, h = self.SequenceDisplay.frameWidth, self.SequenceDisplay.frameHeight
+					if w > a and a > 0 and h > b and b > 0:
+						if self.DrawRoiStatus == "idle":
+							self.DrawRoiStatus = "drawing"
+							self.rois.append(Roi())
+
+
 
 			if self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 1 and len(self.rois)>0:
 				a,b = self.screenToImage(event.x(), event.y())
@@ -501,7 +512,7 @@ class ImageDisplayWidget(QGLWidget):
 
 	def mouseReleaseEvent(self, event):
 		
-		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==0:
+		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==0 and self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==0:
 
 			if self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize==0 or  (len(self.rois)==0 or self.DrawRoiStatus =='drawing'):
 				
@@ -542,6 +553,38 @@ class ImageDisplayWidget(QGLWidget):
 		
 		return a,b
 
+
+	def calculateSemicircularRoiPoints(self,radius,xc,yc,angle):
+			ys = []
+			ys2 = []
+			c = cos(angle)
+			s = sin(angle)
+			npoints = 100
+			x01 = xc-radius
+			x02 = xc + radius
+			ran = np.linspace(xc,x02,npoints)
+			arg = []
+			# if x1 > x2:
+			# 	ran = np.linspace(x2,x1,npoints)
+			
+			# else:
+			# 	ran = np.linspace(x1,x2,npoints)
+			for i in ran:
+				ys.append(yc + sqrt(abs((radius)**2-(i-x02)**2)))
+				ys2.append(yc - sqrt(abs((radius)**2-(i-x02)**2)))
+			for i in xrange(npoints):
+				arg.append(c*(ran[-i-1]-xc)-s*(ys2[-i-1]-yc) + xc)
+				arg.append(+s*(ran[-i-1]-xc)+c*(ys2[-i-1]-yc) + yc)
+				# arg.append(ran[-i-1])
+				# arg.append(ys[-i-1])
+			for i in xrange(npoints):
+				# arg.append(ran[i]
+				# arg.append(ys[i])
+				arg.append(c*(ran[i]-xc)-s*(ys[i]-yc) + xc)
+				arg.append(+s*(ran[i]-xc)+c*(ys[i]-yc) + yc)
+
+			return arg
+
 	def mouseMoveEvent(self, event):
 		a,b = self.screenToImage(event.x(), event.y())
 
@@ -558,9 +601,39 @@ class ImageDisplayWidget(QGLWidget):
 				y1 = b
 				x2 = self.mouseFirstPosition[0]
 				y2 = self.mouseFirstPosition[1]
-
+				
 				self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
 				self.repaint()
+
+
+		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==1:
+			if self.DrawRoiStatus == "drawing":
+				x1 = a
+				y1 = b
+				x2 = self.mouseFirstPosition[0]
+				y2 = self.mouseFirstPosition[1]
+
+				roiSize = self.SequenceDisplay.optionsDlg.roiOptions.roiSize 
+				if roiSize == 0:
+					radius = sqrt((x1-x2)**2+(y1-y2)**2)
+				else:
+					radius = roiSize
+
+				try:
+					if x1>x2:
+						angle = atan((y1-y2)/(x1-x2))
+					else:
+						angle = pi-atan((y1-y2)/(x2-x1))
+
+				except ZeroDivisionError:
+					angle = pi/2.0
+
+			
+				self.rois[-1].setPoints(*self.calculateSemicircularRoiPoints(radius,x2,y2,angle))
+				#self.rois[-1].setPoints(ran[9],ys2[9],ran[8],ys2[8],ran[7],ys2[7],ran[6],ys2[6],ran[5],ys2[5],ran[4],ys2[4],ran[3],ys2[3],ran[2],ys2[2],ran[1],ys2[1],ran[0],ys2[0], ran[1],ys[1],ran[2],ys[2],ran[3],ys[3],ran[4],ys[4],ran[5],ys[5],ran[6],ys[6],ran[7],ys[7],ran[8],ys[8],ran[9],ys[9])
+				#self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
+				self.repaint()
+
 		if self.IsMouseDown and self.isMovingRoi:
 
 			x,y = self.rois[self.nMovingRoi].computeMassCenter()
@@ -662,10 +735,3 @@ class ImageDisplayWidget(QGLWidget):
 		self.updateGL()
 		
 		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
-	
-
-	# def moveRoi(self,n,x,y):
-	# 	self.rois[n].move(x,y)
-	# 	self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
-
-	# 	self.updateGL()

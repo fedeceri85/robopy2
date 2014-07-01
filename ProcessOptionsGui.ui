@@ -856,7 +856,7 @@
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>45</y>
+         <y>80</y>
          <width>153</width>
          <height>21</height>
         </rect>
@@ -880,6 +880,9 @@
           <property name="text">
            <string>Rectangular Rois</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -915,7 +918,7 @@
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>70</y>
+         <y>100</y>
          <width>191</width>
          <height>21</height>
         </rect>
@@ -924,6 +927,22 @@
         <string>Lock roi relative positions</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="semicircularRoisCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>50</y>
+         <width>119</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Semicircular Rois</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -931,4 +950,7 @@
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

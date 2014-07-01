@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Wed Jun 25 19:04:54 2014
+# Created: Mon Jun 30 15:14:25 2014
 #      by: PyQt4 UI code generator 4.11
 #
 # WARNING! All changes made in this file will be lost!
@@ -415,7 +415,7 @@ class Ui_ProcessOptionsDlg(object):
         self.RoiOptionsTab = QtGui.QWidget()
         self.RoiOptionsTab.setObjectName(_fromUtf8("RoiOptionsTab"))
         self.roiSameSizeCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
-        self.roiSameSizeCheckBox.setGeometry(QtCore.QRect(30, 45, 153, 21))
+        self.roiSameSizeCheckBox.setGeometry(QtCore.QRect(30, 80, 153, 21))
         self.roiSameSizeCheckBox.setObjectName(_fromUtf8("roiSameSizeCheckBox"))
         self.layoutWidget1 = QtGui.QWidget(self.RoiOptionsTab)
         self.layoutWidget1.setGeometry(QtCore.QRect(30, 20, 286, 27))
@@ -425,6 +425,9 @@ class Ui_ProcessOptionsDlg(object):
         self.horizontalLayout_20.setObjectName(_fromUtf8("horizontalLayout_20"))
         self.rectangularRoisCheckBox = QtGui.QCheckBox(self.layoutWidget1)
         self.rectangularRoisCheckBox.setObjectName(_fromUtf8("rectangularRoisCheckBox"))
+        self.buttonGroup = QtGui.QButtonGroup(ProcessOptionsDlg)
+        self.buttonGroup.setObjectName(_fromUtf8("buttonGroup"))
+        self.buttonGroup.addButton(self.rectangularRoisCheckBox)
         self.horizontalLayout_20.addWidget(self.rectangularRoisCheckBox)
         spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_20.addItem(spacerItem3)
@@ -438,8 +441,12 @@ class Ui_ProcessOptionsDlg(object):
         self.horizontalLayout_19.addWidget(self.roiSizeSpinBox)
         self.horizontalLayout_20.addLayout(self.horizontalLayout_19)
         self.lockRoiPositionCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
-        self.lockRoiPositionCheckBox.setGeometry(QtCore.QRect(30, 70, 191, 21))
+        self.lockRoiPositionCheckBox.setGeometry(QtCore.QRect(30, 100, 191, 21))
         self.lockRoiPositionCheckBox.setObjectName(_fromUtf8("lockRoiPositionCheckBox"))
+        self.semicircularRoisCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.semicircularRoisCheckBox.setGeometry(QtCore.QRect(30, 50, 119, 21))
+        self.semicircularRoisCheckBox.setObjectName(_fromUtf8("semicircularRoisCheckBox"))
+        self.buttonGroup.addButton(self.semicircularRoisCheckBox)
         self.PO_TabWidget.addTab(self.RoiOptionsTab, _fromUtf8(""))
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
@@ -505,5 +512,6 @@ class Ui_ProcessOptionsDlg(object):
         self.rectangularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Rectangular Rois", None))
         self.label_7.setText(_translate("ProcessOptionsDlg", "Size (0 = dynamic)", None))
         self.lockRoiPositionCheckBox.setText(_translate("ProcessOptionsDlg", "Lock roi relative positions", None))
+        self.semicircularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Semicircular Rois", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.RoiOptionsTab), _translate("ProcessOptionsDlg", "Roi Options", None))
 
