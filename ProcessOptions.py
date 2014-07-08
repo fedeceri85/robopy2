@@ -234,6 +234,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			d=cPickle.load(open(self.saveFile,'r'))
 			fo.add('rectangularRois', d['rectangularRois'], self.rectangularRoisCheckBox)
 			fo.add('semicircularRois', d['semicircularRois'], self.semicircularRoisCheckBox)
+			fo.add('freehandRois', d['freehandRois'], self.freehandRoisCheckBox)
 
 			fo.add('roiSameSize', d['roiSameSize'], self.roiSameSizeCheckBox)
 			fo.add('roiSize',d['roiSize'],self.roiSizeSpinBox)
@@ -241,7 +242,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		except:
 			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
 			fo.add('semicircularRois',0, self.semicircularRoisCheckBox)
-
+			fo.add('freehandRois', 0, self.freehandRoisCheckBox)
 			fo.add('roiSameSize', 0, self.roiSameSizeCheckBox)
 			fo.add('roiSize',0,self.roiSizeSpinBox)
 			fo.add('lockRoiPositions',0,self.lockRoiPositionCheckBox)

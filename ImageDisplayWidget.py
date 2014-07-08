@@ -463,7 +463,7 @@ class ImageDisplayWidget(QGLWidget):
 							self.DrawRoiStatus = "idle"
 							self.addRoi(self.rois[-1])
 			
-			elif self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==1 and (self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 0 or len(self.rois)==0):
+			elif (self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==1 or self.SequenceDisplay.optionsDlg.roiOptions.freehandRois==1) and (self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize == 0 or len(self.rois)==0):
 
 					a,b = self.screenToImage(event.x(), event.y())
 					self.mouseFirstPosition = (a,b)
@@ -512,7 +512,7 @@ class ImageDisplayWidget(QGLWidget):
 
 	def mouseReleaseEvent(self, event):
 		
-		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==0 and self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==0:
+		if self.IsMouseDown == 1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.rectangularRois==0 and self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==0 and self.SequenceDisplay.optionsDlg.roiOptions.freehandRois==0:
 
 			if self.SequenceDisplay.optionsDlg.roiOptions.roiSameSize==0 or  (len(self.rois)==0 or self.DrawRoiStatus =='drawing'):
 				
@@ -601,12 +601,12 @@ class ImageDisplayWidget(QGLWidget):
 				y1 = b
 				x2 = self.mouseFirstPosition[0]
 				y2 = self.mouseFirstPosition[1]
-				
+				#self.rois[-1].addPoint(a,b)
 				self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
 				self.repaint()
 
 
-		if self.IsMouseDown ==1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==1:
+		elif self.IsMouseDown ==1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.semicircularRois==1:
 			if self.DrawRoiStatus == "drawing":
 				x1 = a
 				y1 = b
@@ -631,6 +631,16 @@ class ImageDisplayWidget(QGLWidget):
 			
 				self.rois[-1].setPoints(*self.calculateSemicircularRoiPoints(radius,x2,y2,angle))
 				#self.rois[-1].setPoints(ran[9],ys2[9],ran[8],ys2[8],ran[7],ys2[7],ran[6],ys2[6],ran[5],ys2[5],ran[4],ys2[4],ran[3],ys2[3],ran[2],ys2[2],ran[1],ys2[1],ran[0],ys2[0], ran[1],ys[1],ran[2],ys[2],ran[3],ys[3],ran[4],ys[4],ran[5],ys[5],ran[6],ys[6],ran[7],ys[7],ran[8],ys[8],ran[9],ys[9])
+				#self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
+				self.repaint()
+
+		elif  self.IsMouseDown ==1 and self.RightMouseButtonClicked == 1 and self.SequenceDisplay.optionsDlg.roiOptions.freehandRois==1:
+			if self.DrawRoiStatus == "drawing":
+				x1 = a
+				y1 = b
+				x2 = self.mouseFirstPosition[0]
+				y2 = self.mouseFirstPosition[1]
+				self.rois[-1].addPoint(a,b)
 				#self.rois[-1].setPoints(x1,y1,x2,y1,x2,y2,x1,y2)
 				self.repaint()
 

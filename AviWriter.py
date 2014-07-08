@@ -5,7 +5,7 @@ import numpy as np
 
 
 class AviWriter:
-	def __init__(self, fName, size=None, fps=25, isColor = True, fourcc = cv.CV_FOURCC('X','V', 'I', 'D')):
+	def __init__(self, fName, size=None, fps=25, isColor = True, fourcc = cv.CV_FOURCC(*'MJPG')):#('X','V', 'I', 'D')):
 		
 		self.fileName = fName
 		self.width = -1
