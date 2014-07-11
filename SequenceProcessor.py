@@ -1209,7 +1209,8 @@ class ProcessedSequence:
 		self.HSVvalue = computeValue(ValueFrame,(self.tiffSequence.origHeight,self.tiffSequence.origWidth),crop)
 		#return self.HSVvalue
 	
-	def applyColormap(self,f,w,h,returnType = "texture"):
+	def applyColormap(self,f,w,h,returnType = "texture",drawRois = False):
+		"drawRois = True needed for save as avi"
 		tex = applyColormapGLSL(self.processedWidget, f, w, h,self.displayParameters.displayColorMin,self.displayParameters.displayColorMax,returnType=returnType)
 		
 		#self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]) + " s", 50, 50, [1.0, 1.0, 1.0],fontsize=24.0)
@@ -1220,7 +1221,7 @@ class ProcessedSequence:
 			self.processedWidget.drawText(str(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0).zfill(3) + " s", self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 
-		
+
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
@@ -1228,9 +1229,12 @@ class ProcessedSequence:
 			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.5
 			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 		
+		if drawRois:
+			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)
+
 		return tex
 		
-	def HSVImage(self,f,w,h):
+	def HSVImage(self,f,w,h,drawRois = False):
 		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, hsvcutoff=self.displayOptions.hsvcutoff)
 		
 		if self.timeOptions.displayTimeStamp:
@@ -1245,6 +1249,11 @@ class ProcessedSequence:
 			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-2.5*float(self.timeOptions.fontSize)
 			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.5
 			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+
+		if drawRois:
+			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)
+
+
 		return tex
 	
 	def drawTimeStamp(self,to):

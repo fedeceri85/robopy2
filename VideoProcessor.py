@@ -44,8 +44,13 @@ class VideoProcessor(QGLFramebufferObject):
                 
                 glActiveTexture(GL_TEXTURE0)
                 glEnable(GL_TEXTURE_RECTANGLE)
-                
-                glEnable(GL_LINE_SMOOTH)
+                #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glEnable(GL_BLEND);
+                glEnable(GL_LINE_SMOOTH);
+
+                glLineWidth(2.0);
+
+#                glEnable(GL_LINE_SMOOTH)
                 openglContext.doneCurrent()
                 
         def __del__(self):
@@ -167,7 +172,53 @@ class VideoProcessor(QGLFramebufferObject):
                         
                 self.checkGLError()
                 self.openglContext.doneCurrent()
-                
+        
+        def drawRois(self,rois):
+                w = self.width()
+                h = self.height()      
+                self.openglContext.makeCurrent()
+                self.checkGLError()
+                self.bind()
+                self.saveGLState()
+                glMatrixMode(GL_PROJECTION)
+                glLoadIdentity()
+
+                glMatrixMode(GL_MODELVIEW)
+                glLoadIdentity()
+
+                glViewport(0,0,w,h)
+                glOrtho(0, w, 0, h, -1, 1) 
+                for r in rois:
+                        glColor3f(r.color.redF(), r.color.greenF(), r.color.blueF())
+                        
+                        
+                        nPoints = r.size()
+                        glBegin(GL_LINE_LOOP)
+                        for i in range(0,nPoints):
+                                glVertex2f(r.point(i).x() , r.point(i).y())
+                                
+                        glEnd()
+
+                        if r.mapSize > 0:
+                                x,y = r.computeMassCenter()
+                                glPushMatrix()
+                                
+                                fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
+                                fontScale = 12.0/fontWidth
+                                glTranslatef(x, y , 1.0)
+                                glScalef(fontScale, -fontScale, 1.0)
+                                #glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
+                                
+                                glutStrokeString(GLUT_STROKE_ROMAN, str(r.ordinal + 1))
+                                glPopMatrix()
+ 
+                glFlush()
+                self.restoreGLState()
+                self.release()
+                        
+                self.checkGLError()
+                self.openglContext.doneCurrent()
+
         def niceNumber(self, value, round_=False):
                 exponent = math.floor(math.log(value,10))
                 fraction = value / 10 ** exponent
@@ -209,8 +260,10 @@ class VideoProcessor(QGLFramebufferObject):
                 
                 w = self.width()
                 h = self.height()
-                
                 self.openglContext.makeCurrent()
+
+
+
                 self.checkGLError()
                 self.bind()
                 self.saveGLState()
@@ -230,6 +283,7 @@ class VideoProcessor(QGLFramebufferObject):
                 glTranslatef(x, y, 0.0)
                 glScalef(fontScale, -fontScale, 1.0)
                 
+
                 glColor4f(color[0], color[1], color[2], 0.0)
                 glutStrokeString(GLUT_STROKE_ROMAN, s)
                 

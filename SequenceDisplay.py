@@ -10,7 +10,7 @@ from OpenGL import GL
 import DisplayParameters
 from SequenceDisplayGui import Ui_SequenceDisplayWnd
 from ImageDisplayWidget import ImageDisplayWidget
-from TiffSequence import TiffSequence, HDF5Sequence
+from TiffSequence import TiffSequence, HDF5Sequence,TimesDict
 import SequenceProcessor
 from mplot import MPlot
 
@@ -207,6 +207,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 
 		self.connect(self.actionRemove_frames, SIGNAL("triggered()"), self.removeFrames)
 			
+		self.connect(self.actionSpecify_interframe_interval, SIGNAL("triggered()"), self.specify_interframe_interval)
+
 	
 	def makeProcessReferenceConnections(self, dlg):
 		self.connect(dlg.FirstFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
@@ -456,13 +458,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.colorMaxSlider.setRange(0, steps)
 		self.colorMaxSlider.blockSignals(False)
 	
-	def getSequenceFrame(self, n, needQImage = True):
+	def getSequenceFrame(self, n, needQImage = True,drawRois=False):
 			
 		self.currentImage = self.tiffSequence.getFrame(n)
 		if self.getViewType() == 0:
 			return self.loadImageGray(self.currentImage,needQImage)
 		elif self.getViewType() == 1:
-			return self.loadImageProcessed(n,needQImage)
+			return self.loadImageProcessed(n,needQImage,drawRois=drawRois)
 
 	def loadImageGray(self,im,needQImage=True):
 		
@@ -483,7 +485,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#else:
 		#	return None, None
 
-	def loadImageProcessed(self,n,needQImage=True):	
+	def loadImageProcessed(self,n,needQImage=True,drawRois=False):	
 		#elif viewType == 1:
 		if self.displayParameters.autoAdjust:
 			f=self.processedSequence.computeProcessedFrame(n)
@@ -491,12 +493,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.changeDisplayColorMin(f.min())
 			self.changeDisplayColorMax(f.max())
 		else:
+
 			f=self.processedSequence.computeProcessedFrame(n,returnType ="texture")
 		
 		if self.optionsDlg.displayOptions.useLUT == 1:
 			h,w = self.tiffSequence.height,self.tiffSequence.width
 
-			tex = self.processedSequence.applyColormap(f,w,h)
+			tex = self.processedSequence.applyColormap(f,w,h,drawRois=drawRois)
 			if self.displayParameters.autoAdjust == False:
 				f=None
 			return tex, f
@@ -506,7 +509,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.processedSequence.computeValue(im)
 
 			h,w = self.tiffSequence.height,self.tiffSequence.width
-			tex = self.processedSequence.HSVImage(f,w,h)	
+			tex = self.processedSequence.HSVImage(f,w,h,drawRois=drawRois)	
 			if self.displayParameters.autoAdjust == False:
 				f=None
 				
@@ -515,8 +518,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		return None, None
 
 
-	def getSequenceFrameAsRgb(self, n):
-		tex, f = self.getSequenceFrame(n)
+	def getSequenceFrameAsRgb(self, n,drawRois=False):
+		tex, f = self.getSequenceFrame(n,drawRois=drawRois)
 		if self.ImageTabWidget.currentIndex() == 0:
 			self.imWidget.makeCurrent()
 			data = self.imWidget.textureToArray(tex, "uint8RGB")
@@ -870,7 +873,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		aviWriter = AviWriter(opt["fname"], (opt["height"], opt["width"]), opt["fps"])
 		totalFrames = int(round((opt["lastFrame"] - opt["firstFrame"]+1)/step))
 		for i in range(opt["firstFrame"]-1, opt["lastFrame"],step):
-			data = self.getSequenceFrameAsRgb(i)
+			data = self.getSequenceFrameAsRgb(i,drawRois=True)
 
 			h,w,k,z = data.shape
 			data = data.reshape(h*w,z)
@@ -997,6 +1000,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.tiffSequence.removeFramesFromList(out)
 		self.tiffLoadFinished()
 
+	def specify_interframe_interval(self):
+		inStr, ok = QInputDialog.getDouble(self,'Select interframe interval','in seconds',0.1,decimals=3)
+		indices = np.array(self.tiffSequence.framesDict.values())
+		self.tiffSequence.timesDict = TimesDict(zip(np.arange(self.tiffSequence.getFrames()),indices*inStr))
+		self.tiffSequence.timesDict.label = 'Time (s)'
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

@@ -518,8 +518,8 @@ class HDF5Sequence(Sequence):
 		 	self.timesDict = TimesDict(zip(list((self.timesArray[:,0]).astype(uint16)),list((self.timesArray[:,1]))))
 		 	self.timesDict.label = self.timesLabel
 		except:
-		 	print("Warning: No times loaded")
-
+		 	print("Warning: No times in hdf5 file")
+	
 		kv = range(self.frames)	
 		self.framesDict = dict(zip(kv,kv))
 		#print len(self.timesDict.times())

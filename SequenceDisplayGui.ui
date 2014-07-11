@@ -187,7 +187,7 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>19</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">
@@ -224,11 +224,19 @@
      <addaction name="actionDivide_by_image"/>
      <addaction name="actionMultiply_by_image"/>
     </widget>
+    <widget class="QMenu" name="menuTimes">
+     <property name="title">
+      <string>Times</string>
+     </property>
+     <addaction name="actionSpecify_interframe_interval"/>
+     <addaction name="actionLoad_times_from_file"/>
+    </widget>
     <addaction name="actionBack_Projection"/>
     <addaction name="actionAverage"/>
     <addaction name="menuMath_2"/>
     <addaction name="separator"/>
     <addaction name="actionRemove_frames"/>
+    <addaction name="menuTimes"/>
    </widget>
    <widget class="QMenu" name="menuOutput">
     <property name="title">
@@ -378,6 +386,16 @@
   <action name="actionRemove_frames">
    <property name="text">
     <string>Remove frames ...</string>
+   </property>
+  </action>
+  <action name="actionSpecify_interframe_interval">
+   <property name="text">
+    <string>Specify interframe interval</string>
+   </property>
+  </action>
+  <action name="actionLoad_times_from_file">
+   <property name="text">
+    <string>Load times from file</string>
    </property>
   </action>
  </widget>

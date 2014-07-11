@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Thu Jun 26 22:57:19 2014
-#      by: PyQt4 UI code generator 4.11
+# Created: Thu Jul 10 17:24:05 2014
+#      by: PyQt4 UI code generator 4.11.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -128,7 +128,7 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 18))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
@@ -136,6 +136,8 @@ class Ui_SequenceDisplayWnd(object):
         self.menuStacks.setObjectName(_fromUtf8("menuStacks"))
         self.menuMath_2 = QtGui.QMenu(self.menuStacks)
         self.menuMath_2.setObjectName(_fromUtf8("menuMath_2"))
+        self.menuTimes = QtGui.QMenu(self.menuStacks)
+        self.menuTimes.setObjectName(_fromUtf8("menuTimes"))
         self.menuOutput = QtGui.QMenu(self.menubar)
         self.menuOutput.setObjectName(_fromUtf8("menuOutput"))
         SequenceDisplayWnd.setMenuBar(self.menubar)
@@ -196,6 +198,10 @@ class Ui_SequenceDisplayWnd(object):
         self.actionDelete_number.setObjectName(_fromUtf8("actionDelete_number"))
         self.actionRemove_frames = QtGui.QAction(SequenceDisplayWnd)
         self.actionRemove_frames.setObjectName(_fromUtf8("actionRemove_frames"))
+        self.actionSpecify_interframe_interval = QtGui.QAction(SequenceDisplayWnd)
+        self.actionSpecify_interframe_interval.setObjectName(_fromUtf8("actionSpecify_interframe_interval"))
+        self.actionLoad_times_from_file = QtGui.QAction(SequenceDisplayWnd)
+        self.actionLoad_times_from_file.setObjectName(_fromUtf8("actionLoad_times_from_file"))
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -216,11 +222,14 @@ class Ui_SequenceDisplayWnd(object):
         self.menuMath_2.addAction(self.actionSubtract_image)
         self.menuMath_2.addAction(self.actionDivide_by_image)
         self.menuMath_2.addAction(self.actionMultiply_by_image)
+        self.menuTimes.addAction(self.actionSpecify_interframe_interval)
+        self.menuTimes.addAction(self.actionLoad_times_from_file)
         self.menuStacks.addAction(self.actionBack_Projection)
         self.menuStacks.addAction(self.actionAverage)
         self.menuStacks.addAction(self.menuMath_2.menuAction())
         self.menuStacks.addSeparator()
         self.menuStacks.addAction(self.actionRemove_frames)
+        self.menuStacks.addAction(self.menuTimes.menuAction())
         self.menuOutput.addAction(self.actionSave_raw_sequence)
         self.menuOutput.addAction(self.actionSave_as_avi)
         self.menuOutput.addAction(self.actionSave_as_hd5_table)
@@ -247,6 +256,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.setTitle(_translate("SequenceDisplayWnd", "Rois", None))
         self.menuStacks.setTitle(_translate("SequenceDisplayWnd", "Stack", None))
         self.menuMath_2.setTitle(_translate("SequenceDisplayWnd", "Math", None))
+        self.menuTimes.setTitle(_translate("SequenceDisplayWnd", "Times", None))
         self.menuOutput.setTitle(_translate("SequenceDisplayWnd", "Output", None))
         self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Roi", None))
         self.actionLoad_from_file.setText(_translate("SequenceDisplayWnd", "Load from file...", None))
@@ -275,4 +285,6 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRoi_monitor.setText(_translate("SequenceDisplayWnd", "Roi monitor", None))
         self.actionDelete_number.setText(_translate("SequenceDisplayWnd", "Delete number", None))
         self.actionRemove_frames.setText(_translate("SequenceDisplayWnd", "Remove frames ...", None))
+        self.actionSpecify_interframe_interval.setText(_translate("SequenceDisplayWnd", "Specify interframe interval", None))
+        self.actionLoad_times_from_file.setText(_translate("SequenceDisplayWnd", "Load times from file", None))
 
