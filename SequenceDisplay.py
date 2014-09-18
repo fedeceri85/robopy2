@@ -722,19 +722,19 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		if self.displayParameters.roiAverageRecomputeNeeded:
 			self.displayParameters.roiProfile = np.zeros((lf, nrois))
-			if self.tiffSequence.__class__ == HDF5Sequence:
+			#if self.tiffSequence.__class__ == HDF5Sequence:
 		
-				self.displayParameters.roiProfile[:, 0:nrois] = self.tiffSequence.computeRois()	
+			#	self.displayParameters.roiProfile[:, 0:nrois] = self.tiffSequence.computeRois()	
 
-			else:	
-				for i in xrange(ff, lf, 100):
-					tlf = i + 100
-					if tlf > lf:
-						tlf = lf
-					self.displayParameters.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)		
-					self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
-					self.update()
-					
+			#else:	
+			for i in xrange(ff, lf, 100):
+				tlf = i + 100
+				if tlf > lf:
+					tlf = lf
+				self.displayParameters.roiProfile[i:tlf, 0:nrois] = self.tiffSequence.computeRois(i, tlf)		
+				self.showStatusMessage("Processed " + str(tlf) + "/" + str(lf))
+				self.update()
+				
 			self.displayParameters.roiAverageRecomputeNeeded = False	
 			
 		

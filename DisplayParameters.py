@@ -28,7 +28,7 @@ class DisplayPamrameters:
 		
 	def initHSVColormap(self):
 		
-		[ph,pv] = np.meshgrid(range(256), range(256), dtype=np.float)
+		[ph,pv] = np.meshgrid(range(256), range(256))
 		ps = np.ones((256, 256), dtype = np.float)
 		hsvM = np.zeros((256,256,3), dtype = np.float)
 		hsvM[:,:,0] = ph / 255.0

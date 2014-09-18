@@ -77,7 +77,10 @@ class calciumAPProcessor(ProcessedSequence):
 		section_idx = xrange(len(record[0]))
 		self.vTrace=np.concatenate(list(record[0][j].asarray() for j in section_idx))
 		self.cameraExp=np.concatenate(list(record[1][j].asarray() for j in section_idx))
-		self.cameraTrigger=np.concatenate(list(record[2][j].asarray() for j in section_idx))
+		try:
+			self.cameraTrigger=np.concatenate(list(record[2][j].asarray() for j in section_idx))
+		except:
+			self.cameraTrigger = self.cameraExp
 		self.times = np.arange(self.vTrace.size)*record.dt*time_scale_factor
 
 	def alignTraces(self):
@@ -116,14 +119,14 @@ class calciumAPProcessor(ProcessedSequence):
 		
 
 			
-	def applyColormap(self,f,w,h):
-		tex = ProcessedSequence.applyColormap(self,f,w,h)
+	def applyColormap(self,f,w,h,drawRois):
+		tex = ProcessedSequence.applyColormap(self,f,w,h,drawRois=drawRois)
 		
 		self.drawTrace()
 		return tex
 	
-	def HSVImage(self,f,w,h):
-		tex = ProcessedSequence.HSVImage(self,f,w,h)
+	def HSVImage(self,f,w,h,drawRois):
+		tex = ProcessedSequence.HSVImage(self,f,w,h,drawRois=drawRois)
 		self.drawTrace()
 		return tex
 		

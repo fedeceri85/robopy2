@@ -28,8 +28,11 @@ class PreviewDisplay(Ui_PreviewDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		if tiffSequence is not None:
 			self.tiffSequence = tiffSequence
-			img2 = tiffSequence.getFramesInterval(1,10)
-			img = img2.mean(2)
+			try:
+				img2 = tiffSequence.getFramesInterval(1,10)
+				img = img2.mean(2)
+			except:
+				img = tiffSequence.getFrame(0)
 		else:
 			self.close()
 
