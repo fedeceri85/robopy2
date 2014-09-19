@@ -152,13 +152,27 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
 		
 		self.setupUi(self)
+		self.setAcceptDrops(True)
 
 		
 		self.initData()
 		self.makeConnections()
 		self.seqDispList=[]
 		self.show()
-		
+	def dragEnterEvent(self, event):
+		if event.mimeData().hasUrls():
+			event.accept()
+		else:
+			event.ignore()
+
+	def dropEvent(self, event):
+		out = []
+		for url in event.mimeData().urls():
+			path = url.toLocalFile().toLocal8Bit().data()
+			if os.path.isfile(path):
+				out.append(path)
+		if out != []:
+			self.roboActionOpenCb(out)
 	def initData(self):
 		self.sequences = list();
 		self.filesList = list()
@@ -187,10 +201,10 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 	def makeImageOptionsConnections(self, seqDisp, procOpt):
 		seqDisp.ImageTabWidget.currentChanged.connect(procOpt.sequenceChangedTab)
 		
-	def roboActionOpenCb(self):
+	def roboActionOpenCb(self,files = None):
 		self.initSaveFolders()
-
-		files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
+		if files == None:
+			files = self.getFileNamesGui("Select sequence", QString(self.lastDirectory), "Tiff images (*.tif);; HDF5 images (*.h5 *.hf5) ")
 		try:
 			f=open(files[0]+'_cropInfo','r')
 			try:
