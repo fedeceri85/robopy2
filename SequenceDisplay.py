@@ -167,7 +167,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.FirstFrameButton, SIGNAL("clicked()"), self.getFirstSequenceFrame)
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
-		self.connect(self.CurrentFrameSlider, SIGNAL("sliderReleased()"), self.currentFrameSliderCb)
+		self.connect(self.CurrentFrameSlider, SIGNAL("sliderMoved(int)"), self.currentFrameSliderCb)
 		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISCb)
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)

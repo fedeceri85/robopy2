@@ -489,7 +489,7 @@ class HDF5Sequence(Sequence):
 		if filterLevel == 0:
 			filters = None
 		else:
-			filters = tb.Filters(complevel=filterLevel, complib='blosc',shuffle=True)
+			filters = tb.Filters(complevel=filterLevel, complib='zlib',shuffle=True)
 
 
 		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames,filters = filters)
