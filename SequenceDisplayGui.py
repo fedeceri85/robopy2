@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Thu Jul 10 17:24:05 2014
-#      by: PyQt4 UI code generator 4.11.1
+# Created: Tue Nov 25 15:00:19 2014
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -128,10 +128,12 @@ class Ui_SequenceDisplayWnd(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout)
         SequenceDisplayWnd.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(SequenceDisplayWnd)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 18))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 628, 19))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuRois = QtGui.QMenu(self.menubar)
         self.menuRois.setObjectName(_fromUtf8("menuRois"))
+        self.menuDatabase = QtGui.QMenu(self.menuRois)
+        self.menuDatabase.setObjectName(_fromUtf8("menuDatabase"))
         self.menuStacks = QtGui.QMenu(self.menubar)
         self.menuStacks.setObjectName(_fromUtf8("menuStacks"))
         self.menuMath_2 = QtGui.QMenu(self.menuStacks)
@@ -144,8 +146,6 @@ class Ui_SequenceDisplayWnd(object):
         self.statusbar = QtGui.QStatusBar(SequenceDisplayWnd)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         SequenceDisplayWnd.setStatusBar(self.statusbar)
-        self.actionCompute_Rois = QtGui.QAction(SequenceDisplayWnd)
-        self.actionCompute_Rois.setObjectName(_fromUtf8("actionCompute_Rois"))
         self.actionLoad_from_file = QtGui.QAction(SequenceDisplayWnd)
         self.actionLoad_from_file.setObjectName(_fromUtf8("actionLoad_from_file"))
         self.actionSave_to_file = QtGui.QAction(SequenceDisplayWnd)
@@ -202,6 +202,25 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSpecify_interframe_interval.setObjectName(_fromUtf8("actionSpecify_interframe_interval"))
         self.actionLoad_times_from_file = QtGui.QAction(SequenceDisplayWnd)
         self.actionLoad_times_from_file.setObjectName(_fromUtf8("actionLoad_times_from_file"))
+        self.actionNew_Database = QtGui.QAction(SequenceDisplayWnd)
+        self.actionNew_Database.setObjectName(_fromUtf8("actionNew_Database"))
+        self.actionOpen_Existing_Database = QtGui.QAction(SequenceDisplayWnd)
+        self.actionOpen_Existing_Database.setObjectName(_fromUtf8("actionOpen_Existing_Database"))
+        self.actionAdd_current_tracks_to_database = QtGui.QAction(SequenceDisplayWnd)
+        self.actionAdd_current_tracks_to_database.setObjectName(_fromUtf8("actionAdd_current_tracks_to_database"))
+        self.actionSave_database = QtGui.QAction(SequenceDisplayWnd)
+        self.actionSave_database.setObjectName(_fromUtf8("actionSave_database"))
+        self.actionRemove_current_dataset = QtGui.QAction(SequenceDisplayWnd)
+        self.actionRemove_current_dataset.setObjectName(_fromUtf8("actionRemove_current_dataset"))
+        self.actionCompute_Rois = QtGui.QAction(SequenceDisplayWnd)
+        self.actionCompute_Rois.setObjectName(_fromUtf8("actionCompute_Rois"))
+        self.menuDatabase.addSeparator()
+        self.menuDatabase.addAction(self.actionNew_Database)
+        self.menuDatabase.addAction(self.actionOpen_Existing_Database)
+        self.menuDatabase.addAction(self.actionSave_database)
+        self.menuDatabase.addSeparator()
+        self.menuDatabase.addAction(self.actionAdd_current_tracks_to_database)
+        self.menuDatabase.addAction(self.actionRemove_current_dataset)
         self.menuRois.addAction(self.actionCompute_Rois)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
@@ -213,6 +232,8 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionForce_recomputation)
         self.menuRois.addAction(self.actionRoi_monitor)
+        self.menuRois.addSeparator()
+        self.menuRois.addAction(self.menuDatabase.menuAction())
         self.menuMath_2.addAction(self.actionAdd)
         self.menuMath_2.addAction(self.actionSubtract)
         self.menuMath_2.addAction(self.actionDivide)
@@ -254,11 +275,11 @@ class Ui_SequenceDisplayWnd(object):
         self.ForwardFrameButton.setText(_translate("SequenceDisplayWnd", ">", None))
         self.LastFrameButton.setText(_translate("SequenceDisplayWnd", ">>", None))
         self.menuRois.setTitle(_translate("SequenceDisplayWnd", "Rois", None))
+        self.menuDatabase.setTitle(_translate("SequenceDisplayWnd", "Database", None))
         self.menuStacks.setTitle(_translate("SequenceDisplayWnd", "Stack", None))
         self.menuMath_2.setTitle(_translate("SequenceDisplayWnd", "Math", None))
         self.menuTimes.setTitle(_translate("SequenceDisplayWnd", "Times", None))
         self.menuOutput.setTitle(_translate("SequenceDisplayWnd", "Output", None))
-        self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Roi", None))
         self.actionLoad_from_file.setText(_translate("SequenceDisplayWnd", "Load from file...", None))
         self.actionSave_to_file.setText(_translate("SequenceDisplayWnd", "Save to file", None))
         self.actionDelete_Last.setText(_translate("SequenceDisplayWnd", "Delete Last", None))
@@ -287,4 +308,10 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRemove_frames.setText(_translate("SequenceDisplayWnd", "Remove frames ...", None))
         self.actionSpecify_interframe_interval.setText(_translate("SequenceDisplayWnd", "Specify interframe interval", None))
         self.actionLoad_times_from_file.setText(_translate("SequenceDisplayWnd", "Load times from file", None))
+        self.actionNew_Database.setText(_translate("SequenceDisplayWnd", "New Database", None))
+        self.actionOpen_Existing_Database.setText(_translate("SequenceDisplayWnd", "Open Existing Database", None))
+        self.actionAdd_current_tracks_to_database.setText(_translate("SequenceDisplayWnd", "Add current dataset", None))
+        self.actionSave_database.setText(_translate("SequenceDisplayWnd", "Save database", None))
+        self.actionRemove_current_dataset.setText(_translate("SequenceDisplayWnd", "Remove current dataset", None))
+        self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Rois", None))
 

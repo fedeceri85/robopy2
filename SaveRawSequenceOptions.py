@@ -32,3 +32,6 @@ class SaveRawSequenceOptions(Ui_frameIntervalDialog, QDialog):
 		
 	def getFrameInterval(self):
 		return range(self.options[0]-1,self.options[1],self.stepSpinBox.value())
+	
+	def getCompressionLevel(self):
+		return self.compLevelSpinBox.value()

@@ -187,13 +187,25 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>18</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRois">
     <property name="title">
      <string>Rois</string>
     </property>
+    <widget class="QMenu" name="menuDatabase">
+     <property name="title">
+      <string>Database</string>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionNew_Database"/>
+     <addaction name="actionOpen_Existing_Database"/>
+     <addaction name="actionSave_database"/>
+     <addaction name="separator"/>
+     <addaction name="actionAdd_current_tracks_to_database"/>
+     <addaction name="actionRemove_current_dataset"/>
+    </widget>
     <addaction name="actionCompute_Rois"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_from_file"/>
@@ -205,6 +217,8 @@
     <addaction name="separator"/>
     <addaction name="actionForce_recomputation"/>
     <addaction name="actionRoi_monitor"/>
+    <addaction name="separator"/>
+    <addaction name="menuDatabase"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -253,11 +267,6 @@
    <addaction name="menuOutput"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionCompute_Rois">
-   <property name="text">
-    <string>Compute Roi</string>
-   </property>
-  </action>
   <action name="actionLoad_from_file">
    <property name="text">
     <string>Load from file...</string>
@@ -396,6 +405,36 @@
   <action name="actionLoad_times_from_file">
    <property name="text">
     <string>Load times from file</string>
+   </property>
+  </action>
+  <action name="actionNew_Database">
+   <property name="text">
+    <string>New Database</string>
+   </property>
+  </action>
+  <action name="actionOpen_Existing_Database">
+   <property name="text">
+    <string>Open Existing Database</string>
+   </property>
+  </action>
+  <action name="actionAdd_current_tracks_to_database">
+   <property name="text">
+    <string>Add current dataset</string>
+   </property>
+  </action>
+  <action name="actionSave_database">
+   <property name="text">
+    <string>Save database</string>
+   </property>
+  </action>
+  <action name="actionRemove_current_dataset">
+   <property name="text">
+    <string>Remove current dataset</string>
+   </property>
+  </action>
+  <action name="actionCompute_Rois">
+   <property name="text">
+    <string>Compute Rois</string>
    </property>
   </action>
  </widget>

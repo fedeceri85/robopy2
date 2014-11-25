@@ -26,11 +26,14 @@ from SequenceProcessor import ProcessedSequence
 import Plugins
 from scipy.misc import imsave
 from  roiAnalysis import MainWindow as rMW
+from scipy.io import savemat,loadmat
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
 		self.setupUi(self)
+		self.setAcceptDrops(True)
+
 		self.imageWidgetSetup()
 		#l = dir(self.CurrentFrameSlider)
 		#for i in l:
@@ -60,7 +63,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.worker.connect(self.worker, SIGNAL("jobDone()"), self, SLOT("tiffLoadFinished()"))
 		#self.connect(self, SIGNAL("startWorkerJob()"), self.worker, SLOT("startJob()"))
 		#self.worker.start()
-		
+		self.database = None
 		#Load plugins
 		self.plugins=[]
 		#self.emit(SIGNAL("startWorkerJob()"))
@@ -168,7 +171,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.LastFrameButton, SIGNAL("clicked()"), self.getLastSequenceFrame)
 		self.connect(self.PlayButton, SIGNAL("clicked()"), self.playButtonCb)
 		self.connect(self.CurrentFrameSlider, SIGNAL("sliderMoved(int)"), self.currentFrameSliderCb)
-		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISCb)
+		self.connect(self.actionLoad_from_file,SIGNAL("triggered()"),self.loadROISDialog)
 		self.connect(self.actionSave_to_file,SIGNAL("triggered()"),self.saveROISCb)
 		self.connect(self.actionSave_traces,SIGNAL("triggered()"),self.saveRoiComputations)
 		self.connect(self.actionForce_recomputation,SIGNAL("triggered()"),self.forceRoiRecomputation)
@@ -209,6 +212,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 		self.connect(self.actionSpecify_interframe_interval, SIGNAL("triggered()"), self.specify_interframe_interval)
 
+		##DATABASE
+		self.connect(self.actionNew_Database,SIGNAL("triggered()"),self.createNewDatabase)
+		self.connect(self.actionOpen_Existing_Database,SIGNAL("triggered()"),self.openDatabase)
+		self.connect(self.actionAdd_current_tracks_to_database,SIGNAL('triggered()'),self.addDatasetToDatabase)
+		self.connect(self.actionSave_database,SIGNAL('triggered()'),self.saveDatabase)
+		self.connect(self.actionRemove_current_dataset,SIGNAL('triggered()'),self.removeLastDataset)
+
+
 	
 	def makeProcessReferenceConnections(self, dlg):
 		self.connect(dlg.FirstFrameSpinBox, SIGNAL("valueChanged(int)"), self.recomputeFalseColorReference)
@@ -223,6 +234,22 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
 		
+	def dragEnterEvent(self, event):
+		if event.mimeData().hasUrls():
+			event.accept()
+		else:
+			event.ignore()
+
+	def dropEvent(self, event):
+		out = []
+		for url in event.mimeData().urls():
+			path = url.toLocalFile().toLocal8Bit().data()
+			if os.path.isfile(path):
+				out.append(path)
+		if out != []:
+			self.loadROISCb(out[0])
+
+
 	def changeDisplayGrayMin(self, v):
 		v = int(v)
 		mn, mx, steps = self.recomputeDisplayRange(v, self.displayParameters.displayGrayMax)
@@ -809,14 +836,19 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		np.savetxt(roiFile, np.hstack((times,rdata)), delimiter="\t")
 
-	def loadROISCb(self):
-		
+	
+	def loadROISDialog(self):
 		if self.FrameImage == None:
 			return
 		
 		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging Roi file",QString(),"Vimmaging roi file (*.mat);;Roi and traces data (*.npy)")
 		
 		roiFile = fname.toAscii().data()
+		self.loadROISCb(roiFile)
+	
+	def loadROISCb(self,roiFile):
+		
+
 		rois, self.displayParameters.roiProfile, times = SequenceProcessor.loadRoisFromFile(roiFile, self.frameWidth, self.frameHeight)
 		for roi in rois:
 			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
@@ -832,6 +864,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				print("Traces data not valid, ignoring")
 				self.displayParameters.roiAverageRecomputeNeeded = True
 	
+
 	def saveROISCb(self):
 		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Vimmaging roi file (*.mat);;Roi and traces data (*.npy)")
 		roiFile = fname.toAscii().data()
@@ -852,14 +885,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if not fname.isEmpty():
 			if optDlg.exec_():
 				framesInd = optDlg.getFrameInterval()
-				
+				compressionLevel = optDlg.getCompressionLevel()
+
 			ext = os.path.splitext(str(fname))[1]
 			if ext == '.tif' or ext=='.tiff' or ext =='.TIF' or ext == '.TIFF':
 				tiff = TiffSequence(None)
 				tiff.saveSequence(fname.toAscii(),sequence=self.tiffSequence,framesInd=framesInd)
 			if ext == '.h5' or ext == 'h5f' or ext == '.H5' or ext == '.H5F':
 				tiff = HDF5Sequence(None)
-			tiff.saveSequence(str(fname.toAscii()),sequence=self.tiffSequence,framesInd=framesInd)	
+				tiff.saveSequence(str(fname.toAscii()),sequence=self.tiffSequence,framesInd=framesInd,filterLevel=compressionLevel)	
+
 	def saveSequenceAsAvi(self):
 		first, step = self.getSequenceStartAndStep()
 		fps = int(round(1.0/(self.tiffSequence.timesDict.dt())))
@@ -1005,6 +1040,96 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		indices = np.array(self.tiffSequence.framesDict.values())
 		self.tiffSequence.timesDict = TimesDict(zip(np.arange(self.tiffSequence.getFrames()),indices*inStr))
 		self.tiffSequence.timesDict.label = 'Time (s)'
+
+	# self.connect(self.actionNew_Database,SIGNAL("triggered()",self.createNewDatabase))
+	# self.connect(self.actionOpen_Existing_Database,SIGNAL("triggered()",self.openDatabase))
+	# self.connect(self.actionAdd_current_tracks_to_database,SIGNAL('triggered()'),self.addDatasetToDatabase)
+	# self.connect(self.actionSave_database,SIGNAL('triggered()'),self.saveDatabase)
+	# self.connect(self.actionRemove_current_dataset,SIGNAL('triggered()'),self.removeLastDataset)
+	def createNewDatabase(self):
+		self.sampleDatabase = './tools/sampleDatabase.mat'
+		sample = loadmat(self.sampleDatabase)['database']
+		self.database = np.empty((1,0),dtype=sample.dtype)		# self.database['vecData'] = []
+		# self.database['oldVecData'] = []
+		# self.database['t'] = []
+		# self.database['activeRois'] = []
+		print("New database created")
+
+	def openDatabase(self):
+		
+		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging database",QString(),"Vimmaging database (*.mat)")
+		dbfile = fname.toAscii().data()
+		self.database = loadmat(dbfile)['database']
+		print("Opened database "+dbfile)
+
+	def addDatasetToDatabase(self):
+		self.sampleDatabase = './tools/sampleDatabase.mat'
+		sample = loadmat(self.sampleDatabase)['database']
+		self.dataset = np.empty((1,1),dtype=sample.dtype)
+
+		self.dataset['peakData'] = np.empty((1,1))
+		self.dataset['minData'] = np.empty((1,1))
+		self.dataset['minPeakDistance'] = np.array([[10]])
+		self.dataset['maxLowerSpan'] = np.array([[100]])
+		self.dataset['locDist'] = np.empty((1,1))
+		self.dataset['sequenceFileName'] = np.array([u'/prova'])
+		self.dataset['sequenceName'] =  np.array([u'prova.mat'])
+		self.dataset['roiFileName'] =np.array([u'prova.mat'])
+		self.dataset['vecData'] = np.empty((1,1))
+		self.dataset['oldVecData'] = np.empty((1,1))
+		#self.dataset['roiArea'] = np.empty((1,1))
+		self.dataset['t'] = np.empty((1,1))
+		self.dataset['peakCount'] = np.array([[0.0]])
+		#self.dataset['maxAmpInRoi'] = np.empty((1,1))
+		self.dataset['activeRois'] = np.empty((1,1))
+	
+		self.dataset['masterRoi'] = np.empty((1,1))
+		self.dataset['ROIS'] = np.empty((1,1))
+
+		self.dataset['stereociliaLine'] = np.empty((1,1))
+		self.dataset['Linescale'] = np.empty((1,1))
+		self.dataset['admittedPeakPercentage'] = np.array([[0.1]])
+		self.dataset['highPassFreq'] = np.array([[0.2]])
+		self.dataset['highPassFilterOnOff'] = np.array([[0]])
+		self.dataset['dataThresholdOnOff'] = np.array([[0]])
+		self.dataset['dataThresholdVal'] =  np.array([[0]])
+		self.dataset['freqData'] = np.empty((1,1))
+		self.dataset['peakFreqAvg'] = np.empty((1,1))
+		self.dataset['peakFreqStd'] = np.empty((1,1))
+		self.dataset['oscillationDurration'] = np.empty((1,1))
+		self.dataset['ampData'] = np.empty((1,1))
+		self.dataset['peakAmpAvg'] = np.empty((1,1))
+		self.dataset['peakAmpStd'] = np.empty((1,1))
+
+		#self.dataset['vecData'] = []
+		#self.dataset['oldVecData'] = []
+		if self.displayParameters.roiProfile is not None:
+			rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
+			self.dataset['vecData'][0,0] = rdata.T
+			self.dataset['oldVecData'][0,0] = rdata.T
+			self.dataset['t'][0,0] = times
+			self.dataset['activeRois'][0,0] = np.ones(rdata.shape[1])
+			self.dataset['roiArea'][0,0] = np.ones((1,rdata.shape[1]))
+			self.dataset['maxAmpInRoi'][0,0] = np.ones((1,rdata.shape[1]))
+		
+			if self.database is None:
+				self.createNewDatabase()
+			self.database = np.hstack((self.database,self.dataset))
+
+			print("New dataset added. This is the dataset number "+str(self.database.shape[1]))
+		else:
+			print("No dataset added to database")
+
+	def saveDatabase(self):
+		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Vimmaging database (*.mat)")
+		dbfile= fname.toAscii().data()
+		if self.database is not None:
+			savemat(dbfile,{'database':self.database})
+
+	def removeLastDataset(self):
+		if self.database is not None:
+			self.database = self.database[:,:-1]
+			print("Dataset removed. "+str(self.database.shape[1])+ " datasets left in database")	
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
