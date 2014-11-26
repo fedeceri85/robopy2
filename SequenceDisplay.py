@@ -63,7 +63,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.worker.connect(self.worker, SIGNAL("jobDone()"), self, SLOT("tiffLoadFinished()"))
 		#self.connect(self, SIGNAL("startWorkerJob()"), self.worker, SLOT("startJob()"))
 		#self.worker.start()
-		self.database = None
+		
 		#Load plugins
 		self.plugins=[]
 		#self.emit(SIGNAL("startWorkerJob()"))
@@ -1041,25 +1041,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.tiffSequence.timesDict = TimesDict(zip(np.arange(self.tiffSequence.getFrames()),indices*inStr))
 		self.tiffSequence.timesDict.label = 'Time (s)'
 
-	# self.connect(self.actionNew_Database,SIGNAL("triggered()",self.createNewDatabase))
-	# self.connect(self.actionOpen_Existing_Database,SIGNAL("triggered()",self.openDatabase))
-	# self.connect(self.actionAdd_current_tracks_to_database,SIGNAL('triggered()'),self.addDatasetToDatabase)
-	# self.connect(self.actionSave_database,SIGNAL('triggered()'),self.saveDatabase)
-	# self.connect(self.actionRemove_current_dataset,SIGNAL('triggered()'),self.removeLastDataset)
+
 	def createNewDatabase(self):
 		self.sampleDatabase = './tools/sampleDatabase.mat'
 		sample = loadmat(self.sampleDatabase)['database']
-		self.database = np.empty((1,0),dtype=sample.dtype)		# self.database['vecData'] = []
-		# self.database['oldVecData'] = []
-		# self.database['t'] = []
-		# self.database['activeRois'] = []
+		self.RoboMainWnd.database = np.empty((1,0),dtype=sample.dtype)	
+		#self.database = self.RoboMainWnd.database
+
 		print("New database created")
 
 	def openDatabase(self):
 		
 		fname = QFileDialog.getOpenFileName(self, "Select Vimmaging database",QString(),"Vimmaging database (*.mat)")
 		dbfile = fname.toAscii().data()
-		self.database = loadmat(dbfile)['database']
+		self.RoboMainWnd.database = loadmat(dbfile)['database']
 		print("Opened database "+dbfile)
 
 	def addDatasetToDatabase(self):
@@ -1109,27 +1104,29 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.dataset['oldVecData'][0,0] = rdata.T
 			self.dataset['t'][0,0] = times
 			self.dataset['activeRois'][0,0] = np.ones(rdata.shape[1])
-			self.dataset['roiArea'][0,0] = np.ones((1,rdata.shape[1]))
+			roiArea = np.array([r.mapSize for r in self.tiffSequence.rois])
+			roiArea = roiArea.reshape((1,roiArea.size))
+			self.dataset['roiArea'][0,0] = roiArea.astype(np.float)
 			self.dataset['maxAmpInRoi'][0,0] = np.ones((1,rdata.shape[1]))
 		
-			if self.database is None:
+			if self.RoboMainWnd.database is None:
 				self.createNewDatabase()
-			self.database = np.hstack((self.database,self.dataset))
+			self.RoboMainWnd.database = np.hstack((self.RoboMainWnd.database,self.dataset))
 
-			print("New dataset added. This is the dataset number "+str(self.database.shape[1]))
+			print("New dataset added. This is the dataset number "+str(self.RoboMainWnd.database.shape[1]))
 		else:
 			print("No dataset added to database")
 
 	def saveDatabase(self):
 		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Vimmaging database (*.mat)")
 		dbfile= fname.toAscii().data()
-		if self.database is not None:
-			savemat(dbfile,{'database':self.database})
+		if self.RoboMainWnd.database is not None:
+			savemat(dbfile,{'database':self.RoboMainWnd.database})
 
 	def removeLastDataset(self):
-		if self.database is not None:
-			self.database = self.database[:,:-1]
-			print("Dataset removed. "+str(self.database.shape[1])+ " datasets left in database")	
+		if self.RoboMainWnd.database is not None:
+			self.RoboMainWnd.database = self.RoboMainWnd.database[:,:-1]
+			print("Dataset removed. "+str(self.RoboMainWnd.database.shape[1])+ " datasets left in database")	
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

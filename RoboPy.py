@@ -177,6 +177,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		self.sequences = list();
 		self.filesList = list()
 		self.options = None
+		self.database = None
 		
 	def initSaveFolders(self):
 		self.optDir = os.path.join(os.path.expanduser('~'),'.robopy')
