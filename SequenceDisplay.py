@@ -63,7 +63,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#self.worker.connect(self.worker, SIGNAL("jobDone()"), self, SLOT("tiffLoadFinished()"))
 		#self.connect(self, SIGNAL("startWorkerJob()"), self.worker, SLOT("startJob()"))
 		#self.worker.start()
-		
+		self.playRois = None
+		self.drawnRois = []
 		#Load plugins
 		self.plugins=[]
 		#self.emit(SIGNAL("startWorkerJob()"))
@@ -580,14 +581,35 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.imWidget.currentDrawData["tex"] = self.FrameImage
 			self.imWidget.currentDrawData["width"] = w
 			self.imWidget.currentDrawData["height"] = h
+
+			if self.playRois is not None:
+				curr = np.argwhere(self.roiBounds[:,0]==self.CurrentShownFrame).ravel()
+				for el in curr:
+					self.imWidget.addRoi(self.playRois[el],fromImageDisplayWidget=False,drawRoiNumber=False)
+					self.drawnRois.append(el)
+
+				toDelete = []
+				for i,el in enumerate(self.drawnRois):
+					if self.roiBounds[el,1] <= self.CurrentShownFrame:
+						toDelete.append(i)
+
+				toDelete.sort(reverse=True)
+				if len(toDelete) > 0:
+					self.imWidget.deleteRois(toDelete)
+					for el in toDelete:
+						self.drawnRois.pop(el)
+
+
 			self.imWidget.updateGL()
+
+
 		else:
 			self.processedWidget.currentDrawData["tex"] = self.FrameImage
 			self.processedWidget.currentDrawData["width"] = w
 			self.processedWidget.currentDrawData["height"] = h
 			self.processedWidget.updateGL()
 			
-		
+			
 		
 	def getNextSequenceFrame(self):
 		first, step = self.getSequenceStartAndStep()
@@ -850,20 +872,24 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 
 		rois, self.displayParameters.roiProfile, times = SequenceProcessor.loadRoisFromFile(roiFile, self.frameWidth, self.frameHeight)
-		for roi in rois:
-			self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
-		if self.displayParameters.roiProfile is None or self.displayParameters.roiProfile.shape[0]!=self.tiffSequence.getFrames():
+		if rois.__class__ is not tuple:
+			self.playRois = None
+			for roi in rois:
+				self.imWidget.addRoi(roi,fromImageDisplayWidget=False)
+			if self.displayParameters.roiProfile is None or self.displayParameters.roiProfile.shape[0]!=self.tiffSequence.getFrames():
 
-			self.displayParameters.roiAverageRecomputeNeeded = True
-		else:	
-			
-			try:
-				self.displayParameters.roiAverageRecomputeNeeded = False
-				self.computeRoisCb()
-			except:
-				print("Traces data not valid, ignoring")
 				self.displayParameters.roiAverageRecomputeNeeded = True
-	
+			else:	
+				
+				try:
+					self.displayParameters.roiAverageRecomputeNeeded = False
+					self.computeRoisCb()
+				except:
+					print("Traces data not valid, ignoring")
+					self.displayParameters.roiAverageRecomputeNeeded = True
+		else:
+			self.playRois = rois[0]
+			self.roiBounds = rois[1]
 
 	def saveROISCb(self):
 		fname = QFileDialog.getSaveFileName(self, "Input file name",QString(),"Vimmaging roi file (*.mat);;Roi and traces data (*.npy)")

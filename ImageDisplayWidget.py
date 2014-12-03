@@ -52,7 +52,8 @@ class ImageDisplayWidget(QGLWidget):
 		self.RightMouseButtonClicked = 0
 		self.DrawRoiStatus = "idle"
 		self.rois = list()
-		
+		self.drawRoiNumber = True
+
 	def close(self):
 		self.makeCurrent()
 		n = len(self.textures['texId'])
@@ -180,9 +181,9 @@ class ImageDisplayWidget(QGLWidget):
 				self.drawRoi(i)
 		
 	def drawRoi(self, r):
-		
 		glColor3f(r.color.redF(), r.color.greenF(), r.color.blueF())
-		
+		#glEnable(GL_BLEND)
+		#glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 		
 		nPoints = r.size()
 		glBegin(GL_LINE_LOOP)
@@ -190,20 +191,19 @@ class ImageDisplayWidget(QGLWidget):
 			glVertex2f(r.point(i).x() , r.point(i).y())
 			
 		glEnd()
-
 		if r.mapSize > 0:
-			x,y = r.computeMassCenter()
-			glPushMatrix()
-			
-			fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
-			fontScale = 12.0/fontWidth
-			glTranslatef(x, y , 1.0)
-			glScalef(fontScale, -fontScale, 1.0)
-			#glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
-			
-			glutStrokeString(GLUT_STROKE_ROMAN, str(r.ordinal + 1))
-			glPopMatrix()
-	
+			if self.drawRoiNumber == True:
+				x,y = r.computeMassCenter()
+				glPushMatrix()
+				
+				fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
+				fontScale = 12.0/fontWidth
+				glTranslatef(x, y , 1.0)
+				glScalef(fontScale, -fontScale, 1.0)
+				#glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
+				glutStrokeString(GLUT_STROKE_ROMAN, str(r.ordinal + 1))
+				glPopMatrix()
+		
 			
 		
 	def arrayToTexture(self, data, w, h, nOrd, internalType = GL_LUMINANCE, 
@@ -715,23 +715,23 @@ class ImageDisplayWidget(QGLWidget):
 			self.SequenceDisplay.keyPressEvent(event)
 
 
-	def addRoi(self,roi,fromImageDisplayWidget = True):
+	def addRoi(self,roi,fromImageDisplayWidget = True,drawRoiNumber=True):
 		if not fromImageDisplayWidget:
 			self.rois.append(roi)
 		if self.computeRoiPointMaps:
 			roi.computePointMap()
 		roi.ordinal = len(self.rois) - 1
+		self.drawRoiNumber = drawRoiNumber
 		
 		colorCycle = matplotlib.rcParams["axes.color_cycle"]
+		if roi.color == QColor(Qt.green):
+			roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
 		
-		roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
-		
-		c = QColor()
-		c.setRgbF(roiCol[0], roiCol[1], roiCol[2])
-		roi.color = c
+			c = QColor()
+			c.setRgbF(roiCol[0], roiCol[1], roiCol[2],0.5)
+			roi.color = c
 		
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
-		
 		self.SequenceDisplay.tiffSequence.rois.append(self.rois[-1])
 		self.updateGL()
 		self.emit(QtCore.SIGNAL("roiAdded(long)"), id(self))
@@ -750,7 +750,30 @@ class ImageDisplayWidget(QGLWidget):
 			newrois.append(i)
 		self.rois = []
 		for i in newrois:	
-			self.addRoi(i,False)
+			self.addRoi(i,False,self.drawRoiNumber)
+		del newrois
+		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+		self.SequenceDisplay.tiffSequence.rois = []
+		for i in self.rois:
+			self.SequenceDisplay.tiffSequence.rois.append(i)
+		
+		self.updateGL()
+		
+		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
+
+	def deleteRois(self,roisN):
+		roisN.sort(reverse=True)
+		newrois = []
+		for n in roisN:
+			del self.rois[n]
+		
+		
+		for i in self.rois:
+			newrois.append(i)
+		
+		self.rois = []
+		for i in newrois:	
+			self.addRoi(i,False,self.drawRoiNumber)
 		del newrois
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 		self.SequenceDisplay.tiffSequence.rois = []

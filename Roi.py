@@ -88,3 +88,18 @@ class Roi(QPolygon):
 		
 		return x,y
 		
+
+
+class RoisList(list):
+	def __init__(self):
+		super(RoisList, self).__init__()
+		
+		#self.color = QColor(Qt.green)
+		#self.ordinal = -1
+		self.roiNumbers = []
+	def append(self,roi,number=None):
+		self.append(roi)
+		if number == None:
+			number = len(self)
+
+		self.roiNumbers.append(number)

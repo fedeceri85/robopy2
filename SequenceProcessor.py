@@ -1020,8 +1020,14 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 def loadRoisFromFile(filename, w, h):
 	roiprofile = None
 	times = None
+	roiBounds = None
+	
 	if os.path.splitext(filename)[1] == '.mat':
 		ROIS = loadmat(filename,struct_as_record=False, squeeze_me=True)['ROIS']
+		try:
+			roiBounds = loadmat(filename,struct_as_record=False, squeeze_me=True)['roiBounds']
+		except:
+			roiBounds = None
 	#try to solve issue when rois is composed of just one roi
 		try:
 			len(ROIS)
@@ -1066,8 +1072,10 @@ def loadRoisFromFile(filename, w, h):
 				roboRois.append(r)
 			
 
-		
-	return roboRois, roiprofile, times
+	if roiBounds is None:
+		return roboRois, roiprofile, times
+	else:
+		return (roboRois,roiBounds), roiprofile, times
 
 def saveRoisToFile(filename,rois,roiprofile = None,times = None):
 	roilist=[]

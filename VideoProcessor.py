@@ -189,7 +189,7 @@ class VideoProcessor(QGLFramebufferObject):
                 glViewport(0,0,w,h)
                 glOrtho(0, w, 0, h, -1, 1) 
                 for r in rois:
-                        glColor3f(r.color.redF(), r.color.greenF(), r.color.blueF())
+                        glColorf(r.color.redF(), r.color.greenF(), r.color.blueF())
                         
                         
                         nPoints = r.size()
