@@ -192,11 +192,11 @@ class Sequence:
 					#self.arraySequence[:,:,index] = img
 
 	def loadWholeTiff(self):
-		self.arraySequence = zeros((self.height,self.width,self.frames))
+		self.arraySequence = zeros((self.height,self.width,self.frames),dtype=np.uint16)
 		for index in xrange(self.frames):
 			img = self.getRawImage(self.framesDict[index])
 			img = self.applyOptions(img)
-			self.arraySequence[:,:,self.framesDict(index)] = img
+			self.arraySequence[:,:,self.framesDict[index]] = img
 			
 	def loadFrameInCache(self, n):
 		if self.arraySequence is not None:
@@ -211,7 +211,7 @@ class Sequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:, :, self.framesDict(n)].copy()
+			return self.arraySequence[:, :, self.framesDict[n]].copy()
 		else:
 			
 
