@@ -211,7 +211,7 @@ class Sequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:, :, self.framesDict[n]].copy()
+			return self.arraySequence[:, :, self.framesDict[n]]#.copy()
 		else:
 			
 
@@ -534,20 +534,20 @@ class HDF5Sequence(Sequence):
 			
 		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)),dtype=np.float)
 
-		if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection'] or self.options['rotate']:
-			for ind in xrange(firstIndex,lastIndex):
-				img = self.getFrame(ind)
-				for i,r in enumerate(self.rois):
-					#print str(ind) + " " + str(i) + " " + str(lastIndex)
-					roiProfile[ind-firstIndex,i] = r.computeAverage(img)
-		else:	
+		#if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection'] or self.options['rotate']:
+		for ind in xrange(firstIndex,lastIndex):
+			img = self.getFrame(ind)
 			for i,r in enumerate(self.rois):
-					#print str(ind) + " " + str(i) + " " + str(lastIndex)
-					summ = np.zeros(lastIndex-firstIndex,dtype = np.float)
-					for j in r.pointMap:
-						summ=summ+self.hdf5Handler[j[1],j[0],firstIndex:lastIndex].mean(0)
+				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+		#else:	
+	#		for i,r in enumerate(self.rois):
+	#				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+	#				summ = np.zeros(lastIndex-firstIndex,dtype = np.float)
+	#				for j in r.pointMap:
+	#					summ=summ+self.hdf5Handler[j[1],j[0],firstIndex:lastIndex].mean(0)
 						
-					roiProfile[:,i] = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)		
+	#				roiProfile[:,i] = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)		
 			
 
 		return roiProfile
