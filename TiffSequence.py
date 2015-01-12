@@ -2,11 +2,13 @@ from libtiff import TIFF
 from numpy import zeros,loadtxt,array,uint16,argwhere
 import numpy as np
 import Roi
-from os.path import splitext, getsize
+from os.path import splitext, getsize,split,join
 import threading
 from scipy.ndimage import zoom
 import tables as tb
 from scipy.misc import imrotate
+import xml.etree.ElementTree as xet
+
 #from pubTools import oneColumnFigure
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
@@ -550,9 +552,62 @@ class HDF5Sequence(Sequence):
 
 		return roiProfile
 
+class RawSequence(Sequence):
+	def __init__(self, fNames,options = None):
+		
 
-					
+		
+		#self.tifHandlers = list()	
+		#self.hdf5Handler = None
+		Sequence.__init__(self,fNames,options)
+		folder = split(fNames[0])[0]
+
+		print join(folder,'Experiment.xml')
+
+		try:
+			folder = split(fNames[0])[0]
+			frames, width,height = fromThorlabsXMLInfo(join(folder,'Experiment.xml'))
+		except:
+			print("Can't read xml file")
+			height,width,frames = 0,0,1
+		if self.options['rebin'] is not None:
+			width = width/self.options['rebin']
+			height = height/self.options['rebin']
+		self.origWidth = width
+		self.origHeight = height
+		if self.options['crop']:
+			width = self.options['rightMargin'] - self.options['leftMargin']
+			height = self.options['bottomMargin'] - self.options['topMargin']
+		
+		self.width=width
+		self.height=height
+		self.frames=frames 
+		self.frameSize = width*height*2
+		print frames
+		print height
+		print width
+		self.origWidth = self.width 
+		self.origHeight = self.height
+
+		self.initTimesDict()
 	
+	def open(self):
+		self.rawSequence = open(self.SequenceFiles[0],'rb')
+		
+	def getRawImage(self,n):
+		offset = n * self.frameSize
+		self.rawSequence.seek(offset)
+		st = self.rawSequence.read(self.frameSize)
+		nparray = np.fromstring(st,dtype = np.uint16).reshape((self.width,self.height))
+		return nparray
+
+	def initTimesDict(self):
+		#TODO
+		kv = range(self.frames)	
+		self.timesDict = dict(zip(kv,kv))
+
+		self.framesDict = dict(zip(kv,kv))
+
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
 	#times=numpy.loadtxt(splitext(filename)[0]+'_times.txt',delimiter='\t',skiprows=1,usecols=(0,1))
@@ -624,3 +679,49 @@ class TimesDict(dict):
 		for i in xrange(len(pts)-1):
 			for ind in xrange(pts[i],pts[i+1]):
 				self[ind+1]=self[ind+1]+meanDt + self[pts[i]]
+
+
+def fromThorlabsXMLInfo(infoFile):
+        try:
+            tree = xet.parse(infoFile)
+        except ValueError:
+            print("Could not parse xml info file!")
+            return
+            
+        root = tree.getroot()
+        cam = root.find("Camera")
+        
+        if cam is None:
+            return
+        
+        ks = cam.keys()
+        # if "pixelSizeUM" in ks:
+        #     self.pixelSize = float(cam.attrib["pixelSizeUM"])
+        # else:
+        #     self.pixelSize= 0
+            
+        lsm = root.find("LSM")
+        ks = lsm.keys()
+        if "pixelX" in ks:
+             width = int(lsm.attrib["pixelX"])
+        else:
+             width = 0
+            
+        if "pixelY" in ks:
+            height = int(lsm.attrib["pixelY"])
+        else:
+            height = 0
+            
+        
+            
+        stream = tree.find("Streaming")
+        if stream is None:
+            print("No Stream section found in info!")
+        else:
+            ks = stream.keys()
+            if "frames" in ks:
+                nFrames = int(stream.attrib["frames"])
+            else:
+                nFrames = 0
+
+        return nFrames,width,height

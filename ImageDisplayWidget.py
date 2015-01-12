@@ -257,7 +257,7 @@ class ImageDisplayWidget(QGLWidget):
 			if dataType == GL_UNSIGNED_SHORT:
 				vType = GL_LUMINANCE16
 			else:
-				vType = GL_RGB32F #GL_LUMINANCE_FLOAT32_ATI
+				vType = GL_RGBA32F #GL_LUMINANCE_FLOAT32_ATI
 			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, vType, w, h, 0, internalType, dataType, data)
 			
 		

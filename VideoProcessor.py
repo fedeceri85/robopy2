@@ -14,7 +14,7 @@ import numpy as np
 Video processing implemented on a QGLFramebuffer and using GLSL programmin
 '''
 class VideoProcessor(QGLFramebufferObject):
-        def __init__(self, w, h, openglContext, internalType = GL_RGB32F): # = GL_LUMINANCE_FLOAT32_ATI):
+        def __init__(self, w, h, openglContext, internalType = GL_RGBA32F): # = GL_LUMINANCE_FLOAT32_ATI):
                 
                 self.openglContext = openglContext
                 openglContext.makeCurrent()

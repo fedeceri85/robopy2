@@ -10,7 +10,7 @@ from OpenGL import GL
 import DisplayParameters
 from SequenceDisplayGui import Ui_SequenceDisplayWnd
 from ImageDisplayWidget import ImageDisplayWidget
-from TiffSequence import TiffSequence, HDF5Sequence,TimesDict
+from TiffSequence import TiffSequence, HDF5Sequence,TimesDict,RawSequence
 import SequenceProcessor
 from mplot import MPlot
 
@@ -96,6 +96,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.tiffSequence = HDF5Sequence(files,self.rawTiffOptions)
 			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
 				self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)			
+		elif os.path.splitext(files[0])[1] == '.raw':
+			self.tiffSequence = RawSequence(files,self.rawTiffOptions)
+
+			self.processedSequence = ProcessedSequence(self.tiffSequence,self.processedWidget,self.displayParameters,self.optionsDlg.frameOptions,
+			self.optionsDlg.displayOptions,self.optionsDlg.timeOptions)	
 		else:
 			for plugin in self.plugins:
 				if plugin.associatedFileType == os.path.splitext(files[0])[1]:
@@ -249,7 +254,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				out.append(path)
 		if out != []:
 			self.loadROISCb(out[0])
-
+			
 
 	def changeDisplayGrayMin(self, v):
 		v = int(v)
