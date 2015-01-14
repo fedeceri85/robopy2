@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Tue Jul  1 12:51:22 2014
-#      by: PyQt4 UI code generator 4.11
+# Created: Wed Jan 14 11:26:28 2015
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -118,6 +118,21 @@ class Ui_ProcessOptionsDlg(object):
         self.referenceFrameSpinBox.setObjectName(_fromUtf8("referenceFrameSpinBox"))
         self.horizontalLayout_2.addWidget(self.referenceFrameSpinBox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_23 = QtGui.QHBoxLayout()
+        self.horizontalLayout_23.setObjectName(_fromUtf8("horizontalLayout_23"))
+        self.referenceFramesLabel_2 = QtGui.QLabel(self.FrameOptionsTab)
+        self.referenceFramesLabel_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.referenceFramesLabel_2.setObjectName(_fromUtf8("referenceFramesLabel_2"))
+        self.horizontalLayout_23.addWidget(self.referenceFramesLabel_2)
+        self.zProjectSpinBox = QtGui.QSpinBox(self.FrameOptionsTab)
+        self.zProjectSpinBox.setMinimum(1)
+        self.zProjectSpinBox.setMaximum(99999)
+        self.zProjectSpinBox.setObjectName(_fromUtf8("zProjectSpinBox"))
+        self.horizontalLayout_23.addWidget(self.zProjectSpinBox)
+        self.movingAverageCheckBox = QtGui.QCheckBox(self.FrameOptionsTab)
+        self.movingAverageCheckBox.setObjectName(_fromUtf8("movingAverageCheckBox"))
+        self.horizontalLayout_23.addWidget(self.movingAverageCheckBox)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_23)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
         self.PO_TabWidget.addTab(self.FrameOptionsTab, _fromUtf8(""))
@@ -473,6 +488,8 @@ class Ui_ProcessOptionsDlg(object):
         self.DisplayTypeComboBox.setItemText(1, _translate("ProcessOptionsDlg", "dF", None))
         self.DisplayTypeComboBox.setItemText(2, _translate("ProcessOptionsDlg", "dF/F0", None))
         self.referenceFramesLabel.setText(_translate("ProcessOptionsDlg", "Number of F0 reference frames", None))
+        self.referenceFramesLabel_2.setText(_translate("ProcessOptionsDlg", "Grouped Z project", None))
+        self.movingAverageCheckBox.setText(_translate("ProcessOptionsDlg", "Moving Average", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.FrameOptionsTab), _translate("ProcessOptionsDlg", "Frame options", None))
         self.label_3.setText(_translate("ProcessOptionsDlg", "Time 0 frame", None))
         self.associatedTimesRadioButton.setText(_translate("ProcessOptionsDlg", "Use associated times", None))

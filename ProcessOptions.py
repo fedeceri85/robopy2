@@ -117,6 +117,8 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('processType', d['processType'], self.ProcessTypeComboBox)
 			fo.add('displayType', d['displayType'], self.DisplayTypeComboBox)
 			fo.add('referenceFrames', d['referenceFrames'], self.referenceFrameSpinBox)
+			fo.add('zproject', d['zproject'], self.zProjectSpinBox)
+			fo.add('movingAverage',d['movingAverage'],self.movingAverageCheckBox)
 			
 		except:	
 			fo.add('firstFrame', 1, self.FirstFrameSpinBox)
@@ -126,8 +128,10 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('secondWavelength', 0, self.SecondWavelengthSpinBox)
 			fo.add('processType', 0, self.ProcessTypeComboBox)
 			fo.add('displayType', 0, self.DisplayTypeComboBox)
-			fo.add('referenceFrames', 1, self.referenceFrameSpinBox)
-			
+			fo.add('referenceFrames', 4, self.referenceFrameSpinBox)
+			fo.add('zproject', 1, self.zProjectSpinBox)
+			fo.add('movingAverage',0,self.movingAverageCheckBox)
+
 
 		self.connect(self.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.processTypeChangedCb)
 		

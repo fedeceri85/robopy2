@@ -130,6 +130,8 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			options['rotate'] = False
 			options['angle'] = 0
 
+		options['zproject'] = 1
+
 		return options
 
 	def closeEvent(self, event):
@@ -224,7 +226,13 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 			tiffSequence = ts.HDF5Sequence(files,None)
 
 
-
+		# if self.options is None:
+		# 	self.options = {}
+		# 	self.options['rebin'] = None
+		# 	self.options['LineCorrection'] = False
+		# 	self.options['crop'] = False
+		# 	self.options['rotate'] = False
+		# 	self.options['zproject'] = 1
 		optDlg = RawSequenceOptions(parent=self,cropL=cropL,img=tiffSequence)
 
 		if optDlg.exec_():

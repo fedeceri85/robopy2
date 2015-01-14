@@ -54,7 +54,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.IsPlaying = False
 		self.timer = QBasicTimer()
 		self.FrameImage = None
-		
+			
+		self.optionsDlg = ProcessOptions(self,saveFolder=os.path.split(files[0])[0])		
+		self.tiffSequence = None
+		self.processedSequence = None
+
 		self.makeConnections()
 		self.show()
 		self.tiffFiles = files
@@ -83,10 +87,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				#If it fails, delete the plugin, 
 				self.plugins.pop()
 				
-	
-		self.optionsDlg = ProcessOptions(self,saveFolder=os.path.split(files[0])[0])		
-		self.tiffSequence = None
-		self.processedSequence = None
+
 
 		if os.path.splitext(files[0])[1] == '.tif':
 			self.tiffSequence = TiffSequence(files,self.rawTiffOptions)
@@ -225,6 +226,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionSave_database,SIGNAL('triggered()'),self.saveDatabase)
 		self.connect(self.actionRemove_current_dataset,SIGNAL('triggered()'),self.removeLastDataset)
 
+		#
+		self.connect(self.optionsDlg.zProjectSpinBox,SIGNAL('valueChanged(int)'),self.zprojectchanged)
+		self.connect(self.optionsDlg.movingAverageCheckBox,SIGNAL('stateChanged(int)'),self.movavgchanged)
 
 	
 	def makeProcessReferenceConnections(self, dlg):
@@ -1158,6 +1162,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		if self.RoboMainWnd.database is not None:
 			self.RoboMainWnd.database = self.RoboMainWnd.database[:,:-1]
 			print("Dataset removed. "+str(self.RoboMainWnd.database.shape[1])+ " datasets left in database")	
+
+	def zprojectchanged(self,n):
+		self.tiffSequence.options['zproject'] = n
+		ma = self.optionsDlg.movingAverageCheckBox.isChecked()
+		self.tiffSequence.applyZproject(movingAverage=ma)
+		self.tiffLoadFinished()
+		self.forceRoiRecomputation()
+
+	def movavgchanged(self,state):
+		self.tiffSequence.applyZproject(movingAverage = True)
+		self.tiffLoadFinished()
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

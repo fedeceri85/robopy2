@@ -8,7 +8,7 @@ from scipy.ndimage import zoom
 import tables as tb
 from scipy.misc import imrotate
 import xml.etree.ElementTree as xet
-
+from copy import copy
 #from pubTools import oneColumnFigure
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
@@ -34,6 +34,7 @@ class Sequence:
 		self.frames = 0
 		self.origWidth = -1
 		self.origHeight = -1
+		self.origFrames = 0
 		self.SequenceFiles = fNames
 		self.options = options
 		if self.options is None:
@@ -42,11 +43,16 @@ class Sequence:
 			self.options['LineCorrection'] = False
 			self.options['crop'] = False
 			self.options['rotate'] = False
-		self.FramesPerFile = list()
+			self.options['zproject'] = 1
+ 		self.FramesPerFile = list()
 		self.rois = list()
 		self.arraySequence = None
 		self.timesDict = TimesDict()
 		self.framesDict = {}    #dict that hold the correspondence VisualizedFrame:originalFrame
+		self.origTimesDict = TimesDict()
+		self.origFramesDict = {}
+		self.movingAverage = False
+
 		try:
 			self.open()
 		except TypeError:
@@ -122,6 +128,8 @@ class Sequence:
 		
 		kv = range(self.frames)	
 		self.framesDict = dict(zip(kv,kv))
+		self.origTimesDict = copy(self.timesDict)
+		self.origFramesDict = self.framesDict.copy()
 
 	def applyOptions(self,img):
 			if self.options['crop']:
@@ -204,6 +212,12 @@ class Sequence:
 		else:
 			img = self.getRawImage(self.framesDict[n])
 			img = self.applyOptions(img)
+			if self.options['zproject']!=1:
+				imgs = [img,]
+				for i in xrange(1,self.options['zproject'] -1 ):
+
+					imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
+				img = np.array(imgs).mean(0)
 			self.cachedFrames[n] = img
 			
 
@@ -222,10 +236,17 @@ class Sequence:
 					if k != n-1 and k != n+1:
 						del self.cachedFrames[k]
 				
-			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] == None:
+			if not self.cachedFrames.has_key(n) or self.cachedFrames[n] is None:
 				self.threadLock.acquire()
 				img = self.getRawImage(self.framesDict[n])
 				img = self.applyOptions(img)
+				if self.options['zproject']!=1:
+					imgs = [img,]
+					for i in xrange(1,self.options['zproject'] -1 ):
+
+						imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
+					img = np.array(imgs).mean(0)
+
 				self.cachedFrames[n] = img
 
 				self.threadLock.release()	
@@ -282,6 +303,30 @@ class Sequence:
 			t.append(self.timesDict[i])
 		return t
 
+	def applyZproject(self,movingAverage=False):
+		n = self.options['zproject']
+		#allframes = set(np.arange(self.origFrames))
+		#keepFrames = set(np.arange(0,self.origFrames,n))
+		#self.timesDict = copy(self.origTimesDict)
+		#self.framesDict = self.origFramesDict.copy()
+		#removeframes = allframes.difference(keepFrames)
+		#self.removeFramesFromList(list(removeframes))
+		if not movingAverage:
+			self.frames = int(np.floor(self.origFrames/n))
+			newtimes = list(self.origTimesDict.values()[::n])
+		 	self.timesDict = TimesDict(zip(range(len(newtimes)),newtimes))
+		 	self.timesDict.label = self.origTimesDict.label
+
+
+			self.framesDict = dict(zip(range(len(newtimes)),list(self.origFramesDict.values()[::n])))
+			self.movingAverage = False
+		else:
+			self.frames = self.origFrames
+			self.timesDict = copy(self.origTimesDict)
+			self.framesDict = self.origFramesDict.copy()
+			self.movingAverage = True
+
+
 class TiffSequence(Sequence):
 	def __init__(self, fNames,options = None):
 		self.tifHandlers = list()	
@@ -300,7 +345,8 @@ class TiffSequence(Sequence):
 					break
 			self.FramesPerFile.append(frames)
 			self.frames = self.frames + frames
-		
+			
+		self.origFrames = self.frames
 		self.initTimesDict()
 
 
@@ -463,6 +509,7 @@ class HDF5Sequence(Sequence):
 		
 		self.origWidth = self.width 
 		self.origHeight = self.height
+		self.origFrames = self.frames
 
 		self.initTimesDict()
 	
@@ -522,9 +569,12 @@ class HDF5Sequence(Sequence):
 		except:
 		 	print("Warning: No times in hdf5 file")
 	
-		kv = range(self.frames)	
+		kv = range(self.frames)
 		self.framesDict = dict(zip(kv,kv))
 		#print len(self.timesDict.times())
+		self.origTimesDict = copy(self.timesDict)
+		print self.origTimesDict.label
+		self.origFramesDict = self.framesDict.copy()
 
 	def computeRois(self,firstIndex = None, lastIndex = None):
 		if firstIndex == None:
@@ -588,6 +638,7 @@ class RawSequence(Sequence):
 		print width
 		self.origWidth = self.width 
 		self.origHeight = self.height
+		self.origFrames = self.frames
 
 		self.initTimesDict()
 	
@@ -607,6 +658,8 @@ class RawSequence(Sequence):
 		self.timesDict = dict(zip(kv,kv))
 
 		self.framesDict = dict(zip(kv,kv))
+		self.origTimesDict = copy(self.timesDict)
+		self.origFramesDict = self.framesDict.copy()
 
 def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
