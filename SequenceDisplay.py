@@ -211,6 +211,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#menus
 		##ROIS
 		self.connect(self.actionCompute_Rois, SIGNAL("triggered()"), self.computeRoisCb)
+		self.connect(self.actionComputeRois_from_list, SIGNAL("triggered()"), self.computeRoisFromListCb)
 		self.connect(self.actionDelete_Last, SIGNAL("triggered()"), self.deleteRoi)
 		self.connect(self.actionRoi_monitor, SIGNAL("triggered()"), self.showRoiMonitor)
 		self.connect(self.actionDelete_number, SIGNAL("triggered()"), self.deleteRoiN)
@@ -769,7 +770,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fig.close()
 
 
-	def computeRoisCb(self):
+	def computeRoisCb(self,showplot=True):
 
 		ff = 0
 		lf = self.tiffSequence.getFrames()
@@ -801,20 +802,47 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#fig,ax = oneColumnFigure(addAxes=True)
 		#ax.plot(roiProfile)
 		#fig.show()
+
+		
+		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
+		if showplot:
+			try:
+				self.fig.close()
+			except:
+				pass
+			fig = MPlot(self)
+			fig.plot(times,rdata,linewidth=0.3)
+			fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
+			fig.show()
+			self.fig = fig
+		return times,rdata
+	
+	def computeRoisFromListCb(self):
+
+		inStr, ok = QInputDialog.getText(self,'Select rois','Comma separated, insert interval as start:end')
+		inStr = str(inStr)
+		pieces = inStr.split(',')
+		out = []
+		for piece in pieces:
+
+			if piece.rfind(':') != -1:
+				tbegin,tend = map(int, piece.split(':'))
+				out.extend(range(tbegin-1,tend-1))
+			else:
+				piece = [piece,]
+				out.append(map(int,piece)[0]-1)
+
+		times,rdata = self.computeRoisCb(False)
 		try:
 			self.fig.close()
 		except:
 			pass
 		fig = MPlot(self)
-		
-		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
-		
-		fig.plot(times,rdata,linewidth=0.3)
+		fig.plot(times,rdata[:,out],linewidth=0.3)
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
 		self.fig = fig
-		return times,rdata
-	
+
 	def deleteRoi(self, n = -1):
 		nRoi = len(self.imWidget.rois)
 		if n == -1 and nRoi > 0:
@@ -1173,6 +1201,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def movavgchanged(self,state):
 		self.tiffSequence.applyZproject(movingAverage = True)
 		self.tiffLoadFinished()
+		self.forceRoiRecomputation()
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

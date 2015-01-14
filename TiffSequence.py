@@ -243,8 +243,10 @@ class Sequence:
 				if self.options['zproject']!=1:
 					imgs = [img,]
 					for i in xrange(1,self.options['zproject'] -1 ):
-
-						imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
+						try:
+							imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
+						except:
+							pass
 					img = np.array(imgs).mean(0)
 
 				self.cachedFrames[n] = img
@@ -321,9 +323,10 @@ class Sequence:
 			self.framesDict = dict(zip(range(len(newtimes)),list(self.origFramesDict.values()[::n])))
 			self.movingAverage = False
 		else:
-			self.frames = self.origFrames
-			self.timesDict = copy(self.origTimesDict)
-			self.framesDict = self.origFramesDict.copy()
+			self.frames = self.origFrames - n
+			newtimes = list(self.origTimesDict.values()[:-n])
+		 	self.timesDict = TimesDict(zip(range(len(newtimes)),newtimes))
+			self.framesDict = dict(zip(range(len(newtimes)),list(self.origFramesDict.values()[:-n])))
 			self.movingAverage = True
 
 

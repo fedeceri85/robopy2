@@ -207,6 +207,7 @@
      <addaction name="actionRemove_current_dataset"/>
     </widget>
     <addaction name="actionCompute_Rois"/>
+    <addaction name="actionComputeRois_from_list"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_from_file"/>
     <addaction name="actionSave_to_file"/>
@@ -435,6 +436,11 @@
   <action name="actionCompute_Rois">
    <property name="text">
     <string>Compute Rois</string>
+   </property>
+  </action>
+  <action name="actionComputeRois_from_list">
+   <property name="text">
+    <string>ComputeRois from list</string>
    </property>
   </action>
  </widget>

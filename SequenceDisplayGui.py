@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Tue Nov 25 15:00:19 2014
+# Created: Wed Jan 14 18:57:32 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -214,6 +214,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRemove_current_dataset.setObjectName(_fromUtf8("actionRemove_current_dataset"))
         self.actionCompute_Rois = QtGui.QAction(SequenceDisplayWnd)
         self.actionCompute_Rois.setObjectName(_fromUtf8("actionCompute_Rois"))
+        self.actionComputeRois_from_list = QtGui.QAction(SequenceDisplayWnd)
+        self.actionComputeRois_from_list.setObjectName(_fromUtf8("actionComputeRois_from_list"))
         self.menuDatabase.addSeparator()
         self.menuDatabase.addAction(self.actionNew_Database)
         self.menuDatabase.addAction(self.actionOpen_Existing_Database)
@@ -222,6 +224,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuDatabase.addAction(self.actionAdd_current_tracks_to_database)
         self.menuDatabase.addAction(self.actionRemove_current_dataset)
         self.menuRois.addAction(self.actionCompute_Rois)
+        self.menuRois.addAction(self.actionComputeRois_from_list)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionLoad_from_file)
         self.menuRois.addAction(self.actionSave_to_file)
@@ -314,4 +317,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_database.setText(_translate("SequenceDisplayWnd", "Save database", None))
         self.actionRemove_current_dataset.setText(_translate("SequenceDisplayWnd", "Remove current dataset", None))
         self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Rois", None))
+        self.actionComputeRois_from_list.setText(_translate("SequenceDisplayWnd", "ComputeRois from list", None))
 
