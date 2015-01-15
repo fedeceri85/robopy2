@@ -135,7 +135,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.makeProcessReferenceConnections(self.optionsDlg)
 		self.clipboard = QApplication.clipboard()
 		self.roiMonitor = False
-
+		self.currentShownRoi = 0
 
 	def tiffLoad(self):
 		print("entering tiffLoad from worker")
@@ -842,6 +842,38 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 		fig.show()
 		self.fig = fig
+	
+	def showNextRoi(self):
+		if self.currentShownRoi+1< len(self.tiffSequence.rois):
+			self.currentShownRoi = self.currentShownRoi + 1 
+			times,rdata = self.computeRoisCb(False)
+			try:
+				self.fig.close()
+			except:
+				pass
+			fig = MPlot(self)
+			fig.plot(times,rdata[:,self.currentShownRoi],linewidth=0.3)
+			fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
+			fig.show()
+			self.fig = fig
+		else:
+			pass
+
+	def showPrevRoi(self):
+		if self.currentShownRoi-1>=0 :
+			self.currentShownRoi = self.currentShownRoi - 1 
+			times,rdata = self.computeRoisCb(False)
+			try:
+				self.fig.close()
+			except:
+				pass
+			fig = MPlot(self)
+			fig.plot(times,rdata[:,self.currentShownRoi],linewidth=0.3)
+			fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
+			fig.show()
+			self.fig = fig
+		else:
+			pass
 
 	def deleteRoi(self, n = -1):
 		nRoi = len(self.imWidget.rois)
@@ -1059,10 +1091,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			try:
 				self.RoboMainWnd.RoboActionOpen_Prev()
 			except:
-				pass
+				passw
 		
 		elif event.key() == Qt.Key_Space:
 			self.playButtonCb()
+
+		elif event.key() == Qt.Key_Q:
+			self.showPrevRoi()
+		elif event.key() == Qt.Key_W:
+			self.showNextRoi()
 
 	def showRoiMonitor(self):
 		self.roiAnal = rMW(self)
@@ -1202,6 +1239,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.tiffSequence.applyZproject(movingAverage = True)
 		self.tiffLoadFinished()
 		self.forceRoiRecomputation()
+
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
