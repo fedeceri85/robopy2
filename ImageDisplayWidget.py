@@ -668,25 +668,32 @@ class ImageDisplayWidget(QGLWidget):
 
 		if self.IsMouseDown ==0 and  self.SequenceDisplay.roiMonitor:
 			
-				
-			try:
+			if self.SequenceDisplay.tiffSequence.arraySequence is not None:
 				size = int(self.SequenceDisplay.optionsDlg.roiOptions.roiSize/2)
 				if size ==0:
 					size = 2
-
-				trace = self.SequenceDisplay.tiffSequence.hdf5Handler[b-size:b+size+1,a-size:a+size+1,self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(1).mean(0)
-			#else:
-		#		r = self.rois[-1]
-
-			#	summ = np.zeros(self.SequenceDisplay.optionsDlg.frameOptions.lastFrame-self.SequenceDisplay.optionsDlg.frameOptions.firstFrame,dtype = np.float)
-			#	for j in r.pointMap:
-			#		summ=summ+self.SequenceDisplay.tiffSequence.hdf5Handler[j[1],j[0],self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(0)
-			#		
-			#	trace  = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)	
-				
+				trace = self.SequenceDisplay.tiffSequence.arraySequence[b-size:b+size+1,a-size:a+size+1,self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(1).mean(0)
 				self.SequenceDisplay.roiAnal.makePlot(trace)
-			except:
-				pass
+
+			else:
+				try:
+					size = int(self.SequenceDisplay.optionsDlg.roiOptions.roiSize/2)
+					if size ==0:
+						size = 2
+
+					trace = self.SequenceDisplay.tiffSequence.hdf5Handler[b-size:b+size+1,a-size:a+size+1,self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(1).mean(0)
+				#else:
+			#		r = self.rois[-1]
+
+				#	summ = np.zeros(self.SequenceDisplay.optionsDlg.frameOptions.lastFrame-self.SequenceDisplay.optionsDlg.frameOptions.firstFrame,dtype = np.float)
+				#	for j in r.pointMap:
+				#		summ=summ+self.SequenceDisplay.tiffSequence.hdf5Handler[j[1],j[0],self.SequenceDisplay.optionsDlg.frameOptions.firstFrame:self.SequenceDisplay.optionsDlg.frameOptions.lastFrame].mean(0)
+				#		
+				#	trace  = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)	
+					
+					self.SequenceDisplay.roiAnal.makePlot(trace)
+				except:
+					pass
 
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":

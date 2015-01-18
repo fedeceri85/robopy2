@@ -208,7 +208,16 @@ class Sequence:
 			
 	def loadFrameInCache(self, n):
 		if self.arraySequence is not None:
-			self.cachedFrames[n] = self.arraySequence[:,:,self.framesDict(n)].copy()
+			img = self.arraySequence[:,:,self.framesDict(n)].copy()
+			if self.options['zproject']!=1:
+				imgs = [img,]
+				for i in xrange(1,self.options['zproject'] -1 ):
+					try:
+						imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i))).copy()
+					except:
+						pass
+				img = np.array(imgs).mean(0)
+			self.cachedFrames[n] = img#self.arraySequence[:,:,self.framesDict(n)].copy()
 		else:
 			img = self.getRawImage(self.framesDict[n])
 			img = self.applyOptions(img)
@@ -225,7 +234,16 @@ class Sequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			return self.arraySequence[:, :, self.framesDict[n]]#.copy()
+			img = self.arraySequence[:, :, self.framesDict[n]]
+			if self.options['zproject']!=1:
+				imgs = [img,]
+				for i in xrange(1,self.options['zproject'] -1 ):
+					try:
+						imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
+					except:
+						pass
+				img = np.array(imgs).mean(0)
+			return img
 		else:
 			
 

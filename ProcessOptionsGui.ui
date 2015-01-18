@@ -186,6 +186,19 @@
            </item>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
@@ -209,6 +222,19 @@
             <number>99999</number>
            </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>
@@ -241,6 +267,59 @@
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_24">
+         <item>
+          <widget class="QLabel" name="referenceFramesLabel_3">
+           <property name="text">
+            <string>Progressive differences</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="progressiveDiffSpinBox">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
@@ -257,6 +336,9 @@
         </spacer>
        </item>
       </layout>
+      <zorder>referenceFramesLabel_3</zorder>
+      <zorder>progressiveDiffSpinBox</zorder>
+      <zorder>referenceFramesLabel_3</zorder>
      </widget>
      <widget class="QWidget" name="timeOptionsTab">
       <attribute name="title">
@@ -299,7 +381,7 @@
            <rect>
             <x>10</x>
             <y>30</y>
-            <width>327</width>
+            <width>347</width>
             <height>82</height>
            </rect>
           </property>
@@ -901,7 +983,7 @@
         <rect>
          <x>30</x>
          <y>20</y>
-         <width>286</width>
+         <width>316</width>
          <height>27</height>
         </rect>
        </property>

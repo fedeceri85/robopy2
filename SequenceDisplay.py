@@ -25,7 +25,7 @@ from SaveRawSequenceOptions import SaveRawSequenceOptions
 from SequenceProcessor import ProcessedSequence
 import Plugins
 from scipy.misc import imsave
-#from  roiAnalysis import MainWindow as rMW
+from  roiAnalysis2 import MainWindow as rMW
 from scipy.io import savemat,loadmat
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
