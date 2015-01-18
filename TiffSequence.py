@@ -347,6 +347,31 @@ class Sequence:
 			self.framesDict = dict(zip(range(len(newtimes)),list(self.origFramesDict.values()[:-n])))
 			self.movingAverage = True
 
+	def computeRois(self,firstIndex = None, lastIndex = None):
+		if firstIndex == None:
+			firstIndex = 0
+		if lastIndex == None:
+			lastIndex = self.getFrames()
+			
+		roiProfile = zeros((lastIndex-firstIndex,len(self.rois)),dtype=np.float)
+
+		#if self.options['crop'] or (self.options['rebin'] is not None) or self.options['LineCorrection'] or self.options['rotate']:
+		for ind in xrange(firstIndex,lastIndex):
+			img = self.getFrame(ind)
+			for i,r in enumerate(self.rois):
+				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+				roiProfile[ind-firstIndex,i] = r.computeAverage(img)
+		#else:	
+	#		for i,r in enumerate(self.rois):
+	#				#print str(ind) + " " + str(i) + " " + str(lastIndex)
+	#				summ = np.zeros(lastIndex-firstIndex,dtype = np.float)
+	#				for j in r.pointMap:
+	#					summ=summ+self.hdf5Handler[j[1],j[0],firstIndex:lastIndex].mean(0)
+						
+	#				roiProfile[:,i] = (1.0*summ)/len(r.pointMap)#r.computeAverage(img)		
+			
+
+		return roiProfile
 
 class TiffSequence(Sequence):
 	def __init__(self, fNames,options = None):
@@ -631,13 +656,13 @@ class RawSequence(Sequence):
 		#self.tifHandlers = list()	
 		#self.hdf5Handler = None
 		Sequence.__init__(self,fNames,options)
-		folder = split(fNames[0])[0]
+		self.folder = split(fNames[0])[0]
 
-		print join(folder,'Experiment.xml')
+
 
 		try:
-			folder = split(fNames[0])[0]
-			frames, width,height = fromThorlabsXMLInfo(join(folder,'Experiment.xml'))
+			#folder = split(fNames[0])[0]
+			frames, width,height = fromThorlabsXMLInfo(join(self.folder,'Experiment.xml'))
 		except:
 			print("Can't read xml file")
 			height,width,frames = 0,0,1
@@ -654,9 +679,7 @@ class RawSequence(Sequence):
 		self.height=height
 		self.frames=frames 
 		self.frameSize = width*height*2
-		print frames
-		print height
-		print width
+		
 		self.origWidth = self.width 
 		self.origHeight = self.height
 		self.origFrames = self.frames
@@ -675,8 +698,16 @@ class RawSequence(Sequence):
 
 	def initTimesDict(self):
 		#TODO
-		kv = range(self.frames)	
-		self.timesDict = dict(zip(kv,kv))
+		kv = range(self.frames)
+		try:
+			
+			times = np.loadtxt(join(self.folder,'timing.txt'))
+			self.timesDict = TimesDict(zip(kv,times))
+			self.timesDict.label = 's'
+		except:
+			print("Cannot read times")
+			self.timesDict = TimesDict(zip(kv,kv))
+			self.timesDict.label = 'Frames'
 
 		self.framesDict = dict(zip(kv,kv))
 		self.origTimesDict = copy(self.timesDict)

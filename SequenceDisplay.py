@@ -433,7 +433,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def updateCurrentFrame(self):
 		if self.getViewType() ==0:
 
-			if self.currentImage == None:
+			if self.currentImage is None:
 				self.FrameImage, self.FrameData = self.getSequenceFrame(self.CurrentShownFrame)
 			else:
 				self.FrameImage, self.FrameData = self.loadImageGray(self.currentImage)
@@ -508,7 +508,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		
 		
-		if im == None:
+		if im is None:
 			return None
 			
 
@@ -733,7 +733,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.IsPlaying = False
 				
 	def imageNewMousePosition(self, x, y):
-		if self.FrameData != None:
+		if self.FrameData is not None:
 			imy, imx = self.FrameData.shape
 			if imy > y and y >= 0 and imx > x and x >= 0:
 				self.showStatusMessage(str(x) + ":" + str(y) + "=" + str(self.FrameData[y][x]))
