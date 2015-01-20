@@ -711,7 +711,7 @@ class ImageDisplayWidget(QGLWidget):
 							i.rotate(-pi/18.0)
 						else:
 							i.rotate(pi/18.0)
-
+						i.computePointMap()
 						self.updateGL()
 
 

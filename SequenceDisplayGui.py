@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Wed Jan 14 18:57:32 2015
+# Created: Tue Jan 20 19:25:08 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -216,6 +216,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionCompute_Rois.setObjectName(_fromUtf8("actionCompute_Rois"))
         self.actionComputeRois_from_list = QtGui.QAction(SequenceDisplayWnd)
         self.actionComputeRois_from_list.setObjectName(_fromUtf8("actionComputeRois_from_list"))
+        self.actionRoi_scale_factor = QtGui.QAction(SequenceDisplayWnd)
+        self.actionRoi_scale_factor.setObjectName(_fromUtf8("actionRoi_scale_factor"))
         self.menuDatabase.addSeparator()
         self.menuDatabase.addAction(self.actionNew_Database)
         self.menuDatabase.addAction(self.actionOpen_Existing_Database)
@@ -237,6 +239,8 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.addAction(self.actionRoi_monitor)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.menuDatabase.menuAction())
+        self.menuRois.addSeparator()
+        self.menuRois.addAction(self.actionRoi_scale_factor)
         self.menuMath_2.addAction(self.actionAdd)
         self.menuMath_2.addAction(self.actionSubtract)
         self.menuMath_2.addAction(self.actionDivide)
@@ -318,4 +322,5 @@ class Ui_SequenceDisplayWnd(object):
         self.actionRemove_current_dataset.setText(_translate("SequenceDisplayWnd", "Remove current dataset", None))
         self.actionCompute_Rois.setText(_translate("SequenceDisplayWnd", "Compute Rois", None))
         self.actionComputeRois_from_list.setText(_translate("SequenceDisplayWnd", "ComputeRois from list", None))
+        self.actionRoi_scale_factor.setText(_translate("SequenceDisplayWnd", "Roi scale factor", None))
 

@@ -220,6 +220,8 @@
     <addaction name="actionRoi_monitor"/>
     <addaction name="separator"/>
     <addaction name="menuDatabase"/>
+    <addaction name="separator"/>
+    <addaction name="actionRoi_scale_factor"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -441,6 +443,11 @@
   <action name="actionComputeRois_from_list">
    <property name="text">
     <string>ComputeRois from list</string>
+   </property>
+  </action>
+  <action name="actionRoi_scale_factor">
+   <property name="text">
+    <string>Roi scale factor</string>
    </property>
   </action>
  </widget>

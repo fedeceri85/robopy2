@@ -62,6 +62,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.makeConnections()
 		self.show()
 		self.tiffFiles = files
+		self.folder = os.path.split(files[0])[0]
 		self.loadInRam = loadInRam
 		#self.worker = Worker(self, self.tiffLoad, self, True)
 		#self.worker.connect(self.worker, SIGNAL("jobDone()"), self, SLOT("tiffLoadFinished()"))
@@ -219,6 +220,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionRemove_frames, SIGNAL("triggered()"), self.removeFrames)
 			
 		self.connect(self.actionSpecify_interframe_interval, SIGNAL("triggered()"), self.specify_interframe_interval)
+		self.connect(self.actionRoi_scale_factor, SIGNAL("triggered()"), self.roiscaleFactor)
 
 		##DATABASE
 		self.connect(self.actionNew_Database,SIGNAL("triggered()"),self.createNewDatabase)
@@ -965,6 +967,17 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		roiFile = fname.toAscii().data()
 		#rois = SequenceProcessor.saveRoisToFile(roiFile,self.imWidget.rois, self.displayParameters.roiProfile, self.tiffSequence.timesDict.times())
 		self.processedSequence.saveRoisToFile(roiFile)
+
+	def roiscaleFactor(self):
+		number, ok = PyQt4.QtGui.QInputDialog.getDouble(self, 'Set Scale Factor','Scale Factor:',1)
+ 		if ok:
+			for i,roi in enumerate(self.imWidget.rois):
+				roi.scale(number)
+				roi.computePointMap()
+				#self.tiffSequence.rois[i].scale(number)
+				#self.processedWidget.rois[i].scale(number)
+		self.imWidget.updateGL()
+		self.processedWidget.updateGL()
 		
 	def forceRoiRecomputation(self):
 		self.displayParameters.roiAverageRecomputeNeeded = True

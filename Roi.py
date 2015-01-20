@@ -67,6 +67,10 @@ class Roi(QPolygon):
 			v1= np.dot(mat,v) + np.array([x,y])
 			self.setPoint(i,QPoint(int(round(v1[0])),int(round(v1[1]))))
 
+	def scale(self,factor=1):
+		for i,p in enumerate(self):
+			self.setPoint(i,QPoint(int(round(p.x()*factor)),int(round(p.y()*factor))))
+
 	def isPointInRoi(self,point):
 		pt = QPoint(point[0],point[1])
 		return self.containsPoint(pt,Qt.OddEvenFill)
