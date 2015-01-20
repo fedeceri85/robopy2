@@ -9,6 +9,11 @@ import tables as tb
 from scipy.misc import imrotate
 import xml.etree.ElementTree as xet
 from copy import copy
+try:
+	from progress import progress
+	showProgress = True
+except:
+	showProgress = False
 #from pubTools import oneColumnFigure
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
@@ -492,20 +497,35 @@ class TiffSequence(Sequence):
 		count = 0
 		if framesInd is None:
 			framesInd = range(sequence.frames)
-		for i in framesInd:
-			th.SetField(256, sequence.width)
-			th.SetField(257, sequence.height)
-			th.SetField(277, 1) #phtometric interpretation black is minimum
-			th.SetField(258, 16) #bits per sample
-			th.SetField(262, 1) #samples per pixel
-			
-			th.write_image(sequence.getFrame(i), "lzw", False)
-			if getsize(f)>2.274032144*1E9:
-				count = count +1 
-				fname2,ext = splitext(str(f))
-				f = fname2+'_part'+str(count).zfill(2)+ext
-				th = TIFF.open(f,'w')
+		if showProgress:
+			for i in progress(framesInd,"Saving...","Cancel"):
+				th.SetField(256, sequence.width)
+				th.SetField(257, sequence.height)
+				th.SetField(277, 1) #phtometric interpretation black is minimum
+				th.SetField(258, 16) #bits per sample
+				th.SetField(262, 1) #samples per pixel
 				
+				th.write_image(sequence.getFrame(i), "lzw", False)
+				if getsize(f)>2.274032144*1E9:
+					count = count +1 
+					fname2,ext = splitext(str(f))
+					f = fname2+'_part'+str(count).zfill(2)+ext
+					th = TIFF.open(f,'w')
+		else:
+			for i in framesInd:
+				th.SetField(256, sequence.width)
+				th.SetField(257, sequence.height)
+				th.SetField(277, 1) #phtometric interpretation black is minimum
+				th.SetField(258, 16) #bits per sample
+				th.SetField(262, 1) #samples per pixel
+				
+				th.write_image(sequence.getFrame(i), "lzw", False)
+				if getsize(f)>2.274032144*1E9:
+					count = count +1 
+					fname2,ext = splitext(str(f))
+					f = fname2+'_part'+str(count).zfill(2)+ext
+					th = TIFF.open(f,'w')
+		
 	def openWriteSequence(self, f):
 		th = TIFF.open(str(f), 'w')
 		return th
@@ -588,13 +608,23 @@ class HDF5Sequence(Sequence):
 
 
 		x = h5file.createEArray(root,'x',atom,shape=(sequence.getHeight(),sequence.getWidth(),0),expectedrows=sequence.frames,filters = filters)
-		for i in framesInd:		
-			data = sequence.getFrame(i)
-			
-			try: 
-				x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
-			except ValueError: 
-				print("Can't add frame "+str(i)+". Wrong dimensions?")
+		
+		if showProgress:
+			for i in progress(framesInd,"Saving...","Cancel"):		
+				data = sequence.getFrame(i)
+				
+				try: 
+					x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
+				except ValueError: 
+					print("Can't add frame "+str(i)+". Wrong dimensions?")
+		else:
+			for i in framesInd:		
+				data = sequence.getFrame(i)
+				
+				try: 
+					x.append(data.reshape((sequence.getHeight(),sequence.getWidth(),1)))
+				except ValueError: 
+					print("Can't add frame "+str(i)+". Wrong dimensions?")
 
 		tGroup = h5file.createGroup(root,'times')
 

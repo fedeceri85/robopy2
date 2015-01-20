@@ -27,7 +27,7 @@ import Plugins
 from scipy.misc import imsave
 from  roiAnalysis import MainWindow as rMW
 from scipy.io import savemat,loadmat
-
+from progress import progress
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -788,7 +788,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			#	self.displayParameters.roiProfile[:, 0:nrois] = self.tiffSequence.computeRois()	
 
 			#else:	
-			for i in xrange(ff, lf, 100):
+			for i in progress(xrange(ff, lf, 100),"Computing rois...","Cancel"):
 				tlf = i + 100
 				if tlf > lf:
 					tlf = lf
@@ -974,8 +974,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			for i,roi in enumerate(self.imWidget.rois):
 				roi.scale(number)
 				roi.computePointMap()
+
 				#self.tiffSequence.rois[i].scale(number)
 				#self.processedWidget.rois[i].scale(number)
+
 		self.imWidget.updateGL()
 		self.processedWidget.updateGL()
 		
