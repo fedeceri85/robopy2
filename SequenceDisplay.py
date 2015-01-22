@@ -12,8 +12,8 @@ from SequenceDisplayGui import Ui_SequenceDisplayWnd
 from ImageDisplayWidget import ImageDisplayWidget
 from TiffSequence import TiffSequence, HDF5Sequence,TimesDict,RawSequence
 import SequenceProcessor
-from mplot import MPlot
-
+#from mplot import MPlot
+from plotWindow import plotWindow
 from ProcessOptions import ProcessOptions
 from Worker import Worker
 
@@ -72,6 +72,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.drawnRois = []
 		#Load plugins
 		self.plugins=[]
+		self.fig = None
+
 		#self.emit(SIGNAL("startWorkerJob()"))
 		
 		for i in Plugins.getPlugins():
@@ -808,15 +810,18 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		if showplot:
-			try:
-				self.fig.close()
-			except:
-				pass
-			fig = MPlot(self)
-			fig.plot(times,rdata,linewidth=0.3)
-			fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
-			fig.show()
-			self.fig = fig
+			if self.fig is None:
+				self.fig = plotWindow()
+			# fig = MPlot(self)
+			# fig.plot(times,rdata,linewidth=0.3)
+			# fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
+			# fig.show()
+			colors = []
+			for roi in self.tiffSequence.rois:
+				colors.append(roi.color.getRgb())
+
+			self.fig.plot(times,rdata,xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors)
+
 		return times,rdata
 	
 	def computeRoisFromListCb(self):
@@ -835,16 +840,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				out.append(map(int,piece)[0]-1)
 
 		times,rdata = self.computeRoisCb(False)
-		try:
-			self.fig.close()
-		except:
-			pass
-		fig = MPlot(self)
-		fig.plot(times,rdata[:,out],linewidth=0.3)
-		fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
-		fig.show()
-		self.fig = fig
-	
+		if self.fig is None:
+			self.fig = plotWindow()
+		
+		# fig = MPlot(self)
+		# fig.plot(times,rdata,linewidth=0.3)
+		# fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
+		# fig.show()
+		colors = []
+		for roi in self.tiffSequence.rois:
+			colors.append(roi.color.getRgb())
+		colors2 = [colors[i] for i in out ]
+		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors2)
+
+
 	def showNextRoi(self):
 		if self.currentShownRoi+1< len(self.tiffSequence.rois):
 			self.currentShownRoi = self.currentShownRoi + 1 
@@ -1017,7 +1026,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		opt = self.aviOptions
 		aviWriter = AviWriter(opt["fname"], (opt["height"], opt["width"]), opt["fps"])
 		totalFrames = int(round((opt["lastFrame"] - opt["firstFrame"]+1)/step))
-		for i in range(opt["firstFrame"]-1, opt["lastFrame"],step):
+		for i in progress(range(opt["firstFrame"]-1, opt["lastFrame"],step)):
 			data = self.getSequenceFrameAsRgb(i,drawRois=True)
 
 			h,w,k,z = data.shape

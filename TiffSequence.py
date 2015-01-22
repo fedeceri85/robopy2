@@ -206,22 +206,32 @@ class Sequence:
 
 	def loadWholeTiff(self):
 		self.arraySequence = zeros((self.height,self.width,self.frames),dtype=np.uint16)
-		for index in xrange(self.frames):
-			img = self.getRawImage(self.framesDict[index])
-			img = self.applyOptions(img)
-			self.arraySequence[:,:,self.framesDict[index]] = img
+		if showProgress:
+			for index in progress(xrange(self.frames),"Loading file","Cancel"):
+				img = self.getRawImage(self.framesDict[index])
+				img = self.applyOptions(img)
+				self.arraySequence[:,:,self.framesDict[index]] = img
 			
+		else:
+
+			for index in xrange(self.frames):
+				img = self.getRawImage(self.framesDict[index])
+				img = self.applyOptions(img)
+				self.arraySequence[:,:,self.framesDict[index]] = img
+				
 	def loadFrameInCache(self, n):
 		if self.arraySequence is not None:
-			img = self.arraySequence[:,:,self.framesDict(n)].copy()
+			img = self.arraySequence[:,:,self.framesDict[n]].copy()
 			if self.options['zproject']!=1:
-				imgs = [img,]
-				for i in xrange(1,self.options['zproject'] -1 ):
-					try:
-						imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i))).copy()
-					except:
-						pass
-				img = np.array(imgs).mean(0)
+				img = self.arraySequence[:,:,self.framesDict[n]:self.framesDict[n]+self.options['zproject']].mean(2)
+
+				# imgs = [img,]
+				# for i in xrange(1,self.options['zproject'] -1 ):
+				# 	try:
+				# 		imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i))).copy()
+				# 	except:
+				# 		pass
+				# img = np.array(imgs).mean(0)
 			self.cachedFrames[n] = img#self.arraySequence[:,:,self.framesDict(n)].copy()
 		else:
 			img = self.getRawImage(self.framesDict[n])
@@ -241,13 +251,14 @@ class Sequence:
 		if self.arraySequence is not None:
 			img = self.arraySequence[:, :, self.framesDict[n]]
 			if self.options['zproject']!=1:
-				imgs = [img,]
-				for i in xrange(1,self.options['zproject'] -1 ):
-					try:
-						imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
-					except:
-						pass
-				img = np.array(imgs).mean(0)
+				img = self.arraySequence[:,:,self.framesDict[n]:self.framesDict[n]+self.options['zproject']].mean(2)
+				# imgs = [img,]
+				# for i in xrange(1,self.options['zproject'] -1 ):
+				# 	try:
+				# 		imgs.append(self.applyOptions(self.getRawImage(self.framesDict[n]+i)))
+				# 	except:
+				# 		pass
+				# img = np.array(imgs).mean(0)
 			return img
 		else:
 			
