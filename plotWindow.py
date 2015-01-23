@@ -10,7 +10,7 @@ import sys
 class plotWindow(pg.GraphicsWindow):
     
     
-      def __init__(self, parent=None):
+	def __init__(self, parent=None):
 		pg.setConfigOptions(antialias=True)
 		pg.setConfigOption('background', 'w')
 		pg.setConfigOption('foreground', 'k')
@@ -35,37 +35,41 @@ class plotWindow(pg.GraphicsWindow):
 
 		self.p8 = self.addPlot(title="Region Selection")
 		pl8 = self.p8.plot()#data2, pen=(255,255,255,200))
-		lr = pg.LinearRegionItem([0,10])
-		lr.setZValue(-10)
-		self.p8.addItem(lr)
+
 		self.nextRow()
 
 		self.p9 = self.addPlot(title="Zoom on selected region")
 		pl9 = self.p9.plot()
-		def updatePlot():
-		    self.p9.setXRange(*lr.getRegion(), padding=0)
-		def updateRegion():
-		    lr.setRegion(self.p9.getViewBox().viewRange()[0])
-		lr.sigRegionChanged.connect(updatePlot)
-		self.p9.sigXRangeChanged.connect(updateRegion)
-		updatePlot()
+
+
 		self.show()
 
-      def plot(self,x,y,xlabel='',ylabel='',colors = None):
-      	self.p8.clear()
-      	self.p9.clear()
-      	for i in xrange(y.shape[1]):
+	def updatePlot(self):
+	    self.p9.setXRange(*self.lr.getRegion(), padding=0)
+
+	def updateRegion(self):
+	    self.lr.setRegion(self.p9.getViewBox().viewRange()[0])
+	def plot(self,x,y,xlabel='',ylabel='',colors = None):
+		self.p8.clear()
+		self.p9.clear()
+		self.lr = pg.LinearRegionItem([0,10])
+		self.lr.setZValue(-10)
+		self.p8.addItem(self.lr)
+		self.lr.sigRegionChanged.connect(self.updatePlot)
+		self.p9.sigXRangeChanged.connect(self.updateRegion)
+		self.updatePlot()
+		for i in xrange(y.shape[1]):
 			if colors is not None:
 				color = colors[i]
 			else:
 				color = [255,255,255,255]
 			self.p8.plot(x,y[:,i],pen=color)#, pen=(255,255,255,200))
 			self.p9.plot(x,y[:,i],pen=color)#, pen=(255,255,255,200))
-			self.p8.setLabel('left',ylabel)
-			self.p8.setLabel('bottom',xlabel)
-			self.p9.setLabel('left',ylabel)
-			self.p9.setLabel('bottom',xlabel)
-            #self.lplt.plot(np.arange(size(y)),y, clear=True, _callSync='off')  ## We do not expect a return value.
+		self.p8.setLabel('left',ylabel)
+		self.p8.setLabel('bottom',xlabel)
+		self.p9.setLabel('left',ylabel)
+		self.p9.setLabel('bottom',xlabel)
+	    #self.lplt.plot(np.arange(size(y)),y, clear=True, _callSync='off')  ## We do not expect a return value.
 
 
 
