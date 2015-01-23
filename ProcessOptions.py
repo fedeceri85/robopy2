@@ -243,6 +243,8 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('roiSameSize', d['roiSameSize'], self.roiSameSizeCheckBox)
 			fo.add('roiSize',d['roiSize'],self.roiSizeSpinBox)
 			fo.add('lockRoiPositions',d['lockRoiPositions'],self.lockRoiPositionCheckBox)
+			fo.add('scaleBarsCheckBox',d['scaleBarsCheckBox'],self.scaleBarsCheckBox)
+
 		except:
 			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
 			fo.add('semicircularRois',0, self.semicircularRoisCheckBox)
@@ -250,6 +252,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('roiSameSize', 0, self.roiSameSizeCheckBox)
 			fo.add('roiSize',0,self.roiSizeSpinBox)
 			fo.add('lockRoiPositions',0,self.lockRoiPositionCheckBox)
+			fo.add('scaleBarsCheckBox',0,self.scaleBarsCheckBox)
 
 		return fo
 

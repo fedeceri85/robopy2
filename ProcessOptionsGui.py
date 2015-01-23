@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Sun Jan 18 15:00:53 2015
+# Created: Fri Jan 23 19:26:51 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -487,6 +487,9 @@ class Ui_ProcessOptionsDlg(object):
         self.freehandRoisCheckBox.setGeometry(QtCore.QRect(30, 70, 119, 21))
         self.freehandRoisCheckBox.setObjectName(_fromUtf8("freehandRoisCheckBox"))
         self.buttonGroup.addButton(self.freehandRoisCheckBox)
+        self.scaleBarsCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.scaleBarsCheckBox.setGeometry(QtCore.QRect(30, 180, 191, 21))
+        self.scaleBarsCheckBox.setObjectName(_fromUtf8("scaleBarsCheckBox"))
         self.PO_TabWidget.addTab(self.RoiOptionsTab, _fromUtf8(""))
         self.verticalLayout.addWidget(self.PO_TabWidget)
 
@@ -557,5 +560,6 @@ class Ui_ProcessOptionsDlg(object):
         self.lockRoiPositionCheckBox.setText(_translate("ProcessOptionsDlg", "Lock roi relative positions", None))
         self.semicircularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Semicircular Rois", None))
         self.freehandRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Freehand Rois", None))
+        self.scaleBarsCheckBox.setText(_translate("ProcessOptionsDlg", "Use scalebars", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.RoiOptionsTab), _translate("ProcessOptionsDlg", "Roi Options", None))
 

@@ -336,9 +336,6 @@
         </spacer>
        </item>
       </layout>
-      <zorder>referenceFramesLabel_3</zorder>
-      <zorder>progressiveDiffSpinBox</zorder>
-      <zorder>referenceFramesLabel_3</zorder>
      </widget>
      <widget class="QWidget" name="timeOptionsTab">
       <attribute name="title">
@@ -1071,6 +1068,19 @@
        <attribute name="buttonGroup">
         <string notr="true">buttonGroup</string>
        </attribute>
+      </widget>
+      <widget class="QCheckBox" name="scaleBarsCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>180</y>
+         <width>191</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Use scalebars</string>
+       </property>
       </widget>
      </widget>
     </widget>

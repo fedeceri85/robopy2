@@ -750,12 +750,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.currentImage = SequenceProcessor.computeAverage(self.tiffSequence,framesInd)
 		self.loadImageGray(self.currentImage)
 		self.updateDisplay()
-		fig = MPlot(self)
-		fig.imshow(self.currentImage)
-		fig.show()
+		# fig = MPlot(self)
+		# fig.imshow(self.currentImage)
+		# fig.show()
 		fname = os.path.splitext(self.tiffFiles[0])[0]+'_average.tif'
 		imsave(fname,self.currentImage)
-		fig.close()
+		# fig.close()
 
 	def backProjCb(self):
 		
@@ -766,12 +766,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.currentImage = SequenceProcessor.computeMax(self.tiffSequence,framesInd)
 		self.loadImageGray(self.currentImage)
 		self.updateDisplay()
-		fig = MPlot(self)
-		fig.imshow(self.currentImage)
-		fig.show()
+		#fig = MPlot(self)
+		#fig.imshow(self.currentImage)
+		#fig.show()
 		fname = os.path.splitext(self.tiffFiles[0])[0]+'_backproj.tif'
 		imsave(fname,self.currentImage)
-		fig.close()
+		#fig.close()
 
 
 	def computeRoisCb(self,showplot=True):
@@ -811,7 +811,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 		if showplot:
 			if self.fig is None:
-				self.fig = plotWindow()
+				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
 			# fig = MPlot(self)
 			# fig.plot(times,rdata,linewidth=0.3)
 			# fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
@@ -820,7 +820,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			for roi in self.tiffSequence.rois:
 				colors.append(roi.color.getRgb())
 
-			self.fig.plot(times,rdata,xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors)
+			self.fig.plot(times,rdata,xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+			self.fig.show()
 
 		return times,rdata
 	
@@ -851,40 +852,32 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		for roi in self.tiffSequence.rois:
 			colors.append(roi.color.getRgb())
 		colors2 = [colors[i] for i in out ]
-		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors2)
-
+		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors2,title=inStr,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+		self.fig.show()
 
 	def showNextRoi(self):
 		if self.currentShownRoi+1< len(self.tiffSequence.rois):
 			self.currentShownRoi = self.currentShownRoi + 1 
 			times,rdata = self.computeRoisCb(False)
-			try:
-				self.fig.close()
-			except:
-				pass
-			fig = MPlot(self)
-			fig.plot(times,rdata[:,self.currentShownRoi],linewidth=0.3)
-			fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
-			fig.show()
-			self.fig = fig
+			if self.fig is None:
+				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
+			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1),scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+
 		else:
 			pass
+		self.fig.show()
 
 	def showPrevRoi(self):
 		if self.currentShownRoi-1>=0 :
 			self.currentShownRoi = self.currentShownRoi - 1 
 			times,rdata = self.computeRoisCb(False)
-			try:
-				self.fig.close()
-			except:
-				pass
-			fig = MPlot(self)
-			fig.plot(times,rdata[:,self.currentShownRoi],linewidth=0.3)
-			fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
-			fig.show()
-			self.fig = fig
+			if self.fig is None:
+				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
+			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1))
+
 		else:
 			pass
+		self.fig.show()
 
 	def deleteRoi(self, n = -1):
 		nRoi = len(self.imWidget.rois)
