@@ -100,7 +100,10 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 		self.timeOptions = self.initTimeOptions()
 		self.displayOptions = self.initDisplayOptions()
 		self.roiOptions = self.initRoiOptions()
-       
+
+		
+
+
 	def sequenceChangedTab(self, idx):
 		self.PO_TabWidget.setCurrentIndex(idx)
 	
@@ -134,26 +137,28 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 
 
 		self.connect(self.ProcessTypeComboBox, SIGNAL("currentIndexChanged(int)"), self.processTypeChangedCb)
-		
 		return fo
 		
 	def processTypeChangedCb(self, value):
-		dispTypeLabels = QStringList()
-		if value == 0:
-			dispTypeLabels.append("F")
-			dispTypeLabels.append("dF")
-			dispTypeLabels.append("dF/F0")
-		else:
-			dispTypeLabels.append("R")
-			dispTypeLabels.append("dR")
-			dispTypeLabels.append("dR/R0")
-		
+		dispTypeLabels = self.getdispTypeLabels()
 		for i in xrange(0,self.DisplayTypeComboBox.count()):	
 			self.DisplayTypeComboBox.setItemText(i, dispTypeLabels[i])
 		
 		self.frameOptions.displayType = 0
 		
 		#print("processTypeChangedCb ")
+	def getdispTypeLabels(self):
+		dispTypeLabels = QStringList()
+		value = self.frameOptions.processType
+		if value == 0:
+			dispTypeLabels.append("F")
+			dispTypeLabels.append("dF")
+			dispTypeLabels.append("dF/F0")
+		elif value == 1:
+			dispTypeLabels.append("R")
+			dispTypeLabels.append("dR")
+			dispTypeLabels.append("dR/R0")
+		return dispTypeLabels
 		
 	def initTimeOptions(self):
 		fo = Properties(self)

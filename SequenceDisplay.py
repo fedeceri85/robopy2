@@ -773,6 +773,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		imsave(fname,self.currentImage)
 		#fig.close()
 
+	def getYlabel(self):
+
+		return str(self.optionsDlg.getdispTypeLabels()[self.optionsDlg.frameOptions.displayType])
 
 	def computeRoisCb(self,showplot=True):
 
@@ -817,10 +820,14 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			# fig.axes.set_xlabel(self.tiffSequence.timesDict.label)
 			# fig.show()
 			colors = []
+
 			for roi in self.tiffSequence.rois:
 				colors.append(roi.color.getRgb())
 
-			self.fig.plot(times,rdata,xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+
+
+			ylabel = self.getYlabel()
+			self.fig.plot(times,rdata,xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
 			self.fig.show()
 
 		return times,rdata
@@ -852,7 +859,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		for roi in self.tiffSequence.rois:
 			colors.append(roi.color.getRgb())
 		colors2 = [colors[i] for i in out ]
-		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=colors2,title=inStr,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+		ylabel = self.getYlabel()
+
+		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=colors2,title=inStr,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
 		self.fig.show()
 
 	def showNextRoi(self):
@@ -861,7 +870,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			times,rdata = self.computeRoisCb(False)
 			if self.fig is None:
 				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
-			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1),scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+
+			ylabel = self.getYlabel()
+			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1),scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
 
 		else:
 			pass
@@ -873,7 +884,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			times,rdata = self.computeRoisCb(False)
 			if self.fig is None:
 				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
-			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = '',colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1))
+
+			ylabel = self.getYlabel()
+			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1))
 
 		else:
 			pass

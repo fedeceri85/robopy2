@@ -1,7 +1,7 @@
 from pyqtgraph.Qt import QtGui, QtCore
-from pyqtgraph.GraphicsObject import *
-from pyqtgraph.GraphicsWidgetAnchor import *
-from pyqtgraph.TextItem import TextItem
+from pyqtgraph import GraphicsObject # import *
+from pyqtgraph import GraphicsWidgetAnchor #import *
+from pyqtgraph import TextItem
 import numpy as np
 from pyqtgraph import functions as fn
 from pyqtgraph import getConfigOption
@@ -33,7 +33,7 @@ class verticalScaleBar(GraphicsObject, GraphicsWidgetAnchor):
         self.bar.setBrush(self.brush)
         self.bar.setParentItem(self)
         
-        self.text = TextItem(text=fn.siFormat(size, suffix=suffix), anchor=(1,0.5))
+        self.text = TextItem(text=fn.siFormat(size, suffix=suffix), anchor=(0.5,1),angle=90,color=(0,0,0))
         self.text.setParentItem(self)
 
     def parentChanged(self):
@@ -49,10 +49,10 @@ class verticalScaleBar(GraphicsObject, GraphicsWidgetAnchor):
         if view is None:
             return
         p1 = view.mapFromViewToItem(self, QtCore.QPointF(0,0))
-        p2 = view.mapFromViewToItem(self, QtCore.QPointF(self.size,0))
-        w = (p2-p1).x()
-        self.bar.setRect(QtCore.QRectF(0,-w,self._width,w))
-        self.text.setPos(0,-w/2.)
+        p2 = view.mapFromViewToItem(self, QtCore.QPointF(0,self.size))
+        w = (p2-p1).y()
+        self.bar.setRect(QtCore.QRectF(0,0,self._width,w))
+        self.text.setPos(0,w/2.)
 
     def boundingRect(self):
         return QtCore.QRectF()

@@ -12,7 +12,7 @@ from verticalScaleBar import verticalScaleBar
 class plotWindow(pg.GraphicsWindow):
     
     
-	def __init__(self, parent=None,scalebar = False):
+	def __init__(self, parent=None,scalebar = True):
 		pg.setConfigOptions(antialias=True)
 		pg.setConfigOption('background', 'w')
 		pg.setConfigOption('foreground', 'k')
@@ -44,27 +44,38 @@ class plotWindow(pg.GraphicsWindow):
 		pl9 = self.p9.plot()
 		vb = self.p8.getViewBox()
 		xsize = vb.viewRange()[0][1] - vb.viewRange()[0][0]
+		ysize = vb.viewRange()[1][1] - vb.viewRange()[1][0]
 		self.scale = pg.ScaleBar(size=round_to_1(xsize/10.0),suffix='s')                                                                                                                                                                   
 		self.scale.setParentItem(vb)
 		self.scale.anchor((0, 1), (1, 1), offset=(-20, -10))
-		self.vscale = pg.verticalScaleBar(size=round_to_1(xsize/10.0),suffix='s')                                                                                                                                                                   
+		self.vscale = verticalScaleBar(size=round_to_1(ysize/5.0),suffix='s')                                                                                                                                                                   
 		self.vscale.setParentItem(vb)
 		self.vscale.anchor((0, 1), (1, 1), offset=(-20, -10))
 		self.p8.sigXRangeChanged.connect(self.updateSB)
+		self.xlabel = ''
+		self.ylabel = ''
+		self.updateSB()
 		self.show()
 
 	def updateSB(self):
 		try:
 			self.scale.scene().removeItem(self.scale)
+			self.vscale.scene().removeItem(self.vscale)
 		except:
 			pass
 		if self.scalebar:
 			vb = self.p8.getViewBox()
 			xsize = vb.viewRange()[0][1] - vb.viewRange()[0][0]
-			self.scale = pg.ScaleBar(size=round_to_1(xsize/10.0),suffix='s')                                                                                                                                                                   
+			ysize = vb.viewRange()[1][1] - vb.viewRange()[1][0]
+
+			self.scale = pg.ScaleBar(size=round_to_1(xsize/10.0),suffix=self.xlabel)                                                                                                                                                                   
 			self.scale.setParentItem(vb)
 			self.scale.anchor((0, 1), (1, 1), offset=(-20, -10))
-
+			self.vscale = verticalScaleBar(size=round_to_1(ysize/5.0),suffix=self.ylabel)                                                                                                                                                                   
+			self.vscale.setParentItem(vb)
+			self.vscale.anchor((0, 1), (1, 1), offset=(-20, -5))
+			self.scale.text.setText(pg.functions.siFormat(round_to_1(xsize/10.0),suffix=self.xlabel),color=(0,0,0))
+	
 	def updatePlot(self):
 	    self.p9.setXRange(*self.lr.getRegion(), padding=0)
 
@@ -100,7 +111,8 @@ class plotWindow(pg.GraphicsWindow):
 		self.p8.setLabel('bottom',xlabel)
 		self.p9.setLabel('left',ylabel)
 		self.p9.setLabel('bottom',xlabel)
-
+		self.xlabel = xlabel
+		self.ylabel = ylabel
 		if scalebars:
 			self.scalebar = True
 
@@ -111,6 +123,8 @@ class plotWindow(pg.GraphicsWindow):
 		else:
 			try:
 				self.scale.scene().removeItem(self.scale)
+				self.vscale.scene().removeItem(self.vscale)
+
 				self.scalebar = False
 			except:
 				pass
