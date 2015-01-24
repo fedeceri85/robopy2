@@ -28,6 +28,7 @@ from scipy.misc import imsave
 from  roiAnalysis import MainWindow as rMW
 from scipy.io import savemat,loadmat
 from progress import progress
+
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
