@@ -895,7 +895,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
 
 			ylabel = self.getYlabel()
-			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1))
+			self.fig.plot(times,rdata[:,self.currentShownRoi].reshape((len(times),1)),xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=[self.tiffSequence.rois[self.currentShownRoi].color.getRgb(),],title = 'Roi '+str(self.currentShownRoi+1),scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
 
 		else:
 			pass
