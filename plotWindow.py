@@ -12,18 +12,19 @@ from verticalScaleBar import verticalScaleBar
 class plotWindow(pg.GraphicsWindow):
     
     
-	def __init__(self, parent=None,scalebar = True):
+	def __init__(self, parent=None,scalebar = True,useViewBox = False):
 		pg.setConfigOptions(antialias=True)
 		pg.setConfigOption('background', 'w')
 		pg.setConfigOption('foreground', 'k')
 		pg.GraphicsWindow.__init__(self)
+		self.useViewBox = useViewBox
 		#win = pg.GraphicsWindow(title="Basic plotting examples")
 		# self.view = pg.PlotWidget(self)
 
 		# self.view = pg.widgets.RemoteGraphicsView.RemoteGraphicsView()
 		#self.view.pg.setConfigOptions(antialias=True)  ## prettier plots at no cost to the main process! 
 		# self.view.setWindowTitle('pyqtgraph example: RemoteSpeedTest')
-		self.resize(800,600)
+		self.resize(800,350)
 		#win.setWindowTitle('pyqtgraph example: Plotting')
 
 		# Enable antialiasing for prettier plots
@@ -32,16 +33,15 @@ class plotWindow(pg.GraphicsWindow):
 		# self.setCentralWidget(self.view)    
 		# self.curve = self.view.plot()
 		self.curve = []
-		x2 = np.linspace(-100, 100, 1000)
-		data2 = np.sin(x2) / x2
 
 		self.p8 = self.addPlot(title="Region Selection")
 		pl8 = self.p8.plot()#data2, pen=(255,255,255,200))
+		if self.useViewBox:
+			self.nextRow()
 
-		self.nextRow()
-
-		self.p9 = self.addPlot(title="Zoom on selected region")
-		pl9 = self.p9.plot()
+			self.p9 = self.addPlot(title="Zoom on selected region")
+			pl9 = self.p9.plot()
+		
 		vb = self.p8.getViewBox()
 		xsize = vb.viewRange()[0][1] - vb.viewRange()[0][0]
 		ysize = vb.viewRange()[1][1] - vb.viewRange()[1][0]
@@ -51,9 +51,12 @@ class plotWindow(pg.GraphicsWindow):
 		self.vscale = verticalScaleBar(size=round_to_1(ysize/5.0),suffix='s')                                                                                                                                                                   
 		self.vscale.setParentItem(vb)
 		self.vscale.anchor((0, 1), (1, 1), offset=(-20, -10))
-		self.p8.sigXRangeChanged.connect(self.updateSB)
+
 		self.xlabel = ''
 		self.ylabel = ''
+		self.marker = pg.InfiniteLine(pos=0,pen = (0,0,0))
+		self.p8.addItem(self.marker)
+		self.p8.sigXRangeChanged.connect(self.updateSB)
 		self.updateSB()
 		self.show()
 
@@ -84,15 +87,18 @@ class plotWindow(pg.GraphicsWindow):
 
 	def plot(self,x,y,xlabel='',ylabel='',colors = None,title = None,scalebars = False):
 		self.p8.clear()
-		self.p9.clear()
-		self.lr = pg.LinearRegionItem([0,10])
-		self.lr.setZValue(-10)
-		self.p8.addItem(self.lr)
-		self.lr.sigRegionChanged.connect(self.updatePlot)
-		self.p9.sigXRangeChanged.connect(self.updateRegion)
+		if self.useViewBox:
+			self.p9.clear()
+			self.lr = pg.LinearRegionItem([0,10])
+			self.lr.setZValue(-10)
+			self.p8.addItem(self.lr)
+			self.lr.sigRegionChanged.connect(self.updatePlot)
+			self.p9.sigXRangeChanged.connect(self.updateRegion)
+			self.updatePlot()
 		
 		self.p8.setTitle(title)
-		self.updatePlot()
+		self.marker = pg.InfiniteLine(pos=0,pen = (0,0,0))
+		self.p8.addItem(self.marker)
 		diff = 0	
 		for i in xrange(y.shape[1]):
 			if colors is not None:
@@ -106,17 +112,19 @@ class plotWindow(pg.GraphicsWindow):
 				else:
 					diff = 0
 			self.p8.plot(x,y[:,i]+diff,pen=color)#, pen=(255,255,255,200))
-			self.p9.plot(x,y[:,i],pen=color)#, pen=(255,255,255,200))
+			if self.useViewBox:
+				self.p9.plot(x,y[:,i],pen=color)#, pen=(255,255,255,200))
 		self.p8.setLabel('left',ylabel)
 		self.p8.setLabel('bottom',xlabel)
-		self.p9.setLabel('left',ylabel)
-		self.p9.setLabel('bottom',xlabel)
+		if self.useViewBox:
+			self.p9.setLabel('left',ylabel)
+			self.p9.setLabel('bottom',xlabel)
 		self.xlabel = xlabel
 		self.ylabel = ylabel
 		if scalebars:
 			self.scalebar = True
 
-			self.updateSB
+			self.updateSB()
 			self.p8.hideAxis('bottom')
 			self.p8.hideAxis('left')
 

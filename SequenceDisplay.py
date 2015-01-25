@@ -675,7 +675,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.blockSignals(True)
 		self.CurrentFrameSpinBox.setValue(self.CurrentShownFrame)
 		self.CurrentFrameSpinBox.blockSignals(False)
-	
+		try:
+			self.fig.marker.setValue(self.tiffSequence.times()[self.CurrentShownFrame])
+		except:
+			pass
+
 	def changeCurrentFrameWidget(self,n):
 		self.CurrentFrameSlider.blockSignals(True)
 		self.CurrentFrameSlider.setValue(n)
@@ -684,7 +688,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.blockSignals(True)
 		self.CurrentFrameSpinBox.setValue(n)
 		self.CurrentFrameSpinBox.blockSignals(False)	
-		
+		try:
+			self.fig.marker.setValue(self.tiffSequence.times()[n])
+		except:
+			pass
+
 	def updateFrameWidgetsRange(self):
 		self.CurrentFrameSlider.blockSignals(True)
 		self.CurrentFrameSlider.setRange(0, self.MaxFrames-1)
