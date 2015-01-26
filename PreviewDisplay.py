@@ -63,7 +63,7 @@ class PreviewDisplay(Ui_PreviewDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		
 		
-		if im == None:
+		if im is None:
 			return None
 			
 

@@ -214,15 +214,15 @@ class Shader():
 			void main() {
 				float v1 = texture2DRect(f1, gl_TexCoord[0].st).g * 65535.0 - float(bck1);
 				float v2 = 0.0;
-				
+				float ratioThresh = 0.1;
 				int f2Clip = 0;
 				
 				if(procType == 1) {
 					v2 = texture2DRect(f2, gl_TexCoord[0].st).g * 65535.0 - float(bck2);
 					if(v2 > 0.0) {
-						v2 = max(v2, 0.0001);
+						v2 = max(v2, ratioThresh);
 					} else {
-						v2 = min(v2, -0.0001);
+						v2 = min(v2, -ratioThresh);
 					}
 					
 					v1 /= v2;
@@ -236,9 +236,9 @@ class Shader():
 					} else {
 						v1 -= r;
 						if(r > 0.0) {
-							r = max(r, 0.0001);
+							r = max(r, ratioThresh);
 						} else {
-							r = min(r, -0.0001);
+							r = min(r, -ratioThresh);
 						}
 					
 						v1 /= r;

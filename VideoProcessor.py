@@ -2,7 +2,7 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4.QtCore import *
-
+import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -10,6 +10,7 @@ from OpenGL.GL.ARB.multitexture import *
 
 import numpy as np
 
+OpenGL.ERROR_CHECKING = False
 '''
 Video processing implemented on a QGLFramebuffer and using GLSL programmin
 '''

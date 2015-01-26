@@ -58,7 +58,6 @@ class plotWindow(pg.GraphicsWindow):
 		self.markerpos = 0
 		self.p8.addItem(self.marker)
 		self.p8.sigXRangeChanged.connect(self.updateSB)
-		vb.enableAutoRange()
 		self.updateSB()
 		self.show()
 
@@ -80,7 +79,8 @@ class plotWindow(pg.GraphicsWindow):
 			self.vscale.setParentItem(vb)
 			self.vscale.anchor((0, 1), (1, 1), offset=(-20, -5))
 			self.scale.text.setText(pg.functions.siFormat(round_to_1(xsize/10.0),suffix=self.xlabel),color=(0,0,0))
-	
+			#vb.autoRange()
+
 	def updatePlot(self):
 	    self.p9.setXRange(*self.lr.getRegion(), padding=0)
 
@@ -125,10 +125,10 @@ class plotWindow(pg.GraphicsWindow):
 		self.ylabel = ylabel
 		if scalebars:
 			self.scalebar = True
-
-			self.updateSB()
 			self.p8.hideAxis('bottom')
 			self.p8.hideAxis('left')
+			self.updateSB()
+
 
 		else:
 			try:
@@ -138,6 +138,8 @@ class plotWindow(pg.GraphicsWindow):
 				self.scalebar = False
 			except:
 				pass
+		vb = self.p8.getViewBox()
+		vb.autoRange()
 	    #self.lplt.plot(np.arange(size(y)),y, clear=True, _callSync='off')  ## We do not expect a return value.
 
 def round_to_1(x):

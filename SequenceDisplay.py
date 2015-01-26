@@ -1144,6 +1144,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.showNextRoi()
 		elif event.key() == Qt.Key_E:
 			self.computeRoisCb(True)
+		elif event.key() == Qt.Key_R:
+			self.computeRoisFromListCb()
+
 
 	def showRoiMonitor(self):
 		self.roiAnal = rMW(self)

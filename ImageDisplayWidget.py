@@ -5,7 +5,7 @@ from PyQt4.QtCore import *
 
 from Shader import Shader
 from VideoProcessor import VideoProcessor
-
+import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -15,6 +15,7 @@ import sys
 import matplotlib
 from math import atan, pi, sqrt,cos,sin
 
+OpenGL.ERROR_CHECKING = False
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
 computer running must be opengl es 2.0 capable
