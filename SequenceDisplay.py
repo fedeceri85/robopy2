@@ -677,6 +677,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.blockSignals(False)
 		try:
 			self.fig.marker.setValue(self.tiffSequence.times()[self.CurrentShownFrame])
+			self.fig.markerpos = self.tiffSequence.times()[self.CurrentShownFrame]
 		except:
 			pass
 
@@ -690,6 +691,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.blockSignals(False)	
 		try:
 			self.fig.marker.setValue(self.tiffSequence.times()[n])
+			self.fig.markerpos = self.tiffSequence.times()[n]
+
 		except:
 			pass
 
@@ -1139,6 +1142,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.showPrevRoi()
 		elif event.key() == Qt.Key_W:
 			self.showNextRoi()
+		elif event.key() == Qt.Key_E:
+			self.computeRoisCb(True)
 
 	def showRoiMonitor(self):
 		self.roiAnal = rMW(self)

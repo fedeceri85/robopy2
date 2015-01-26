@@ -55,8 +55,10 @@ class plotWindow(pg.GraphicsWindow):
 		self.xlabel = ''
 		self.ylabel = ''
 		self.marker = pg.InfiniteLine(pos=0,pen = (0,0,0))
+		self.markerpos = 0
 		self.p8.addItem(self.marker)
 		self.p8.sigXRangeChanged.connect(self.updateSB)
+		vb.enableAutoRange()
 		self.updateSB()
 		self.show()
 
@@ -97,7 +99,7 @@ class plotWindow(pg.GraphicsWindow):
 			self.updatePlot()
 		
 		self.p8.setTitle(title)
-		self.marker = pg.InfiniteLine(pos=0,pen = (0,0,0))
+		self.marker = pg.InfiniteLine(pos=self.markerpos,pen = (0,0,0))
 		self.p8.addItem(self.marker)
 		diff = 0	
 		for i in xrange(y.shape[1]):
