@@ -734,7 +734,7 @@ class RawSequence(Sequence):
 		offset = n * self.frameSize
 		self.rawSequence.seek(offset)
 		st = self.rawSequence.read(self.frameSize)
-		nparray = np.fromstring(st,dtype = np.uint16).reshape((self.width,self.height))
+		nparray = np.fromstring(st,dtype = np.uint16).reshape((self.height,self.width))
 		return nparray
 
 	def initTimesDict(self):

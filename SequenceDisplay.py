@@ -1044,7 +1044,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		opt = self.aviOptions
 		aviWriter = AviWriter(opt["fname"], (opt["height"], opt["width"]), opt["fps"])
 		totalFrames = int(round((opt["lastFrame"] - opt["firstFrame"]+1)/step))
-		for i in progress(range(opt["firstFrame"]-1, opt["lastFrame"],step)):
+		for i in progress(range(opt["firstFrame"]-1, opt["lastFrame"],step),"Saving avi","Cancel"):
 			data = self.getSequenceFrameAsRgb(i,drawRois=True)
 
 			h,w,k,z = data.shape
@@ -1114,9 +1114,10 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			#Try loading the second frame of the nomarski stack (the first one is usually black). If it fails, it may be possible 
 			#that the nomarski is a single image
 			try:
-				self.processedSequence.computeValue(nomarski.getFrame(1))
-			except AttributeError:
 				self.processedSequence.computeValue(nomarski.getFrame(0))
+			except AttributeError,KeyError:
+				print("Can't load nomarski")
+				#self.processedSequence.computeValue(nomarski.getFrame(1))
 				
 	def copyToClipboard(self):
 		self.clipboard.setText(self.tiffSequence.fileName[0])
