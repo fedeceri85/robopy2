@@ -139,7 +139,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 	def paintGL(self):
 		
-		
+		glClearColor(0.2, 0.2, 0.2, 0.0)
 		glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 		
 		

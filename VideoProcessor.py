@@ -302,21 +302,19 @@ class VideoProcessor(QGLFramebufferObject):
                         
                         self.prepareRender(prg)
                         
-                        #mnLoc = prg.uniformLocation("mn")
                         mnLoc = glGetUniformLocation(prg.programId(), "mn")
-                        mxLoc = prg.uniformLocation("mx")
+                        mxLoc = glGetUniformLocation(prg.programId(), "mx")
                         
-                        #prg.setUniformValue(mnLoc, float(mn) / 65535.0)
-                        glUniform1f(mnLoc, float(mn)/65535.0)
-                        prg.setUniformValue(mxLoc, float(mx) / 65535.0)
+                        glUniform1f(mnLoc, float(mn) / 65535.0)
+                        glUniform1f(mxLoc, float(mx) / 65535.0)
                         
-                        rLoc = prg.uniformLocation("r")
-                        gLoc = prg.uniformLocation("g")
-                        bLoc = prg.uniformLocation("b")
+                        rLoc = glGetUniformLocation(prg.programId(), "r")
+                        gLoc = glGetUniformLocation(prg.programId(), "g")
+                        bLoc = glGetUniformLocation(prg.programId(), "b")
                         
-                        prg.setUniformValue(rLoc, r)
-                        prg.setUniformValue(gLoc, g)
-                        prg.setUniformValue(bLoc, b)
+                        glUniform1f(rLoc, r)
+                        glUniform1f(gLoc, g)
+                        glUniform1f(bLoc, b)
                         
                         self.drawTexes(list([tex]), w, h)
                         self.endRender(prg)
@@ -334,20 +332,23 @@ class VideoProcessor(QGLFramebufferObject):
                         
                         self.prepareRender(prg)
                         
-                        hmnLoc = prg.uniformLocation("hmn")
-                        hmxLoc = prg.uniformLocation("hmx")
-                        mnLoc = prg.uniformLocation("mn")
-                        mxLoc = prg.uniformLocation("mx")
-			gammahLoc = prg.uniformLocation("gammah")
-                        hcutoffLoc = prg.uniformLocation("hcutoff")
-			prg.setUniformValue(hmnLoc, float(hmn))
-                        prg.setUniformValue(hmxLoc, float(hmx))
-                        prg.setUniformValue(mnLoc, float(mn))
-                        prg.setUniformValue(mxLoc, float(mx))
-                        prg.setUniformValue(hcutoffLoc,float(hcutoff))
-			prg.setUniformValue(gammahLoc, float(gammah))
-                        prg.setUniformValue("view1", 0)
-                        prg.setUniformValue("bckView", 1)
+                        hmnLoc = glGetUniformLocation(prg.programId(), "hmn")
+                        hmxLoc = glGetUniformLocation(prg.programId(), "hmx")
+                        mnLoc = glGetUniformLocation(prg.programId(), "mn")
+                        mxLoc = glGetUniformLocation(prg.programId(), "mx")
+                        gammahLoc = glGetUniformLocation(prg.programId(), "gammah")
+                        hcutoffLoc = glGetUniformLocation(prg.programId(), "hcutoff")
+                        view1Loc = glGetUniformLocation(prg.programId(), "view1")
+                        bckViewLoc = glGetUniformLocation(prg.programId(), "bckView")
+                        
+                        glUniform1f(hmnLoc, float(hmn))
+                        glUniform1f(hmxLoc, float(hmx))
+                        glUniform1f(mnLoc, float(mn))
+                        glUniform1f(mxLoc, float(mx))
+                        glUniform1f(hcutoffLoc,float(hcutoff))
+                        glUniform1f(gammahLoc, float(gammah))
+                        glUniform1i(view1Loc, 0)
+                        glUniform1i(bckViewLoc, 1)
                         
                         self.drawTexes(list([tex, valTex]), w, h)
                         self.endRender(prg)
@@ -358,51 +359,46 @@ class VideoProcessor(QGLFramebufferObject):
                         
                         #print("processFluorescence params: " + str(w) + ", " + str(h) + ", " + str(pType) + ", " + str(dType) + ", " + str(bck1) + ", " + str(bck2))
                         
-                        pTypeLoc = prg.uniformLocation("procType")
-                        dTypeLoc = prg.uniformLocation("dispType")
-                        bck1Loc = prg.uniformLocation("bck1")
-                        bck2Loc = prg.uniformLocation("bck2")
+                        pTypeLoc = glGetUniformLocation(prg.programId(), "procType")
+                        dTypeLoc = glGetUniformLocation(prg.programId(), "dispType")
+                        bck1Loc = glGetUniformLocation(prg.programId(), "bck1")
+                        bck2Loc = glGetUniformLocation(prg.programId(), "bck2")
                         if pTypeLoc != -1:
-                                prg.setUniformValue(pTypeLoc, int(pType))
+                                glUniform1i(pTypeLoc, int(pType))
                         else:
                                 print("pType not used!")
                         
                         if dTypeLoc != -1:
-                                prg.setUniformValue(dTypeLoc, int(dType))
+                                glUniform1i(dTypeLoc, int(dType))
                         else:
                                 print("dTypeLoc not used!")
                         
                         if bck1Loc != -1:
-                                prg.setUniformValue(bck1Loc, float(bck1))
+                                glUniform1f(bck1Loc, float(bck1))
                         else:
                                 print("bck1Loc not used!")
                         
                         if bck2Loc != -1:
-                                prg.setUniformValue(bck2Loc, float(bck2))
+                                glUniform1f(bck2Loc, float(bck2))
                         else:
                                 print("bck2Loc not used!")
                         
-                        #prg.setUniformValue("procType", pType)
-                        #prg.setUniformValue("dispType", dType)
-                        #prg.setUniformValue("bck1", bck1)
-                        #prg.setUniformValue("bck2", bck2)
-                        
-                        f1Loc = prg.uniformLocation("f1")
-                        f2Loc = prg.uniformLocation("f2")
-                        refLoc = prg.uniformLocation("ref")
+                        f1Loc = glGetUniformLocation(prg.programId(), "f1")
+                        f2Loc = glGetUniformLocation(prg.programId(), "f2")
+                        refLoc = glGetUniformLocation(prg.programId(), "ref")
                         
                         if f1Loc != -1:
-                                prg.setUniformValue("f1", 0)
+                                glUniform1i(f1Loc, 0)
                         else:
                                 print("f1Loc not used!")
                         
                         if f2Loc != -1:
-                                prg.setUniformValue("f2", 1)
+                                glUniform1i(f2Loc, 1)
                         else:
                                 print("f2Loc not used!")
                         
                         if refLoc != -1:
-                                prg.setUniformValue("ref", 2)
+                                glUniform1i(refLoc, 2)
                         else:
                                 print("refLoc not used!")
                         
@@ -413,14 +409,15 @@ class VideoProcessor(QGLFramebufferObject):
                 if self.isValid():
                         self.prepareRender(prg)
                         
-                        mnLoc = prg.uniformLocation("mapMn")
-                        mxLoc = prg.uniformLocation("mapMx")
-			gammahLoc = prg.uniformLocation("gammah")
-                        prg.setUniformValue(mnLoc, float(imMin))
-                        prg.setUniformValue(mxLoc, float(imMax))
-			prg.setUniformValue(gammahLoc, float(gammah))
+                        mnLoc = glGetUniformLocation(prg.programId(), "mapMn")
+                        mxLoc = glGetUniformLocation(prg.programId(), "mapMx")
+                        gammahLoc = glGetUniformLocation(prg.programId(), "gammah")
+                        f1Loc = glGetUniformLocation(prg.programId(), "f1")
+                        glUniform1f(mnLoc, float(imMin))
+                        glUniform1f(mxLoc, float(imMax))
+                        glUniform1f(gammahLoc, float(gammah))
                         
-                        prg.setUniformValue("f1", 0)
+                        glUniform1i(f1Loc, 0)
                         
                         self.drawTexes(list([data]), w, h)
                         self.endRender(prg)
