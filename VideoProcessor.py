@@ -302,10 +302,12 @@ class VideoProcessor(QGLFramebufferObject):
                         
                         self.prepareRender(prg)
                         
-                        mnLoc = prg.uniformLocation("mn")
+                        #mnLoc = prg.uniformLocation("mn")
+                        mnLoc = glGetUniformLocation(prg.programId(), "mn")
                         mxLoc = prg.uniformLocation("mx")
                         
-                        prg.setUniformValue(mnLoc, float(mn) / 65535.0)
+                        #prg.setUniformValue(mnLoc, float(mn) / 65535.0)
+                        glUniform1f(mnLoc, float(mn)/65535.0)
                         prg.setUniformValue(mxLoc, float(mx) / 65535.0)
                         
                         rLoc = prg.uniformLocation("r")
