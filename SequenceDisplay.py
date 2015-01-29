@@ -28,6 +28,7 @@ from scipy.misc import imsave
 from  roiAnalysis import MainWindow as rMW
 from scipy.io import savemat,loadmat
 from progress import progress
+from time import sleep
 
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
@@ -759,6 +760,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		if optDlg.exec_():
 			framesInd = optDlg.getFrameInterval()
+
+		self.computeAverage(framesInd)
+		# fig.close()
+
+	def computeAverage(self,framesInd=range(100)):
 		self.currentImage = SequenceProcessor.computeAverage(self.tiffSequence,framesInd)
 		self.loadImageGray(self.currentImage)
 		self.updateDisplay()
@@ -767,7 +773,6 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		# fig.show()
 		fname = os.path.splitext(self.tiffFiles[0])[0]+'_average.tif'
 		imsave(fname,self.currentImage)
-		# fig.close()
 
 	def backProjCb(self):
 		
@@ -1148,6 +1153,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		elif event.key() == Qt.Key_R:
 			self.computeRoisFromListCb()
 
+		elif event.key() == Qt.Key_A:
+			endFrame = self.CurrentShownFrame + 100
+			if endFrame >= self.tiffSequence.getFrames():
+				endFrame = self.tiffSequence.getFrames()
+			self.computeAverage(range(self.CurrentShownFrame,endFrame))
+
+		elif event.key() == Qt.Key_R:
+
+			self.computeRoisFromListCb()
+
 
 	def showRoiMonitor(self):
 		self.roiAnal = rMW(self)
@@ -1163,6 +1178,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
         # do stuff
 		self.tiffSequence.close()
 		self.optionsDlg.close()
+		if self.fig is not None:
+			self.fig.close()
+		sleep(3)
 		event.accept()
 
 

@@ -19,9 +19,15 @@ class VideoProcessor(QGLFramebufferObject):
                 
                 self.openglContext = openglContext
                 openglContext.makeCurrent()
+
+                #format = QGLFramebufferObjectFormat()
+                #format.setSamples(3)
+                #format.setAttachment(QGLFramebufferObject.NoAttachment)
+                #format.setInternalTextureFormat(internalType)
                 
                 super(VideoProcessor, self).__init__(w, h, QGLFramebufferObject.NoAttachment, GL_TEXTURE_RECTANGLE, internalType)
-                
+                #self.format().setSamples(4)
+
                 
                 supMulti = glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB)
                 print("VideoProcessor: " + str(supMulti) + " textures supported")
