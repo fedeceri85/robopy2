@@ -106,7 +106,7 @@ class plotWindow(pg.GraphicsWindow):
 			if colors is not None:
 				color = colors[i]
 			else:
-				color = [255,255,255,255]
+				color = [0,0,0,255]
 
 			if scalebars:
 				if i>0:

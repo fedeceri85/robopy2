@@ -1161,7 +1161,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 	def closeEvent(self, event):
         # do stuff
-
+		self.tiffSequence.close()
 		self.optionsDlg.close()
 		event.accept()
 

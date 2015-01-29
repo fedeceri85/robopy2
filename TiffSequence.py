@@ -389,6 +389,9 @@ class Sequence:
 
 		return roiProfile
 
+	def close(self):
+		pass
+
 class TiffSequence(Sequence):
 	def __init__(self, fNames,options = None):
 		self.tifHandlers = list()	
@@ -591,10 +594,10 @@ class HDF5Sequence(Sequence):
 		self.initTimesDict()
 	
 	def open(self):
-		fi = tb.open_file(self.SequenceFiles[0])
-		self.hdf5Handler = fi.root.x
-		self.timesArray = fi.root.times.timesArray.read()
-		self.timesLabel = unicode(fi.root.times.timeLabel.read().tostring(),'utf-8')
+		self.fi = tb.open_file(self.SequenceFiles[0])
+		self.hdf5Handler = self.fi .root.x
+		self.timesArray = self.fi .root.times.timesArray.read()
+		self.timesLabel = unicode(self.fi .root.times.timeLabel.read().tostring(),'utf-8')
 
 	def getRawImage(self,n):
 		return self.hdf5Handler[:,:,n]	
@@ -689,6 +692,10 @@ class HDF5Sequence(Sequence):
 
 		return roiProfile
 
+	def close(self):
+		self.fi.flush()
+		self.fi.close()
+			
 class RawSequence(Sequence):
 	def __init__(self, fNames,options = None):
 		
