@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Fri Jan 23 19:26:51 2015
+# Created: Thu Jan 29 11:47:18 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -347,6 +347,18 @@ class Ui_ProcessOptionsDlg(object):
         self.yOffsetSpinBox.setObjectName(_fromUtf8("yOffsetSpinBox"))
         self.horizontalLayout_10.addWidget(self.yOffsetSpinBox)
         self.verticalLayout_9.addLayout(self.horizontalLayout_10)
+        self.horizontalLayout_25 = QtGui.QHBoxLayout()
+        self.horizontalLayout_25.setObjectName(_fromUtf8("horizontalLayout_25"))
+        self.yOffsetLabel_4 = QtGui.QLabel(self.tab)
+        self.yOffsetLabel_4.setObjectName(_fromUtf8("yOffsetLabel_4"))
+        self.horizontalLayout_25.addWidget(self.yOffsetLabel_4)
+        self.decimalPlacesSpinBox = QtGui.QSpinBox(self.tab)
+        self.decimalPlacesSpinBox.setMinimum(0)
+        self.decimalPlacesSpinBox.setMaximum(5)
+        self.decimalPlacesSpinBox.setProperty("value", 2)
+        self.decimalPlacesSpinBox.setObjectName(_fromUtf8("decimalPlacesSpinBox"))
+        self.horizontalLayout_25.addWidget(self.decimalPlacesSpinBox)
+        self.verticalLayout_9.addLayout(self.horizontalLayout_25)
         spacerItem5 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_9.addItem(spacerItem5)
         self.horizontalLayout_18 = QtGui.QHBoxLayout()
@@ -544,6 +556,7 @@ class Ui_ProcessOptionsDlg(object):
         self.fontSizeLabel.setText(_translate("ProcessOptionsDlg", "Font Size", None))
         self.xOffsetLabel.setText(_translate("ProcessOptionsDlg", "X offset", None))
         self.yOffsetLabel.setText(_translate("ProcessOptionsDlg", "Y offset", None))
+        self.yOffsetLabel_4.setText(_translate("ProcessOptionsDlg", "Decimal places", None))
         self.yOffsetLabel_3.setText(_translate("ProcessOptionsDlg", "Interframe interval (ms) ", None))
         self.scalebarCheckBox.setText(_translate("ProcessOptionsDlg", "Display scalebar on the video", None))
         self.label_2.setText(_translate("ProcessOptionsDlg", "Scale Factor (um/pixel)", None))

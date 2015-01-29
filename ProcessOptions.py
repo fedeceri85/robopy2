@@ -174,6 +174,8 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('xOffset',d['xOffset'],self.xOffsetSpinBox)
 			fo.add('yOffset',d['yOffset'],self.yOffsetSpinBox)
 			fo.add('PlayInterframe',d['PlayInterframe'],self.PlayInterframeSpinBox)
+			fo.add('decimalPlaces',d['decimalPlaces'],self.decimalPlacesSpinBox)
+
 			
 		except:	
 			fo.add('useAssociatedTimes', 1, self.associatedTimesRadioButton)
@@ -185,7 +187,9 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('fontSize',12,self.fontSizeSpinBox)
 			fo.add('xOffset',50,self.xOffsetSpinBox)
 			fo.add('yOffset',50,self.yOffsetSpinBox)
-			fo.add('PlayInterframe',50,self.PlayInterframeSpinBox)			
+			fo.add('PlayInterframe',50,self.PlayInterframeSpinBox)
+			fo.add('decimalPlaces',2,self.decimalPlacesSpinBox)
+			
 		return fo
 	
 	def initDisplayOptions(self):

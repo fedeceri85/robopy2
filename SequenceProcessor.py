@@ -1226,7 +1226,9 @@ class ProcessedSequence:
 		#self.processedWidget.drawTraces(data, 5, self.currentProcessedFrame, self.currentProcessedFrame,lineWidth=4)
 		if self.timeOptions.displayTimeStamp:
 			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
-			timeString = "{0:.2f}".format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
+			decimalPlaces = str(self.timeOptions.decimalPlaces)
+			st1 = "{0:."+decimalPlaces+"f}"
+			timeString = st1.format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
 			self.processedWidget.drawText(timeString, self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 			self.processedWidget.drawText("s", self.timeOptions.xOffset + float(self.timeOptions.fontSize)*len(timeString),
@@ -1249,12 +1251,14 @@ class ProcessedSequence:
 		
 		if self.timeOptions.displayTimeStamp:
 			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
-			timeString = "{0:.2f}".format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
+			decimalPlaces = str(self.timeOptions.decimalPlaces)
+			st1 = "{0:."+decimalPlaces+"f}"
+			timeString = st1.format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
 			self.processedWidget.drawText(timeString, self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 			self.processedWidget.drawText("s", self.timeOptions.xOffset + float(self.timeOptions.fontSize)*len(timeString),
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
-			
+
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
