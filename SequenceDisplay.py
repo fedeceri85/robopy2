@@ -1180,7 +1180,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.optionsDlg.close()
 		if self.fig is not None:
 			self.fig.close()
-		sleep(3)
+		#sleep(3)
+
 		event.accept()
 
 

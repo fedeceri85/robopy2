@@ -693,7 +693,7 @@ class HDF5Sequence(Sequence):
 		return roiProfile
 
 	def close(self):
-		self.fi.flush()
+		#self.fi.flush()
 		self.fi.close()
 			
 class RawSequence(Sequence):
