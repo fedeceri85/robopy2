@@ -11,6 +11,7 @@ import cPickle
 from OpenGL.GLUT import *
 from PreviewDisplay import PreviewDisplay
 import TiffSequence as ts
+
 '''
 Main window of Robopy project
 Launches various windows and tools
@@ -175,6 +176,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 				out.append(path)
 		if out != []:
 			self.roboActionOpenCb(out)
+
 	def initData(self):
 		self.sequences = list();
 		self.filesList = list()
@@ -248,6 +250,7 @@ class RoboPy(Ui_RoboMainWnd, PyQt4.QtGui.QMainWindow):
 		#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)#self.sequences.append(sd)
 		self.seqDispList.append(sd)
 		self.showStatusMessage("Ready!" + " sequences " + str(len(self.sequences)))
+		tiffSequence.close()
 		with open (self.lastDirFile,'w') as myfile:
 			myfile.write(os.path.split(files[0])[0])
 			myfile.close()

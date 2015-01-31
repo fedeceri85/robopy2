@@ -1225,10 +1225,16 @@ class ProcessedSequence:
 		#data = np.array([10.0, 10.0, 50.0, 10.0, 50.0, 35.0, 70.0, 35.0,70.0,10.0]).astype(np.float32)*2.0
 		#self.processedWidget.drawTraces(data, 5, self.currentProcessedFrame, self.currentProcessedFrame,lineWidth=4)
 		if self.timeOptions.displayTimeStamp:
-			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
 			decimalPlaces = str(self.timeOptions.decimalPlaces)
 			st1 = "{0:."+decimalPlaces+"f}"
-			timeString = st1.format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
+			if self.timeOptions.useAssociatedTimes:
+
+				t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
+				timeString = st1.format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
+			elif self.timeOptions.useInterframeInverval:
+				t0 = self.tiffSequence.framesDict[self.timeOptions.time0Frame]
+				dt = self.timeOptions.interframeInterval/1000.0
+				timeString = st1.format((self.tiffSequence.framesDict[self.currentProcessedFrame]-t0)*dt)
 			self.processedWidget.drawText(timeString, self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 			self.processedWidget.drawText("s", self.timeOptions.xOffset + float(self.timeOptions.fontSize)*len(timeString),
@@ -1237,10 +1243,10 @@ class ProcessedSequence:
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
-			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-2.5*float(self.timeOptions.fontSize)
-			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.5
-			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
-		
+			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
+			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.2
+			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' um',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			
 		if drawRois:
 			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)
 
@@ -1250,10 +1256,16 @@ class ProcessedSequence:
 		tex = HSVImageGLSL(self.processedWidget, f,self.HSVvalue, w, h, self.displayParameters.displayColorMin, self.displayParameters.displayColorMax, hsvcutoff=self.displayOptions.hsvcutoff)
 		
 		if self.timeOptions.displayTimeStamp:
-			t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
 			decimalPlaces = str(self.timeOptions.decimalPlaces)
 			st1 = "{0:."+decimalPlaces+"f}"
-			timeString = st1.format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
+			if self.timeOptions.useAssociatedTimes:
+
+				t0 = self.tiffSequence.timesDict[self.timeOptions.time0Frame]
+				timeString = st1.format(self.tiffSequence.timesDict[self.currentProcessedFrame]-t0)
+			elif self.timeOptions.useInterframeInverval:
+				t0 = self.tiffSequence.framesDict[self.timeOptions.time0Frame]
+				dt = self.timeOptions.interframeInterval/1000.0
+				timeString = st1.format((self.tiffSequence.framesDict[self.currentProcessedFrame]-t0)*dt)
 			self.processedWidget.drawText(timeString, self.timeOptions.xOffset,
 				 self.timeOptions.yOffset, [1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 			self.processedWidget.drawText("s", self.timeOptions.xOffset + float(self.timeOptions.fontSize)*len(timeString),
@@ -1262,9 +1274,9 @@ class ProcessedSequence:
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
-			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-2.5*float(self.timeOptions.fontSize)
-			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.5
-			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
+			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.2
+			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' um',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 
 		if drawRois:
 			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)
