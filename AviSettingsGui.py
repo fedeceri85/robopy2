@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'AviSettingsGui.ui'
 #
-# Created: Fri Aug  2 11:54:06 2013
-#      by: PyQt4 UI code generator 4.10
+# Created: Sat Feb 14 17:03:45 2015
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -44,6 +44,7 @@ class Ui_aviSettingsWnd(object):
         self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
         self.fpsSpinBox = QtGui.QSpinBox(aviSettingsWnd)
         self.fpsSpinBox.setMinimum(1)
+        self.fpsSpinBox.setMaximum(200)
         self.fpsSpinBox.setProperty("value", 25)
         self.fpsSpinBox.setObjectName(_fromUtf8("fpsSpinBox"))
         self.gridLayout.addWidget(self.fpsSpinBox, 1, 1, 1, 1)

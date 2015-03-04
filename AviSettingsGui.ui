@@ -44,6 +44,9 @@
        <property name="minimum">
         <number>1</number>
        </property>
+       <property name="maximum">
+        <number>200</number>
+       </property>
        <property name="value">
         <number>25</number>
        </property>

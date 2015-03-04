@@ -221,8 +221,9 @@ class Sequence:
 				
 	def loadFrameInCache(self, n):
 		if self.arraySequence is not None:
-			img = self.arraySequence[:,:,self.framesDict[n]].copy()
-			if self.options['zproject']!=1:
+			if self.options['zproject']==1:
+				img = self.arraySequence[:,:,self.framesDict[n]].copy()
+			else:
 				img = self.arraySequence[:,:,self.framesDict[n]:self.framesDict[n]+self.options['zproject']].mean(2)
 
 				# imgs = [img,]
@@ -249,8 +250,9 @@ class Sequence:
 	def getFrame(self, n):
 		#index = self.timesDict.frames()[n]
 		if self.arraySequence is not None:
-			img = self.arraySequence[:, :, self.framesDict[n]]
-			if self.options['zproject']!=1:
+			if self.options['zproject']==1:
+				img = self.arraySequence[:, :, self.framesDict[n]]
+			else:
 				img = self.arraySequence[:,:,self.framesDict[n]:self.framesDict[n]+self.options['zproject']].mean(2)
 				# imgs = [img,]
 				# for i in xrange(1,self.options['zproject'] -1 ):
@@ -389,8 +391,11 @@ class Sequence:
 
 		return roiProfile
 
+
+
 	def close(self):
 		pass
+
 
 class TiffSequence(Sequence):
 	def __init__(self, fNames,options = None):
@@ -413,7 +418,6 @@ class TiffSequence(Sequence):
 			
 		self.origFrames = self.frames
 		self.initTimesDict()
-
 
 		
 	def __del__(self):
@@ -600,7 +604,8 @@ class HDF5Sequence(Sequence):
 		self.timesLabel = unicode(self.fi .root.times.timeLabel.read().tostring(),'utf-8')
 
 	def getRawImage(self,n):
-		return self.hdf5Handler[:,:,n]	
+		img = self.hdf5Handler[:,:,n]	
+		return img
 	
 	
 	def saveSequence(self, f,sequence=None,framesInd = None,filterLevel = 5):
@@ -691,6 +696,7 @@ class HDF5Sequence(Sequence):
 			
 
 		return roiProfile
+
 
 	def close(self):
 		#self.fi.flush()

@@ -75,7 +75,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#Load plugins
 		self.plugins=[]
 		self.fig = None
-
+		self.background = None
 		#self.emit(SIGNAL("startWorkerJob()"))
 		
 		for i in Plugins.getPlugins():
@@ -248,6 +248,9 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		
 		self.connect(dlg.HSVradioButton, SIGNAL("released()"), self.recomputeHSVvalue)
 		self.connect(dlg.NomarskiRadioButton,SIGNAL("released()"),self.recomputeHSVvalue)
+		self.connect(dlg.subBackCheckBox,SIGNAL("stateChanged(int)"),self.subBackChanged)
+
+
 	def showStatusMessage(self, msg):
 		self.statusBar().showMessage(msg)
 		
@@ -828,7 +831,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#fig.show()
 
 		
-		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
+		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois,self.background)
 		if showplot:
 			if self.fig is None:
 				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
@@ -1301,11 +1304,31 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.tiffSequence.applyZproject(movingAverage=ma)
 		self.tiffLoadFinished()
 		self.forceRoiRecomputation()
-
+		self.optionsDlg.subBackLineEdit.setText('ZPROJECT CHANGED RELOAD BACKGROUND')	
+		self.optionsDlg.subBackCheckBox.setChecked(False)
 	def movavgchanged(self,state):
 		self.tiffSequence.applyZproject(movingAverage = True)
 		self.tiffLoadFinished()
 		self.forceRoiRecomputation()
+		self.optionsDlg.subBackLineEdit.setText('ZPROJECT CHANGED RELOAD BACKGROUND')	
+		self.optionsDlg.subBackCheckBox.setChecked(False)	
+
+	def subBackChanged(self,state):
+		if self.optionsDlg.subBackCheckBox.isChecked():
+
+			fname = QFileDialog.getOpenFileName(self, "Select a roi file to use as background",QString(self.folder),"Numpy (*.npy);;Vimmaging roi (*.mat)")
+			fname = fname.toAscii().data()
+			self.optionsDlg.subBackLineEdit.setText(fname)
+			p,roi,t = SequenceProcessor.loadRoisFromFile(fname,None,None)
+			self.background = roi
+			if self.background.size != self.tiffSequence.frames:
+				print("Error, wrong number of frames in the background trace")
+				self.background = None
+				self.optionsDlg.subBackLineEdit.setText('')
+				self.optionsDlg.subBackCheckBox.setChecked(False)	
+		else:
+			self.optionsDlg.subBackLineEdit.setText('')
+			self.background = None
 
 
 if __name__== "__main__":

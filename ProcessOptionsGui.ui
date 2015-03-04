@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>515</width>
-    <height>415</height>
+    <width>520</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
     <widget class="QTabWidget" name="PO_TabWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -379,14 +379,14 @@
             <x>10</x>
             <y>30</y>
             <width>347</width>
-            <height>82</height>
+            <height>84</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
             <widget class="QRadioButton" name="associatedTimesRadioButton">
              <property name="text">
-              <string>Use associated times</string>
+              <string>&amp;Use associated times</string>
              </property>
             </widget>
            </item>
@@ -451,7 +451,7 @@
               <item>
                <widget class="QRadioButton" name="LUTradioButton">
                 <property name="text">
-                 <string>Look up table</string>
+                 <string>Look &amp;up table</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -607,7 +607,7 @@
             <item>
              <widget class="QRadioButton" name="NomarskiRadioButton">
               <property name="text">
-               <string>Nomarski</string>
+               <string>Nomars&amp;ki</string>
               </property>
              </widget>
             </item>
@@ -976,7 +976,6 @@
       <zorder>verticalSpacer_2</zorder>
       <zorder>scalebarCheckBox</zorder>
       <zorder>verticalSpacer_3</zorder>
-      <zorder>layoutWidget_2</zorder>
      </widget>
      <widget class="QWidget" name="FiltersTab">
       <attribute name="title">
@@ -987,126 +986,134 @@
       <attribute name="title">
        <string>Roi Options</string>
       </attribute>
-      <widget class="QCheckBox" name="roiSameSizeCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>100</y>
-         <width>153</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Rois same size</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>20</y>
-         <width>316</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_20">
-        <item>
-         <widget class="QCheckBox" name="rectangularRoisCheckBox">
-          <property name="text">
-           <string>Rectangular Rois</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">buttonGroup</string>
-          </attribute>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_19">
-          <item>
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Size (0 = dynamic)</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="roiSizeSpinBox"/>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QCheckBox" name="lockRoiPositionCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Lock roi relative positions</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="semicircularRoisCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>50</y>
-         <width>119</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Semicircular Rois</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
-       </attribute>
-      </widget>
-      <widget class="QCheckBox" name="freehandRoisCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>70</y>
-         <width>119</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Freehand Rois</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
-       </attribute>
-      </widget>
-      <widget class="QCheckBox" name="scaleBarsCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>180</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Use scalebars</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QCheckBox" name="rectangularRoisCheckBox">
+           <property name="text">
+            <string>Rectangular Rois</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Size (0 = dynamic)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="roiSizeSpinBox"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="semicircularRoisCheckBox">
+         <property name="text">
+          <string>Semicircular Rois</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="freehandRoisCheckBox">
+         <property name="text">
+          <string>Freehand Rois</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>66</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="roiSameSizeCheckBox">
+         <property name="text">
+          <string>Rois same size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>65</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="lockRoiPositionCheckBox">
+         <property name="text">
+          <string>Lock roi relative positions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="scaleBarsCheckBox">
+         <property name="text">
+          <string>Use scalebars</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_26">
+         <item>
+          <widget class="QCheckBox" name="subBackCheckBox">
+           <property name="text">
+            <string>Subtract Background (Affects only rois)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="subBackLineEdit">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

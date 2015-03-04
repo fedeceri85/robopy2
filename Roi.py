@@ -46,8 +46,7 @@ class Roi(QPolygon):
 		avg = 0.0
 		for i in self.pointMap:
 			avg = avg + im[i[1], i[0]].sum()
-			
-		return avg/self.mapSize
+		return avg/(self.mapSize*1.0)
 			
 	def move(self,x,y):
 

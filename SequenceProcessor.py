@@ -492,16 +492,18 @@ def median_filter(im):
 def gaussian_filter(im):
 	ndimage.gaussian_filter(im,3,output=im)
 
-def applyRoiComputationOptions(rdata, times, fo, rois):
+def applyRoiComputationOptions(rdata, times, fo, rois,background=None):
 	
 	nrois = len(rois)
 	
 	#print("processType is " + str(fo.processType))
-	
+	if background is None:
+		background = np.zeros(rdata.shape[0],dtype = rdata.dtype)
+	background = np.tile(background,(1,nrois)) 
 	if fo.processType == 0:
 		#print("firstFrame " + str(fo.firstFrame) + " firstWawvelength " + str(fo.firstWavelength))
 		
-		outData = rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois]
+		outData = rdata[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois] - background[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois] + background[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize, 0:nrois].min()
 		times = times[fo.firstFrame-2 + fo.firstWavelength:fo.lastFrame:fo.cycleSize]
 		
 		f0 = outData[0:fo.referenceFrames,:].mean(0)
@@ -527,7 +529,7 @@ def applyRoiComputationOptions(rdata, times, fo, rois):
 				swFrames = swFrames[0:fwSize]
 		
 		times = times[fwFrames]
-		outData = np.divide(rdata[fwFrames, 0:nrois], rdata[swFrames, 0:nrois])
+		outData = np.divide(rdata[fwFrames, 0:nrois] - background[fwFrames, 0:nrois]+background[fwFrames, 0:nrois].min(), rdata[swFrames, 0:nrois]- background[swFrames, 0:nrois]+background[swFrames, 0:nrois].min())
 		
 		r0 = np.mean(outData[0:fo.referenceFrames])
 		
