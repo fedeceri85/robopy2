@@ -498,8 +498,9 @@ def applyRoiComputationOptions(rdata, times, fo, rois,background=None):
 	
 	#print("processType is " + str(fo.processType))
 	if background is None:
-		background = np.zeros(rdata.shape[0],dtype = rdata.dtype)
+		background = np.zeros((rdata.shape[0],1),dtype = rdata.dtype)
 	background = np.tile(background,(1,nrois)) 
+	
 	if fo.processType == 0:
 		#print("firstFrame " + str(fo.firstFrame) + " firstWawvelength " + str(fo.firstWavelength))
 		
