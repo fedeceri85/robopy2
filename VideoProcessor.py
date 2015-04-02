@@ -196,7 +196,7 @@ class VideoProcessor(QGLFramebufferObject):
                 glViewport(0,0,w,h)
                 glOrtho(0, w, 0, h, -1, 1) 
                 for r in rois:
-                        glColorf(r.color.redF(), r.color.greenF(), r.color.blueF())
+                        glColor3f(r.color.redF(), r.color.greenF(), r.color.blueF())
                         
                         
                         nPoints = r.size()
@@ -212,7 +212,7 @@ class VideoProcessor(QGLFramebufferObject):
                                 
                                 fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
                                 fontScale = 12.0/fontWidth
-                                glTranslatef(x, y , 1.0)
+                                glTranslatef(x+10, y-7 , 1.0)
                                 glScalef(fontScale, -fontScale, 1.0)
                                 #glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
                                 

@@ -1020,7 +1020,7 @@ def computeProcessedFrameWeave(tif, n, fo, ref, b1 = 0, b2 = 0, wave2Threshold =
 	return res
 		
 
-def loadRoisFromFile(filename, w, h):
+def loadRoisFromFile(filename, w=None, h=None):
 	roiprofile = None
 	times = None
 	roiBounds = None
@@ -1044,8 +1044,8 @@ def loadRoisFromFile(filename, w, h):
 			isValidRoi = True
 			
 			for x,y in zip(c[0],c[1]):
-				if w < x or x < 0 or h < y or y < 0:
-					isValidRoi = False
+				#if w < x or x < 0 or h < y or y < 0:
+				#	isValidRoi = False
 				r.addPoint(x,y)
 				
 			if isValidRoi:
@@ -1066,8 +1066,8 @@ def loadRoisFromFile(filename, w, h):
 			isValidRoi = True
 			
 			for x,y in zip(c[0],c[1]):
-				if w < x or x < 0 or h < y or y < 0:
-					isValidRoi = False
+				#if w < x or x < 0 or h < y or y < 0:
+				#	isValidRoi = False
 				r.addPoint(x,y)
 				
 			if isValidRoi:

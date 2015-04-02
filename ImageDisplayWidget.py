@@ -15,6 +15,25 @@ import sys
 import matplotlib
 from math import atan, pi, sqrt,cos,sin
 
+matplotlib.rcParams['axes.color_cycle'] = [(0.8941176470588236, 0.10196078431372549, 0.10980392156862745),\
+											 (0.21568627450980393, 0.49411764705882355, 0.7215686274509804),\
+											 (0.30196078431372547, 0.6862745098039216, 0.2901960784313726),\
+											 (0.596078431372549, 0.3058823529411765, 0.6392156862745098),\
+											 (1.0, 0.4980392156862745, 0.0),\
+											 (1.0, 1.0, 0.2),\
+											 (0.6509803921568628, 0.33725490196078434, 0.1568627450980392),\
+											 (0.9686274509803922, 0.5058823529411764, 0.7490196078431373),\
+											 (0.6, 0.6, 0.6),\
+											 (0.4, 0.7607843137254902, 0.6470588235294118),\
+											 (0.9882352941176471, 0.5529411764705883, 0.3843137254901961),\
+											 (0.5529411764705883, 0.6274509803921569, 0.796078431372549),\
+											 (0.9058823529411765, 0.5411764705882353, 0.7647058823529411),\
+											 (0.6509803921568628, 0.8470588235294118, 0.32941176470588235),\
+											 (1.0, 0.8509803921568627, 0.1843137254901961),\
+											 (0.8980392156862745, 0.7686274509803922, 0.5803921568627451),\
+											 (0.7019607843137254, 0.7019607843137254, 0.7019607843137254)]
+
+
 OpenGL.ERROR_CHECKING = False
 '''
 Main Image display widget ontop of QGLWidget (to use opengl hardware)
@@ -199,7 +218,7 @@ class ImageDisplayWidget(QGLWidget):
 				
 				fontWidth = glutStrokeWidth(GLUT_STROKE_ROMAN, ord('O'))
 				fontScale = 12.0/fontWidth
-				glTranslatef(x, y , 1.0)
+				glTranslatef(x+10, y -7, 1.0)
 				glScalef(fontScale, -fontScale, 1.0)
 				#glTranslatef(- fontWidth /2.0, - glutStrokeHeight(GLUT_STROKE_ROMAN)/2.0, 1.0)
 				glutStrokeString(GLUT_STROKE_ROMAN, str(r.ordinal + 1))
@@ -731,7 +750,9 @@ class ImageDisplayWidget(QGLWidget):
 		roi.ordinal = len(self.rois) - 1
 		self.drawRoiNumber = drawRoiNumber
 		
-		colorCycle = matplotlib.rcParams["axes.color_cycle"]
+
+
+		colorCycle =  matplotlib.rcParams["axes.color_cycle"]
 		if roi.color == QColor(Qt.green):
 			roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
 		
