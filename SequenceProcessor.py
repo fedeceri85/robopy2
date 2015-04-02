@@ -1248,7 +1248,7 @@ class ProcessedSequence:
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
 			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
 			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.2
-			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' um',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 			
 		if drawRois:
 			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)
@@ -1279,7 +1279,7 @@ class ProcessedSequence:
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
 			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
 			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.2
-			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' um',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 
 		if drawRois:
 			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)

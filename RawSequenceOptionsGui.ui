@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>229</width>
-    <height>274</height>
+    <width>262</width>
+    <height>338</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,24 @@
    </item>
    <item>
     <widget class="QComboBox" name="rebinComboBox">
+     <property name="currentIndex">
+      <number>3</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>0.125</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>0.25</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>0.5</string>
+      </property>
+     </item>
      <item>
       <property name="text">
        <string>1</string>

@@ -4,7 +4,6 @@ import numpy as np
 import Roi
 from os.path import splitext, getsize,split,join
 import threading
-from scipy.ndimage import zoom
 import tables as tb
 from scipy.misc import imrotate
 import xml.etree.ElementTree as xet
@@ -14,6 +13,7 @@ try:
 	showProgress = True
 except:
 	showProgress = False
+from scipy.misc import imresize
 #from pubTools import oneColumnFigure
 class ThreadedRead(threading.Thread):
 	def __init__(self, threadId, tifSequence):
@@ -778,8 +778,18 @@ def loadTimes(filename,firstFrameIndex=0,firstTimeValue=0,scaleFactor=1.0):
 	
 
 def rebin(a, shape):
-    sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
-    return (a.reshape(sh).sum(-1).sum(1)/(1.0)).astype(np.uint16)
+	# if a.shape[0]>=shape[0]:
+	#     sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
+	#     return (a.reshape(sh).sum(-1).sum(1)/(1.0)).astype(np.uint16)
+	# # else:
+	# try:
+	# 	import cv2
+	# except:
+	# 	print("Error, can't scale the image up. Opencv missing")
+	# 	return
+	# return cv2.resize(a,(int(shape[1]),int(shape[0])),interpolation = cv2.INTER_CUBIC)
+	return imresize(a,(int(shape[0]),int(shape[1])),interp='bicubic')
+
 
 class TimesDict(dict):
 	"""

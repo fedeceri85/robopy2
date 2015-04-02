@@ -1299,6 +1299,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			print("Dataset removed. "+str(self.RoboMainWnd.database.shape[1])+ " datasets left in database")	
 
 	def zprojectchanged(self,n):
+		self.getFirstSequenceFrame()
+
 		self.tiffSequence.options['zproject'] = n
 		ma = self.optionsDlg.movingAverageCheckBox.isChecked()
 		self.tiffSequence.applyZproject(movingAverage=ma)
@@ -1307,6 +1309,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.optionsDlg.subBackLineEdit.setText('ZPROJECT CHANGED RELOAD BACKGROUND')	
 		self.optionsDlg.subBackCheckBox.setChecked(False)
 	def movavgchanged(self,state):
+		self.getFirstSequenceFrame()
 		self.tiffSequence.applyZproject(movingAverage = True)
 		self.tiffLoadFinished()
 		self.forceRoiRecomputation()

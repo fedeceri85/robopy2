@@ -92,11 +92,11 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 
 	def getValues(self):
 		options = {}
-		rebin = int(str(self.rebinComboBox.currentText()))
+		rebin = float(str(self.rebinComboBox.currentText()))
 		if rebin == 1:
 			options['rebin'] = None
 		else:
-			options['rebin'] = int(rebin)
+			options['rebin'] = rebin
 		
 
 		if self.LCcheckBox.isChecked():

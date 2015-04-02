@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'RawSequenceOptionsGui.ui'
 #
-# Created: Sat Jun 21 17:47:13 2014
-#      by: PyQt4 UI code generator 4.11
+# Created: Mon Mar 30 15:45:18 2015
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(229, 274)
+        Dialog.resize(262, 338)
         Dialog.setAutoFillBackground(False)
         self.verticalLayout_5 = QtGui.QVBoxLayout(Dialog)
         self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
@@ -35,6 +35,9 @@ class Ui_Dialog(object):
         self.verticalLayout_5.addWidget(self.label)
         self.rebinComboBox = QtGui.QComboBox(Dialog)
         self.rebinComboBox.setObjectName(_fromUtf8("rebinComboBox"))
+        self.rebinComboBox.addItem(_fromUtf8(""))
+        self.rebinComboBox.addItem(_fromUtf8(""))
+        self.rebinComboBox.addItem(_fromUtf8(""))
         self.rebinComboBox.addItem(_fromUtf8(""))
         self.rebinComboBox.addItem(_fromUtf8(""))
         self.rebinComboBox.addItem(_fromUtf8(""))
@@ -158,6 +161,7 @@ class Ui_Dialog(object):
         self.verticalLayout_5.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog)
+        self.rebinComboBox.setCurrentIndex(3)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -165,10 +169,13 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Raw Sequence Options", None))
         self.label.setText(_translate("Dialog", "Rebin", None))
-        self.rebinComboBox.setItemText(0, _translate("Dialog", "1", None))
-        self.rebinComboBox.setItemText(1, _translate("Dialog", "2", None))
-        self.rebinComboBox.setItemText(2, _translate("Dialog", "4", None))
-        self.rebinComboBox.setItemText(3, _translate("Dialog", "8", None))
+        self.rebinComboBox.setItemText(0, _translate("Dialog", "0.125", None))
+        self.rebinComboBox.setItemText(1, _translate("Dialog", "0.25", None))
+        self.rebinComboBox.setItemText(2, _translate("Dialog", "0.5", None))
+        self.rebinComboBox.setItemText(3, _translate("Dialog", "1", None))
+        self.rebinComboBox.setItemText(4, _translate("Dialog", "2", None))
+        self.rebinComboBox.setItemText(5, _translate("Dialog", "4", None))
+        self.rebinComboBox.setItemText(6, _translate("Dialog", "8", None))
         self.LCcheckBox.setText(_translate("Dialog", "Line correction", None))
         self.label_2.setText(_translate("Dialog", "Left", None))
         self.label_3.setText(_translate("Dialog", "Right", None))
@@ -177,5 +184,5 @@ class Ui_Dialog(object):
         self.label_5.setText(_translate("Dialog", "Right", None))
         self.label_7.setText(_translate("Dialog", "Top", None))
         self.label_6.setText(_translate("Dialog", "Bottom", None))
-        self.rotateCheckBox.setText(_translate("Dialog", "Rotate", None))
+        self.rotateCheckBox.setText(_translate("Dialog", "Rotate (buggy)", None))
 
