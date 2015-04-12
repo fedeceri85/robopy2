@@ -1246,9 +1246,10 @@ class ProcessedSequence:
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
-			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
-			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.2
-			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			if self.displayOptions.textOnScalebar:
+				textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
+				textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset + float(self.timeOptions.fontSize)*1.2
+				self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 			
 		if drawRois:
 			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)
@@ -1277,9 +1278,10 @@ class ProcessedSequence:
 		if self.displayOptions.displayScalebar:
 			data = np.array([10.0,10.0,10.0+round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor), 10.0]).astype(np.float32)
 			self.processedWidget.drawTraces(data, 2, self.displayOptions.scaleBarXOffset, self.displayOptions.scaleBarYOffset,lineWidth=float(self.displayOptions.scaleBarLineSize))
-			textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
-			textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.2
-			self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
+			if self.displayOptions.textOnScalebar:
+				textX = (self.displayOptions.scaleBarXOffset + round(self.displayOptions.scaleBarLength/self.displayOptions.scaleBarScaleFactor)/2)-1.8*float(self.timeOptions.fontSize)
+				textY = self.tiffSequence.height-self.displayOptions.scaleBarYOffset +  float(self.timeOptions.fontSize)*1.2
+				self.processedWidget.drawText(str(int(self.displayOptions.scaleBarLength))+' μm',textX*1.0,textY*1.0,[1.0, 1.0, 1.0],fontsize=float(self.timeOptions.fontSize))
 
 		if drawRois:
 			self.processedWidget.drawRoisVideoProcessor(self.tiffSequence.rois)

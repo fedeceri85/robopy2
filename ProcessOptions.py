@@ -208,6 +208,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('NomarskiBackground', d['NomarskiBackground'],self.NomarskiRadioButton)
 			
 			fo.add('displayScalebar', d['displayScalebar'],self.scalebarCheckBox)
+			fo.add('textOnScalebar',d['textOnScalebar'],self.textOnScalebarCheckBox)
 			fo.add('scaleBarScaleFactor', d['scaleBarScaleFactor'],self.sbScaleFactorSpinBox)
 			fo.add('scaleBarLength', d['scaleBarLength'],self.sbLengthSpinBox)
 			fo.add('scaleBarFontSize', d['scaleBarFontSize'],self.sbFontSizeSpinBox)
@@ -230,6 +231,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('NomarskiBackground',0,self.NomarskiRadioButton)
 			
 			fo.add('displayScalebar',0,self.scalebarCheckBox)
+			fo.add('textOnScalebar',0,self.textOnScalebarCheckBox)
 			fo.add('scaleBarScaleFactor',0.47,self.sbScaleFactorSpinBox)
 			fo.add('scaleBarLength',25.0,self.sbLengthSpinBox)
 			fo.add('scaleBarFontSize',12.0,self.sbFontSizeSpinBox)
