@@ -192,7 +192,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionSave_raw_sequence,SIGNAL("triggered()"),self.saveRawSequence)
 		self.connect(self.actionSave_as_avi, SIGNAL("triggered()"), self.saveSequenceAsAvi)
 		self.connect(self.actionSave_as_hd5_table, SIGNAL("triggered()"), self.saveSequenceAsTable)
+		self.connect(self.actionSave_current_frame, SIGNAL("triggered()"), self.saveCurrentFrame)
+		self.connect(self.actionSave_decorations_as_mask, SIGNAL("triggered()"), self.exportDecoration)
+
+
 		
+
 		self.connect(self.imWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.processedWidget, SIGNAL("mousePositionChanged(int, int)"), self.imageNewMousePosition)
 		self.connect(self.imWidget, SIGNAL("roiRecomputeNeeded(bool)"), self.roiRecomputeNeeded)
@@ -680,8 +685,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.setValue(self.CurrentShownFrame)
 		self.CurrentFrameSpinBox.blockSignals(False)
 		try:
-			self.fig.marker.setValue(self.tiffSequence.times()[self.CurrentShownFrame])
-			self.fig.markerpos = self.tiffSequence.times()[self.CurrentShownFrame]
+			if self.optionsDlg.timeOptions.useAssociatedTimes:
+				self.fig.marker.setValue(self.tiffSequence.times()[self.CurrentShownFrame]-self.tiffSequence.timesDict[self.optionsDlg.timeOptions.time0Frame])
+				self.fig.markerpos = self.tiffSequence.times()[self.CurrentShownFrame]-self.tiffSequence.timesDict[self.optionsDlg.timeOptions.time0Frame]
+			elif self.optionsDlg.timeOptions.useInterframeInverval:
+				self.fig.marker.setValue((self.tiffSequence.framesDict[self.CurrentShownFrame]- self.optionsDlg.timeOptions.time0Frame)*self.optionsDlg.timeOptions.interframeInterval/1000.0)
+				self.fig.markerpos = (self.tiffSequence.framesDict[self.CurrentShownFrame] - self.optionsDlg.timeOptions.time0Frame)*self.optionsDlg.timeOptions.interframeInterval/1000.0
 		except:
 			pass
 
@@ -694,8 +703,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.CurrentFrameSpinBox.setValue(n)
 		self.CurrentFrameSpinBox.blockSignals(False)	
 		try:
-			self.fig.marker.setValue(self.tiffSequence.times()[n])
-			self.fig.markerpos = self.tiffSequence.times()[n]
+			if self.optionsDlg.timeOptions.useAssociatedTimes:
+				self.fig.marker.setValue(self.tiffSequence.times()[n]-self.tiffSequence.timesDict[self.optionsDlg.timeOptions.time0Frame])
+				self.fig.markerpos = self.tiffSequence.times()[n]-self.tiffSequence.timesDict[self.optionsDlg.timeOptions.time0Frame]
+			elif self.optionsDlg.timeOptions.useInterframeInverval:
+				self.fig.marker.setValue((self.tiffSequence.framesDict[n]- self.optionsDlg.timeOptions.time0Frame)*self.optionsDlg.timeOptions.interframeInterval/1000.0)
+				self.fig.markerpos = (self.tiffSequence.framesDict[n] - self.optionsDlg.timeOptions.time0Frame)*self.optionsDlg.timeOptions.interframeInterval/1000.0
 
 		except:
 			pass
@@ -830,8 +843,15 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#ax.plot(roiProfile)
 		#fig.show()
 
-		
-		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois,self.background)
+		if self.optionsDlg.timeOptions.useAssociatedTimes:
+			t0 = self.tiffSequence.timesDict[self.optionsDlg.timeOptions.time0Frame]
+			timesToPass = np.array(self.tiffSequence.times()) -t0
+			lab = self.tiffSequence.timesDict.label
+		elif self.optionsDlg.timeOptions.useInterframeInverval:
+			timesToPass = (np.array(self.tiffSequence.framesDict.values())-self.optionsDlg.timeOptions.time0Frame)*self.optionsDlg.timeOptions.interframeInterval/1000.0
+			lab = 'Time (s)'
+		rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile,timesToPass, self.optionsDlg.frameOptions, self.tiffSequence.rois,self.background)
+
 		if showplot:
 			if self.fig is None:
 				self.fig = plotWindow(self,self.optionsDlg.scaleBarsCheckBox.isChecked())
@@ -847,7 +867,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 
 
 			ylabel = self.getYlabel()
-			self.fig.plot(times,rdata,xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+			self.fig.plot(times,rdata,xlabel=lab,ylabel = ylabel,colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
 			self.fig.show()
 
 		return times,rdata
@@ -1066,6 +1086,16 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 		aviWriter.clearAviHandler()
 		
+	def saveCurrentFrame(self):
+		data = self.getSequenceFrameAsRgb(self.CurrentShownFrame,drawRois=True)
+		h,w,k,z = data.shape
+		data = data.reshape(h*w,z)
+		#data = np.swapaxes(data, 0, 1)
+		data = data.reshape(w,h,z)
+		fname = os.path.splitext(self.tiffFiles[0])[0]+'_frame'+str(self.CurrentShownFrame)+'.tif'
+
+		imsave(fname,data)
+
 	def saveSequenceAsTable(self):
 		import tables as tb
 		self.ImageTabWidget.setCurrentIndex(1)
@@ -1165,6 +1195,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		elif event.key() == Qt.Key_R:
 
 			self.computeRoisFromListCb()
+		elif event.key() == Qt.Key_S:
+			self.saveCurrentFrame()
 
 
 	def showRoiMonitor(self):
@@ -1333,6 +1365,21 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			self.optionsDlg.subBackLineEdit.setText('')
 			self.background = None
 
+	def exportDecoration(self):
+
+		img2 = self.currentImage.copy()
+		self.currentImage = np.ones(img2.shape)*(1E16-1)
+		self.loadImageGray(self.currentImage)
+		self.updateDisplay()
+
+		# data = self.getSequenceFrameAsRgb(self.CurrentShownFrame,drawRois=True)
+		# h,w,k,z = data.shape
+		# data = data.reshape(h*w,z)
+		# data = data.reshape(w,h,z)
+		# fname = os.path.splitext(self.tiffFiles[0])[0]+'_mask.tif'
+		# imsave(fname,self.currentImage)
+		# self.currentImage = img2
+		# self.updateDisplay()
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
