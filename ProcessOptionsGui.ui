@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="PO_TabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="FrameOptionsTab">
       <attribute name="title">
@@ -995,9 +995,6 @@
       </layout>
       <zorder>displayTimesCheckBox</zorder>
       <zorder>verticalSpacer_2</zorder>
-      <zorder>scalebarCheckBox</zorder>
-      <zorder>textOnScalebarCheckBox</zorder>
-      <zorder>horizontalSpacer_6</zorder>
      </widget>
      <widget class="QWidget" name="FiltersTab">
       <attribute name="title">
@@ -1054,6 +1051,22 @@
         <widget class="QCheckBox" name="semicircularRoisCheckBox">
          <property name="text">
           <string>Semicircular Rois</string>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup</string>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="polygonalRoisCheckBox">
+         <property name="text">
+          <string>Polygolnal Rois</string>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">buttonGroup</string>

@@ -251,6 +251,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('semicircularRois', d['semicircularRois'], self.semicircularRoisCheckBox)
 			fo.add('freehandRois', d['freehandRois'], self.freehandRoisCheckBox)
 
+			fo.add('polygonalRois', d['polygonalRois'], self.polygonalRoisCheckBox)
 			fo.add('roiSameSize', d['roiSameSize'], self.roiSameSizeCheckBox)
 			fo.add('roiSize',d['roiSize'],self.roiSizeSpinBox)
 			fo.add('lockRoiPositions',d['lockRoiPositions'],self.lockRoiPositionCheckBox)
@@ -260,6 +261,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
 			fo.add('semicircularRois',0, self.semicircularRoisCheckBox)
 			fo.add('freehandRois', 0, self.freehandRoisCheckBox)
+			fo.add('polygonalRois', 0, self.polygonalRoisCheckBox)
 			fo.add('roiSameSize', 0, self.roiSameSizeCheckBox)
 			fo.add('roiSize',0,self.roiSizeSpinBox)
 			fo.add('lockRoiPositions',0,self.lockRoiPositionCheckBox)

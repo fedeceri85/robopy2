@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Sun Apr 12 17:05:45 2015
+# Created: Sun Apr 12 18:04:49 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -496,9 +496,15 @@ class Ui_ProcessOptionsDlg(object):
         self.horizontalLayout_20.addLayout(self.horizontalLayout_19)
         self.verticalLayout.addLayout(self.horizontalLayout_20)
         self.semicircularRoisCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.semicircularRoisCheckBox.setAutoExclusive(False)
         self.semicircularRoisCheckBox.setObjectName(_fromUtf8("semicircularRoisCheckBox"))
         self.buttonGroup.addButton(self.semicircularRoisCheckBox)
         self.verticalLayout.addWidget(self.semicircularRoisCheckBox)
+        self.polygonalRoisCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
+        self.polygonalRoisCheckBox.setAutoExclusive(False)
+        self.polygonalRoisCheckBox.setObjectName(_fromUtf8("polygonalRoisCheckBox"))
+        self.buttonGroup.addButton(self.polygonalRoisCheckBox)
+        self.verticalLayout.addWidget(self.polygonalRoisCheckBox)
         self.freehandRoisCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
         self.freehandRoisCheckBox.setObjectName(_fromUtf8("freehandRoisCheckBox"))
         self.buttonGroup.addButton(self.freehandRoisCheckBox)
@@ -530,7 +536,7 @@ class Ui_ProcessOptionsDlg(object):
         self.gridLayout_3.addWidget(self.PO_TabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(ProcessOptionsDlg)
-        self.PO_TabWidget.setCurrentIndex(0)
+        self.PO_TabWidget.setCurrentIndex(5)
         QtCore.QMetaObject.connectSlotsByName(ProcessOptionsDlg)
 
     def retranslateUi(self, ProcessOptionsDlg):
@@ -595,6 +601,7 @@ class Ui_ProcessOptionsDlg(object):
         self.rectangularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Rectangular Rois", None))
         self.label_7.setText(_translate("ProcessOptionsDlg", "Size (0 = dynamic)", None))
         self.semicircularRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Semicircular Rois", None))
+        self.polygonalRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Polygolnal Rois", None))
         self.freehandRoisCheckBox.setText(_translate("ProcessOptionsDlg", "Freehand Rois", None))
         self.roiSameSizeCheckBox.setText(_translate("ProcessOptionsDlg", "Rois same size", None))
         self.lockRoiPositionCheckBox.setText(_translate("ProcessOptionsDlg", "Lock roi relative positions", None))
