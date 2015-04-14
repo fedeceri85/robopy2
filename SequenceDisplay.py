@@ -233,6 +233,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionRoi_scale_factor, SIGNAL("triggered()"), self.roiscaleFactor)
 		self.connect(self.actionReset_roi_Colors, SIGNAL("triggered()"), self.resetRoiColors)
 		self.connect(self.actionAll_Rois_same_color, SIGNAL("triggered()"), self.allRoisSameColor)
+		self.connect(self.actionMake_all_rois_rectangular, SIGNAL("triggered()"), self.rectifyRois)
+
 
 		##DATABASE
 		self.connect(self.actionNew_Database,SIGNAL("triggered()"),self.createNewDatabase)
@@ -1409,6 +1411,20 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def drawRoiNumberscChanged(self):
 		self.imWidget.updateGL()	
 		self.processedWidget.updateGL()
+
+	def rectifyRois(self):
+		if self.optionsDlg.roiOptions.roiSize == 0:
+			d = 10
+		else:
+			d = self.optionsDlg.roiOptions.roiSize
+		for roi in self.imWidget.rois:
+			x,y = roi.computeMassCenter()
+			roi.setPoints([x-d/2,y-d/2,x+d/2,y-d/2,x+d/2,y+d/2,x-d/2,y+d/2])
+			roi.clearPointMap()
+			roi.computePointMap()
+		self.imWidget.updateGL()	
+		self.processedWidget.updateGL()		
+
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

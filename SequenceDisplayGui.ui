@@ -224,6 +224,8 @@
     <addaction name="actionRoi_scale_factor"/>
     <addaction name="actionAll_Rois_same_color"/>
     <addaction name="actionReset_roi_Colors"/>
+    <addaction name="separator"/>
+    <addaction name="actionMake_all_rois_rectangular"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -467,12 +469,17 @@
   </action>
   <action name="actionReset_roi_Colors">
    <property name="text">
-    <string>Reset roi Color cycle</string>
+    <string>Reset roi Color c&amp;ycle</string>
    </property>
   </action>
   <action name="actionAll_Rois_same_color">
    <property name="text">
-    <string>All Rois same color</string>
+    <string>&amp;All Rois same color</string>
+   </property>
+  </action>
+  <action name="actionMake_all_rois_rectangular">
+   <property name="text">
+    <string>Make all rois rectangular</string>
    </property>
   </action>
  </widget>
