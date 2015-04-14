@@ -29,7 +29,8 @@ from  roiAnalysis import MainWindow as rMW
 from scipy.io import savemat,loadmat
 from progress import progress
 from time import sleep
-
+from matplotlib import colors as matCol
+from matplotlib import rcParams
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -230,6 +231,8 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			
 		self.connect(self.actionSpecify_interframe_interval, SIGNAL("triggered()"), self.specify_interframe_interval)
 		self.connect(self.actionRoi_scale_factor, SIGNAL("triggered()"), self.roiscaleFactor)
+		self.connect(self.actionReset_roi_Colors, SIGNAL("triggered()"), self.resetRoiColors)
+		self.connect(self.actionAll_Rois_same_color, SIGNAL("triggered()"), self.allRoisSameColor)
 
 		##DATABASE
 		self.connect(self.actionNew_Database,SIGNAL("triggered()"),self.createNewDatabase)
@@ -241,6 +244,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#
 		self.connect(self.optionsDlg.zProjectSpinBox,SIGNAL('valueChanged(int)'),self.zprojectchanged)
 		self.connect(self.optionsDlg.movingAverageCheckBox,SIGNAL('stateChanged(int)'),self.movavgchanged)
+
 
 	
 	def makeProcessReferenceConnections(self, dlg):
@@ -1380,6 +1384,24 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		# imsave(fname,self.currentImage)
 		# self.currentImage = img2
 		# self.updateDisplay()
+	def resetRoiColors(self):
+		colorCycle =  rcParams["axes.color_cycle"]
+		
+		for roi in self.tiffSequence.rois:
+			roiCol = matCol.colorConverter.to_rgb(colorCycle[roi.ordinal % len(colorCycle)])
+				
+			c = QColor()
+			c.setRgbF(roiCol[0], roiCol[1], roiCol[2],1)
+			roi.color = c
+		self.imWidget.updateGL()	
+
+	def allRoisSameColor(self):
+		roiCol = self.optionsDlg.roiOptions.roiColor
+		c = QColor()
+		c.setRgbF(roiCol[0], roiCol[1], roiCol[2],1)
+		for roi in self.tiffSequence.rois:
+			roi.color = c
+		self.imWidget.updateGL()	
 
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)

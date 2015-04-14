@@ -257,6 +257,9 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('lockRoiPositions',d['lockRoiPositions'],self.lockRoiPositionCheckBox)
 			fo.add('scaleBarsCheckBox',d['scaleBarsCheckBox'],self.scaleBarsCheckBox)
 
+			fo.add('automaticColor',d['automaticColor'],self.autoColorRadioButton)
+			fo.add('setColor',d['setColor'],self.setColorradioButton)
+
 		except:
 			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
 			fo.add('semicircularRois',0, self.semicircularRoisCheckBox)
@@ -266,7 +269,11 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('roiSize',0,self.roiSizeSpinBox)
 			fo.add('lockRoiPositions',0,self.lockRoiPositionCheckBox)
 			fo.add('scaleBarsCheckBox',0,self.scaleBarsCheckBox)
+			fo.add('automaticColor',1,self.autoColorRadioButton)
+			fo.add('setColor',0,self.setColorradioButton)
 
+		fo.add('roiColor',[1.0,0,0],None)
+		self.connect(self.chooseColorButton,SIGNAL('clicked()'),self.chooseColor)
 		return fo
 
 	def HSVchanged(self):
@@ -278,7 +285,12 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			self.HSVbackGroupBox.setEnabled(False)
 			self.saturationLabel.setEnabled(False)
 			self.saturationSpinBox.setEnabled(False)
-			
+
+	def chooseColor(self):
+		col = QColorDialog.getColor()
+		if col.isValid():
+			self.roiOptions.roiColor = col.getRgbF()[:3]
+			self.chooseColorButton.setStyleSheet("QWidget { background-color: %s }"% col.name())
 	def applyWidgetValueWithoutSignal(self, obj, v):
 		obj.blockSignals(True)
 		obj.setValue(v)

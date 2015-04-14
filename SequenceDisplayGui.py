@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Fri Apr 10 14:53:42 2015
+# Created: Tue Apr 14 10:34:42 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -222,6 +222,10 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_current_frame.setObjectName(_fromUtf8("actionSave_current_frame"))
         self.actionSave_decorations_as_mask = QtGui.QAction(SequenceDisplayWnd)
         self.actionSave_decorations_as_mask.setObjectName(_fromUtf8("actionSave_decorations_as_mask"))
+        self.actionReset_roi_Colors = QtGui.QAction(SequenceDisplayWnd)
+        self.actionReset_roi_Colors.setObjectName(_fromUtf8("actionReset_roi_Colors"))
+        self.actionAll_Rois_same_color = QtGui.QAction(SequenceDisplayWnd)
+        self.actionAll_Rois_same_color.setObjectName(_fromUtf8("actionAll_Rois_same_color"))
         self.menuDatabase.addSeparator()
         self.menuDatabase.addAction(self.actionNew_Database)
         self.menuDatabase.addAction(self.actionOpen_Existing_Database)
@@ -245,6 +249,8 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.addAction(self.menuDatabase.menuAction())
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionRoi_scale_factor)
+        self.menuRois.addAction(self.actionAll_Rois_same_color)
+        self.menuRois.addAction(self.actionReset_roi_Colors)
         self.menuMath_2.addAction(self.actionAdd)
         self.menuMath_2.addAction(self.actionSubtract)
         self.menuMath_2.addAction(self.actionDivide)
@@ -331,5 +337,7 @@ class Ui_SequenceDisplayWnd(object):
         self.actionComputeRois_from_list.setText(_translate("SequenceDisplayWnd", "C&omputeRois from list", None))
         self.actionRoi_scale_factor.setText(_translate("SequenceDisplayWnd", "Ro&i scale factor", None))
         self.actionSave_current_frame.setText(_translate("SequenceDisplayWnd", "Save current &frame", None))
-        self.actionSave_decorations_as_mask.setText(_translate("SequenceDisplayWnd", "Save decorations as mask", None))
+        self.actionSave_decorations_as_mask.setText(_translate("SequenceDisplayWnd", "Save &decorations as mask", None))
+        self.actionReset_roi_Colors.setText(_translate("SequenceDisplayWnd", "Reset roi Color cycle", None))
+        self.actionAll_Rois_same_color.setText(_translate("SequenceDisplayWnd", "All Rois same color", None))
 
