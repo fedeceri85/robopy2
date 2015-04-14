@@ -1062,14 +1062,14 @@ def loadRoisFromFile(filename, w=None, h=None):
 		for roi in ROIS:
 			r = Roi.Roi()
 			c = roi['Coordinates']
-			
+			color = roi['Color']
 			isValidRoi = True
-			
+			r.color.setRgbF(color[0]/255.0,color[1]/255.0,color[2]/255.0,1.0)
 			for x,y in zip(c[0],c[1]):
 				#if w < x or x < 0 or h < y or y < 0:
 				#	isValidRoi = False
 				r.addPoint(x,y)
-				
+			
 			if isValidRoi:
 				r.computePointMap()
 				roboRois.append(r)
@@ -1079,6 +1079,7 @@ def loadRoisFromFile(filename, w=None, h=None):
 		return roboRois, roiprofile, times
 	else:
 		return (roboRois,roiBounds), roiprofile, times
+
 
 def saveRoisToFile(filename,rois,roiprofile = None,times = None):
 	roilist=[]

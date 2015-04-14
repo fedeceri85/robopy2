@@ -753,11 +753,11 @@ class ImageDisplayWidget(QGLWidget):
 
 
 		colorCycle =  matplotlib.rcParams["axes.color_cycle"]
-		if roi.color == QColor(Qt.green):
+		if roi.color == QColor(Qt.green) or roi.color is None:
 			roiCol = matplotlib.colors.colorConverter.to_rgb(colorCycle[self.rois[-1].ordinal % len(colorCycle)])
 		
 			c = QColor()
-			c.setRgbF(roiCol[0], roiCol[1], roiCol[2],0.5)
+			c.setRgbF(roiCol[0], roiCol[1], roiCol[2],1)
 			roi.color = c
 		
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
