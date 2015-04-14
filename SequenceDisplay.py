@@ -244,6 +244,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		#
 		self.connect(self.optionsDlg.zProjectSpinBox,SIGNAL('valueChanged(int)'),self.zprojectchanged)
 		self.connect(self.optionsDlg.movingAverageCheckBox,SIGNAL('stateChanged(int)'),self.movavgchanged)
+		self.connect(self.optionsDlg.drawRoiNumberscheckBox,SIGNAL('stateChanged(int)'),self.drawRoiNumberscChanged)
 
 
 	
@@ -1394,6 +1395,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			c.setRgbF(roiCol[0], roiCol[1], roiCol[2],1)
 			roi.color = c
 		self.imWidget.updateGL()	
+		self.processedWidget.updateGL()
 
 	def allRoisSameColor(self):
 		roiCol = self.optionsDlg.roiOptions.roiColor
@@ -1402,7 +1404,11 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		for roi in self.tiffSequence.rois:
 			roi.color = c
 		self.imWidget.updateGL()	
+		self.processedWidget.updateGL()
 
+	def drawRoiNumberscChanged(self):
+		self.imWidget.updateGL()	
+		self.processedWidget.updateGL()
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

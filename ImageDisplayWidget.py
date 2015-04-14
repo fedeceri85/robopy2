@@ -212,6 +212,8 @@ class ImageDisplayWidget(QGLWidget):
 			
 		glEnd()
 		if r.mapSize > 0:
+			self.drawRoiNumber = self.SequenceDisplay.optionsDlg.roiOptions.drawRoiNumbers
+
 			if self.drawRoiNumber == True:
 				x,y = r.computeMassCenter()
 				glPushMatrix()
@@ -433,7 +435,9 @@ class ImageDisplayWidget(QGLWidget):
 		self.videoBuffers[bufId].addText(s, x, y, color,fontsize=fontsize)
 	
 	def drawRoisVideoProcessor(self,rois,bufId=2):
-		self.videoBuffers[bufId].drawRois(rois)
+		self.drawRoiNumber = self.SequenceDisplay.optionsDlg.roiOptions.drawRoiNumbers
+
+		self.videoBuffers[bufId].drawRois(rois,self.drawRoiNumber)
 
 	def checkGLError(self, msg=None):
 		err = glGetError()
@@ -742,13 +746,13 @@ class ImageDisplayWidget(QGLWidget):
 			self.SequenceDisplay.keyPressEvent(event)
 
 
-	def addRoi(self,roi,fromImageDisplayWidget = True,drawRoiNumber=True):
+	def addRoi(self,roi,fromImageDisplayWidget = True):
 		if not fromImageDisplayWidget:
 			self.rois.append(roi)
 		if self.computeRoiPointMaps:
 			roi.computePointMap()
 		roi.ordinal = len(self.rois) - 1
-		self.drawRoiNumber = drawRoiNumber
+		self.drawRoiNumber = self.SequenceDisplay.optionsDlg.roiOptions.drawRoiNumbers
 		
 
 
@@ -781,7 +785,7 @@ class ImageDisplayWidget(QGLWidget):
 			newrois.append(i)
 		self.rois = []
 		for i in newrois:	
-			self.addRoi(i,False,self.drawRoiNumber)
+			self.addRoi(i,False)
 		del newrois
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 		self.SequenceDisplay.tiffSequence.rois = []
@@ -804,7 +808,7 @@ class ImageDisplayWidget(QGLWidget):
 		
 		self.rois = []
 		for i in newrois:	
-			self.addRoi(i,False,self.drawRoiNumber)
+			self.addRoi(i,False)
 		del newrois
 		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
 		self.SequenceDisplay.tiffSequence.rois = []

@@ -259,6 +259,8 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 
 			fo.add('automaticColor',d['automaticColor'],self.autoColorRadioButton)
 			fo.add('setColor',d['setColor'],self.setColorradioButton)
+			fo.add('drawRoiNumbers',d['drawRoiNumbers'],self.drawRoiNumberscheckBox)
+
 
 		except:
 			fo.add('rectangularRois', 1, self.rectangularRoisCheckBox)
@@ -271,6 +273,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('scaleBarsCheckBox',0,self.scaleBarsCheckBox)
 			fo.add('automaticColor',1,self.autoColorRadioButton)
 			fo.add('setColor',0,self.setColorradioButton)
+			fo.add('drawRoiNumbers',1,self.drawRoiNumberscheckBox)
 
 		fo.add('roiColor',[1.0,0,0],None)
 		self.connect(self.chooseColorButton,SIGNAL('clicked()'),self.chooseColor)

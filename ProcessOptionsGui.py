@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Tue Apr 14 10:20:33 2015
+# Created: Tue Apr 14 11:42:11 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -567,6 +567,10 @@ class Ui_ProcessOptionsDlg(object):
         self.horizontalLayout_28.addWidget(self.chooseColorButton)
         self.verticalLayout.addLayout(self.horizontalLayout_28)
         self.verticalLayout_12.addLayout(self.verticalLayout)
+        self.drawRoiNumberscheckBox = QtGui.QCheckBox(self.groupBox)
+        self.drawRoiNumberscheckBox.setChecked(True)
+        self.drawRoiNumberscheckBox.setObjectName(_fromUtf8("drawRoiNumberscheckBox"))
+        self.verticalLayout_12.addWidget(self.drawRoiNumberscheckBox)
         self.verticalLayout_13.addWidget(self.groupBox)
         self.PO_TabWidget.addTab(self.RoiOptionsTab, _fromUtf8(""))
         self.gridLayout_3.addWidget(self.PO_TabWidget, 0, 0, 1, 1)
@@ -643,9 +647,10 @@ class Ui_ProcessOptionsDlg(object):
         self.lockRoiPositionCheckBox.setText(_translate("ProcessOptionsDlg", "Lock roi relative positions", None))
         self.scaleBarsCheckBox.setText(_translate("ProcessOptionsDlg", "Use scalebars", None))
         self.subBackCheckBox.setText(_translate("ProcessOptionsDlg", "Subtract Background (Affects only rois)", None))
-        self.groupBox.setTitle(_translate("ProcessOptionsDlg", "Roi Color", None))
+        self.groupBox.setTitle(_translate("ProcessOptionsDlg", "Roi Style", None))
         self.autoColorRadioButton.setText(_translate("ProcessOptionsDlg", "A&utomatic Color", None))
         self.setColorradioButton.setText(_translate("ProcessOptionsDlg", "Set color", None))
         self.chooseColorButton.setText(_translate("ProcessOptionsDlg", "Choose color", None))
+        self.drawRoiNumberscheckBox.setText(_translate("ProcessOptionsDlg", "Draw Roi Numbers", None))
         self.PO_TabWidget.setTabText(self.PO_TabWidget.indexOf(self.RoiOptionsTab), _translate("ProcessOptionsDlg", "Roi Options", None))
 

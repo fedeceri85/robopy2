@@ -180,7 +180,7 @@ class VideoProcessor(QGLFramebufferObject):
                 self.checkGLError()
                 self.openglContext.doneCurrent()
         
-        def drawRois(self,rois):
+        def drawRois(self,rois,drawRoiNumbers=True):
                 w = self.width()
                 h = self.height()      
                 self.openglContext.makeCurrent()
@@ -206,7 +206,7 @@ class VideoProcessor(QGLFramebufferObject):
                                 
                         glEnd()
 
-                        if r.mapSize > 0:
+                        if r.mapSize > 0 and drawRoiNumbers:
                                 x,y = r.computeMassCenter()
                                 glPushMatrix()
                                 
