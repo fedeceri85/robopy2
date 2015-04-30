@@ -29,7 +29,7 @@ class plotWindow(pg.GraphicsWindow):
 
 		# Enable antialiasing for prettier plots
 		self.scalebar = scalebar
-
+		self.scalebartype=0
 		# self.setCentralWidget(self.view)    
 		# self.curve = self.view.plot()
 		self.curve = []
@@ -64,21 +64,28 @@ class plotWindow(pg.GraphicsWindow):
 	def updateSB(self):
 		try:
 			self.scale.scene().removeItem(self.scale)
+		except:
+			pass
+
+		try:
 			self.vscale.scene().removeItem(self.vscale)
 		except:
 			pass
+
 		if self.scalebar:
 			vb = self.p8.getViewBox()
 			xsize = vb.viewRange()[0][1] - vb.viewRange()[0][0]
 			ysize = vb.viewRange()[1][1] - vb.viewRange()[1][0]
+			if self.scalebartype==0:
+				self.scale = pg.ScaleBar(size=round_to_1(xsize/10.0),suffix=self.xlabel)                                                                                                                                                                   
+				self.scale.setParentItem(vb)
+				self.scale.anchor((0, 1), (1, 1), offset=(-20, -10))
+				self.scale.text.setText(pg.functions.siFormat(round_to_1(xsize/10.0),suffix=self.xlabel),color=(0,0,0))
+			if self.scalebartype==0 or self.scalebartype==1:
 
-			self.scale = pg.ScaleBar(size=round_to_1(xsize/10.0),suffix=self.xlabel)                                                                                                                                                                   
-			self.scale.setParentItem(vb)
-			self.scale.anchor((0, 1), (1, 1), offset=(-20, -10))
-			self.vscale = verticalScaleBar(size=round_to_1(ysize/5.0),suffix=self.ylabel)                                                                                                                                                                   
-			self.vscale.setParentItem(vb)
-			self.vscale.anchor((0, 1), (1, 1), offset=(-20, -5))
-			self.scale.text.setText(pg.functions.siFormat(round_to_1(xsize/10.0),suffix=self.xlabel),color=(0,0,0))
+				self.vscale = verticalScaleBar(size=round_to_1(ysize/5.0),suffix=self.ylabel)                                                                                                                                                                   
+				self.vscale.setParentItem(vb)
+				self.vscale.anchor((0, 1), (1, 1), offset=(-20, -5))
 			#vb.autoRange()
 
 	def updatePlot(self):
@@ -87,7 +94,7 @@ class plotWindow(pg.GraphicsWindow):
 	def updateRegion(self):
 	    self.lr.setRegion(self.p9.getViewBox().viewRange()[0])
 
-	def plot(self,x,y,xlabel='',ylabel='',colors = None,title = None,scalebars = False):
+	def plot(self,x,y,xlabel='',ylabel='',colors = None,title = None,scalebars = False,fixedDiff=False,scalebarType=0):
 		self.p8.clear()
 		if self.useViewBox:
 			self.p9.clear()
@@ -101,7 +108,8 @@ class plotWindow(pg.GraphicsWindow):
 		self.p8.setTitle(title)
 		self.marker = pg.InfiniteLine(pos=self.markerpos,pen = (0,0,0),movable = True)
 		self.p8.addItem(self.marker)
-		diff = 0	
+		diff = 0
+		diff2 = 0	
 		for i in xrange(y.shape[1]):
 			if colors is not None:
 				color = colors[i]
@@ -110,10 +118,18 @@ class plotWindow(pg.GraphicsWindow):
 
 			if scalebars:
 				if i>0:
-					diff = diff+y[:,i-1].max()
+					if fixedDiff is not False:
+						diff = fixedDiff+diff
+						diff2 = diff - y[:,i].min()
+					else:
+
+						diff = diff+(y[:,i-1].max()-y[:,i-1].min())
+						diff2 = diff - y[:,i].min()
 				else:
 					diff = 0
-			self.p8.plot(x,y[:,i]+diff,pen=color)#, pen=(255,255,255,200))
+					diff2=- y[:,i].min()
+					
+			self.p8.plot(x,y[:,i]+diff2,pen=color)#, pen=(255,255,255,200))
 			if self.useViewBox:
 				self.p9.plot(x,y[:,i],pen=color)#, pen=(255,255,255,200))
 		self.p8.setLabel('left',ylabel)
@@ -125,8 +141,11 @@ class plotWindow(pg.GraphicsWindow):
 		self.ylabel = ylabel
 		if scalebars:
 			self.scalebar = True
-			self.p8.hideAxis('bottom')
-			self.p8.hideAxis('left')
+			self.scalebartype = scalebarType
+			if self.scalebartype==0:
+				self.p8.hideAxis('bottom')
+			if self.scalebartype==0 or self.scalebartype==1:
+				self.p8.hideAxis('left')
 			self.updateSB()
 
 

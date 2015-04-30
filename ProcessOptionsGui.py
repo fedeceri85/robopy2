@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ProcessOptionsGui.ui'
 #
-# Created: Tue Apr 14 14:26:29 2015
+# Created: Tue Apr 21 17:23:02 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -524,9 +524,23 @@ class Ui_ProcessOptionsDlg(object):
         self.lockRoiPositionCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
         self.lockRoiPositionCheckBox.setObjectName(_fromUtf8("lockRoiPositionCheckBox"))
         self.verticalLayout_14.addWidget(self.lockRoiPositionCheckBox)
+        self.horizontalLayout_29 = QtGui.QHBoxLayout()
+        self.horizontalLayout_29.setObjectName(_fromUtf8("horizontalLayout_29"))
         self.scaleBarsCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
         self.scaleBarsCheckBox.setObjectName(_fromUtf8("scaleBarsCheckBox"))
-        self.verticalLayout_14.addWidget(self.scaleBarsCheckBox)
+        self.horizontalLayout_29.addWidget(self.scaleBarsCheckBox)
+        spacerItem10 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_29.addItem(spacerItem10)
+        self.label_9 = QtGui.QLabel(self.RoiOptionsTab)
+        self.label_9.setObjectName(_fromUtf8("label_9"))
+        self.horizontalLayout_29.addWidget(self.label_9)
+        self.spacingSpinBox = QtGui.QDoubleSpinBox(self.RoiOptionsTab)
+        self.spacingSpinBox.setDecimals(3)
+        self.spacingSpinBox.setMaximum(65000.0)
+        self.spacingSpinBox.setSingleStep(0.001)
+        self.spacingSpinBox.setObjectName(_fromUtf8("spacingSpinBox"))
+        self.horizontalLayout_29.addWidget(self.spacingSpinBox)
+        self.verticalLayout_14.addLayout(self.horizontalLayout_29)
         self.horizontalLayout_26 = QtGui.QHBoxLayout()
         self.horizontalLayout_26.setObjectName(_fromUtf8("horizontalLayout_26"))
         self.subBackCheckBox = QtGui.QCheckBox(self.RoiOptionsTab)
@@ -581,7 +595,7 @@ class Ui_ProcessOptionsDlg(object):
         self.gridLayout_3.addWidget(self.PO_TabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(ProcessOptionsDlg)
-        self.PO_TabWidget.setCurrentIndex(0)
+        self.PO_TabWidget.setCurrentIndex(5)
         QtCore.QMetaObject.connectSlotsByName(ProcessOptionsDlg)
 
     def retranslateUi(self, ProcessOptionsDlg):
@@ -652,6 +666,7 @@ class Ui_ProcessOptionsDlg(object):
         self.roiSameSizeCheckBox.setText(_translate("ProcessOptionsDlg", "Rois same size", None))
         self.lockRoiPositionCheckBox.setText(_translate("ProcessOptionsDlg", "Lock roi relative positions", None))
         self.scaleBarsCheckBox.setText(_translate("ProcessOptionsDlg", "Use scalebars", None))
+        self.label_9.setText(_translate("ProcessOptionsDlg", "Fixed Spacing( 0=Auto)", None))
         self.subBackCheckBox.setText(_translate("ProcessOptionsDlg", "Subtract Background (Affects only rois)", None))
         self.groupBox.setTitle(_translate("ProcessOptionsDlg", "Roi Style", None))
         self.autoColorRadioButton.setText(_translate("ProcessOptionsDlg", "A&utomatic Color", None))

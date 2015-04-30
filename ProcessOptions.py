@@ -260,6 +260,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('automaticColor',d['automaticColor'],self.autoColorRadioButton)
 			fo.add('setColor',d['setColor'],self.setColorradioButton)
 			fo.add('drawRoiNumbers',d['drawRoiNumbers'],self.drawRoiNumberscheckBox)
+			fo.add('traceSpacing',d['traceSpacing'],self.spacingSpinBox)
 
 
 		except:
@@ -274,7 +275,7 @@ class ProcessOptions(Ui_ProcessOptionsDlg, QDialog):
 			fo.add('automaticColor',1,self.autoColorRadioButton)
 			fo.add('setColor',0,self.setColorradioButton)
 			fo.add('drawRoiNumbers',1,self.drawRoiNumberscheckBox)
-
+			fo.add('traceSpacing',0.00,self.spacingSpinBox)
 		fo.add('roiColor',[1.0,0,0],None)
 		self.connect(self.chooseColorButton,SIGNAL('clicked()'),self.chooseColor)
 		return fo

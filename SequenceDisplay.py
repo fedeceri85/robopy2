@@ -871,10 +871,13 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			for roi in self.tiffSequence.rois:
 				colors.append(roi.color.getRgb())
 
-
+			if self.optionsDlg.roiOptions.traceSpacing != 0.0:
+				traceSpacing = self.optionsDlg.roiOptions.traceSpacing
+			else:
+				traceSpacing = False
 
 			ylabel = self.getYlabel()
-			self.fig.plot(times,rdata,xlabel=lab,ylabel = ylabel,colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+			self.fig.plot(times,rdata,xlabel=lab,ylabel = ylabel,colors=colors,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked(),fixedDiff = traceSpacing,scalebarType=1)
 			self.fig.show()
 
 		return times,rdata
@@ -908,7 +911,12 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		colors2 = [colors[i] for i in out ]
 		ylabel = self.getYlabel()
 
-		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=colors2,title=inStr,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked())
+		if self.optionsDlg.roiOptions.traceSpacing != 0.0:
+			traceSpacing = self.optionsDlg.roiOptions.traceSpacing
+		else:
+			traceSpacing = False
+
+		self.fig.plot(times,rdata[:,out],xlabel=self.tiffSequence.timesDict.label,ylabel = ylabel,colors=colors2,title=inStr,scalebars = self.optionsDlg.scaleBarsCheckBox.isChecked(),fixedDiff = traceSpacing,scalebarType=1)
 		self.fig.show()
 
 	def showNextRoi(self):
@@ -1424,7 +1432,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			roi.computePointMap()
 		self.imWidget.updateGL()	
 		self.processedWidget.updateGL()		
-
+		self.roiRecomputeNeeded(True)
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()
