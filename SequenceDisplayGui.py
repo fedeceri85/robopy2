@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'SequenceDisplayGui.ui'
 #
-# Created: Tue Apr 14 12:07:45 2015
+# Created: Thu May 21 10:35:22 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -228,6 +228,8 @@ class Ui_SequenceDisplayWnd(object):
         self.actionAll_Rois_same_color.setObjectName(_fromUtf8("actionAll_Rois_same_color"))
         self.actionMake_all_rois_rectangular = QtGui.QAction(SequenceDisplayWnd)
         self.actionMake_all_rois_rectangular.setObjectName(_fromUtf8("actionMake_all_rois_rectangular"))
+        self.actionDownsample_Roi_Ponts = QtGui.QAction(SequenceDisplayWnd)
+        self.actionDownsample_Roi_Ponts.setObjectName(_fromUtf8("actionDownsample_Roi_Ponts"))
         self.menuDatabase.addSeparator()
         self.menuDatabase.addAction(self.actionNew_Database)
         self.menuDatabase.addAction(self.actionOpen_Existing_Database)
@@ -253,6 +255,7 @@ class Ui_SequenceDisplayWnd(object):
         self.menuRois.addAction(self.actionRoi_scale_factor)
         self.menuRois.addAction(self.actionAll_Rois_same_color)
         self.menuRois.addAction(self.actionReset_roi_Colors)
+        self.menuRois.addAction(self.actionDownsample_Roi_Ponts)
         self.menuRois.addSeparator()
         self.menuRois.addAction(self.actionMake_all_rois_rectangular)
         self.menuMath_2.addAction(self.actionAdd)
@@ -344,5 +347,6 @@ class Ui_SequenceDisplayWnd(object):
         self.actionSave_decorations_as_mask.setText(_translate("SequenceDisplayWnd", "Save &decorations as mask", None))
         self.actionReset_roi_Colors.setText(_translate("SequenceDisplayWnd", "Reset roi Color c&ycle", None))
         self.actionAll_Rois_same_color.setText(_translate("SequenceDisplayWnd", "&All Rois same color", None))
-        self.actionMake_all_rois_rectangular.setText(_translate("SequenceDisplayWnd", "Make all rois rectangular", None))
+        self.actionMake_all_rois_rectangular.setText(_translate("SequenceDisplayWnd", "&Make all rois rectangular", None))
+        self.actionDownsample_Roi_Ponts.setText(_translate("SequenceDisplayWnd", "Downsample Roi Ponts", None))
 

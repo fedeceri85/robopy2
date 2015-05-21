@@ -224,6 +224,7 @@
     <addaction name="actionRoi_scale_factor"/>
     <addaction name="actionAll_Rois_same_color"/>
     <addaction name="actionReset_roi_Colors"/>
+    <addaction name="actionDownsample_Roi_Ponts"/>
     <addaction name="separator"/>
     <addaction name="actionMake_all_rois_rectangular"/>
    </widget>
@@ -479,7 +480,12 @@
   </action>
   <action name="actionMake_all_rois_rectangular">
    <property name="text">
-    <string>Make all rois rectangular</string>
+    <string>&amp;Make all rois rectangular</string>
+   </property>
+  </action>
+  <action name="actionDownsample_Roi_Ponts">
+   <property name="text">
+    <string>Downsample Roi Ponts</string>
    </property>
   </action>
  </widget>

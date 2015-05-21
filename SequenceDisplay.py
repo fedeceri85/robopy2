@@ -31,6 +31,8 @@ from progress import progress
 from time import sleep
 from matplotlib import colors as matCol
 from matplotlib import rcParams
+import matplotlib.pylab as pl
+
 class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def __init__(self, parent = None, files=None,loadInRam=False,rawTiffOptions = None):
 		PyQt4.QtGui.QMainWindow.__init__(self, parent=parent)
@@ -234,7 +236,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionReset_roi_Colors, SIGNAL("triggered()"), self.resetRoiColors)
 		self.connect(self.actionAll_Rois_same_color, SIGNAL("triggered()"), self.allRoisSameColor)
 		self.connect(self.actionMake_all_rois_rectangular, SIGNAL("triggered()"), self.rectifyRois)
-
+		self.connect(self.actionDownsample_Roi_Ponts, SIGNAL("triggered()"), self.downSampleRois)
 
 		##DATABASE
 		self.connect(self.actionNew_Database,SIGNAL("triggered()"),self.createNewDatabase)
@@ -1383,18 +1385,36 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 	def exportDecoration(self):
 
 		img2 = self.currentImage.copy()
-		self.currentImage = np.ones(img2.shape)*(1E16-1)
-		self.loadImageGray(self.currentImage)
-		self.updateDisplay()
-
-		# data = self.getSequenceFrameAsRgb(self.CurrentShownFrame,drawRois=True)
-		# h,w,k,z = data.shape
-		# data = data.reshape(h*w,z)
-		# data = data.reshape(w,h,z)
-		# fname = os.path.splitext(self.tiffFiles[0])[0]+'_mask.tif'
-		# imsave(fname,self.currentImage)
-		# self.currentImage = img2
+		# self.currentImage = np.ones(img2.shape)*(1E16-1)
+		# self.loadImageGray(self.currentImage)
 		# self.updateDisplay()
+
+		pl.imshow(img2,cmap=pl.cm.gray)
+		#colors = ['r','r','r','b','g']
+
+		for j,roi in enumerate(self.imWidget.rois):
+			x = []
+			y = []
+		#    roi.downsample(7)
+			for i in xrange(roi.size()):
+				p = roi.point(i)
+				x.append(p.x())
+				y.append(p.y())
+			x.append(roi.point(0).x())
+			y.append(roi.point(0).y())
+
+			xc,yc = roi.computeMassCenter()
+			pl.text(xc,yc,str(j+1),color = np.array(roi.color.getRgb()[:3])/255.0)
+			pl.plot(x,y,color=np.array(roi.color.getRgb()[:3])/255.0,linewidth=2)
+		#plt.gca().invert_yaxis()
+		#axis('equal')
+		pl.xlim((0,img2.shape[1]))
+		pl.ylim((img2.shape[0]-1,0))
+		a = pl.plt.gca()
+		a.yaxis.set_visible(False)
+		a.xaxis.set_visible(False)
+
+
 	def resetRoiColors(self):
 		colorCycle =  rcParams["axes.color_cycle"]
 		
@@ -1433,6 +1453,18 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.imWidget.updateGL()	
 		self.processedWidget.updateGL()		
 		self.roiRecomputeNeeded(True)
+
+	def downSampleRois(self):
+		number, ok = PyQt4.QtGui.QInputDialog.getInt(self, 'Downsample roi','Factor:',1)
+ 		if ok:
+ 			for roi in self.imWidget.rois:
+				roi.downsample(number)
+				roi.clearPointMap()
+				roi.computePointMap()
+		self.imWidget.updateGL()	
+		self.processedWidget.updateGL()		
+		self.roiRecomputeNeeded(True)
+					
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

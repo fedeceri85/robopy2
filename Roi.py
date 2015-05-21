@@ -41,6 +41,17 @@ class Roi(QPolygon):
 		
 	def addPoint(self, x, y):
 		self.append(QPoint(x,y))
+
+	def removePoint(self,n):
+		self.remove(n)
+
+	def downsample(self,n):
+		p = range(self.size())
+		toKeep = p[::n]
+		toRemove = list(set(p).difference(set(toKeep)))
+		toRemove.sort(reverse=True)
+		for i in toRemove:
+			self.removePoint(i)
 		
 	def computeAverage(self, im):
 		avg = 0.0

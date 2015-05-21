@@ -722,6 +722,9 @@ class ImageDisplayWidget(QGLWidget):
 	def mouseDoubleClickEvent(self, event):
 		if self.DrawRoiStatus == "drawing":
 			self.DrawRoiStatus = "idle"
+			#if self.SequenceDisplay.optionsDlg.roiOptions.freehandRois==1:
+			#	self.rois[-1].downsample(5)
+
 			self.addRoi(self.rois[-1])
 		else:
 			if event.button() == Qt.LeftButton:
