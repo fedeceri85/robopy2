@@ -1286,7 +1286,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.dataset['minPeakDistance'] = np.array([[10]])
 		self.dataset['maxLowerSpan'] = np.array([[100]])
 		self.dataset['locDist'] = np.empty((1,1))
-		self.dataset['sequenceFileName'] = np.array([u'/prova'])
+		self.dataset['sequenceFileName'] = np.array([unicode(self.tiffFiles[0])])
 		self.dataset['sequenceName'] =  np.array([u'prova.mat'])
 		self.dataset['roiFileName'] =np.array([u'prova.mat'])
 		self.dataset['vecData'] = np.empty((1,1))

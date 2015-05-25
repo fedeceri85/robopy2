@@ -1,0 +1,11 @@
+ 
+python-numpy
+python-scipy
+python-matplotlib
+python-opencv
+python-qt4
+python-opengl
+python-qt4-gl
+python-libtiff (Ubuntu :download with pip)
+python-pytables
+pyqtgraph (pip)
