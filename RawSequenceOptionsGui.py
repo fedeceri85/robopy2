@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'RawSequenceOptionsGui.ui'
 #
-# Created: Mon Mar 30 15:45:18 2015
+# Created: Mon Jun  8 13:07:42 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -146,12 +146,14 @@ class Ui_Dialog(object):
         self.rotateCheckBox = QtGui.QCheckBox(Dialog)
         self.rotateCheckBox.setObjectName(_fromUtf8("rotateCheckBox"))
         self.horizontalLayout.addWidget(self.rotateCheckBox)
-        self.rotateSpinBox = QtGui.QSpinBox(Dialog)
-        self.rotateSpinBox.setEnabled(False)
-        self.rotateSpinBox.setMinimum(0)
-        self.rotateSpinBox.setMaximum(180)
-        self.rotateSpinBox.setObjectName(_fromUtf8("rotateSpinBox"))
-        self.horizontalLayout.addWidget(self.rotateSpinBox)
+        self.rotateComboBox = QtGui.QComboBox(Dialog)
+        self.rotateComboBox.setEnabled(False)
+        self.rotateComboBox.setObjectName(_fromUtf8("rotateComboBox"))
+        self.rotateComboBox.addItem(_fromUtf8(""))
+        self.rotateComboBox.addItem(_fromUtf8(""))
+        self.rotateComboBox.addItem(_fromUtf8(""))
+        self.rotateComboBox.addItem(_fromUtf8(""))
+        self.horizontalLayout.addWidget(self.rotateComboBox)
         self.verticalLayout_5.addLayout(self.horizontalLayout)
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
         self.buttonBox.setEnabled(True)
@@ -185,4 +187,8 @@ class Ui_Dialog(object):
         self.label_7.setText(_translate("Dialog", "Top", None))
         self.label_6.setText(_translate("Dialog", "Bottom", None))
         self.rotateCheckBox.setText(_translate("Dialog", "Rotate (buggy)", None))
+        self.rotateComboBox.setItemText(0, _translate("Dialog", "0", None))
+        self.rotateComboBox.setItemText(1, _translate("Dialog", "90", None))
+        self.rotateComboBox.setItemText(2, _translate("Dialog", "180", None))
+        self.rotateComboBox.setItemText(3, _translate("Dialog", "270", None))
 

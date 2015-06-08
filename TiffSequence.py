@@ -158,7 +158,17 @@ class Sequence:
 					#img = zoom(img-sub+uint16(lrsub.mean()),1.0/self.options['rebin'],order=0)
 					img = rebin(img-sub+uint16(lrsub.mean()),(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
 					if self.options['rotate']:
-						img = imrotate(img,self.options['angle'])
+						if self.options['angle'] == 0:
+							pass
+						elif self.options['angle'] == 90:
+							img = img.T[:,::-1]
+						elif self.options['angle'] == 180:
+							img = img[::-1,::-1]
+						elif self.options['angle'] == 270:
+							img = img.T[::-1,:]
+
+
+						#img = imrotate(img,self.options['angle'])
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -168,7 +178,15 @@ class Sequence:
 					img = rebin(img,(img.shape[0]/self.options['rebin'],img.shape[1]/self.options['rebin']))
 
 					if self.options['rotate']:
-						img = imrotate(img,self.options['angle'])
+						if self.options['angle'] == 0:
+							pass
+						elif self.options['angle'] == 90:
+							img = img.T[:,::-1]
+						elif self.options['angle'] == 180:
+							img = img[::-1,::-1]
+						elif self.options['angle'] == 270:
+							img = img.T[::-1,:]
+
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img
@@ -190,14 +208,30 @@ class Sequence:
 					img = img-sub+uint16(lrsub.mean())
 
 					if self.options['rotate']:
-						img = imrotate(img,self.options['angle'])
+						if self.options['angle'] == 0:
+							pass
+						elif self.options['angle'] == 90:
+							img = img.T[:,::-1]
+						elif self.options['angle'] == 180:
+							img = img[::-1,::-1]
+						elif self.options['angle'] == 270:
+							img = img.T[::-1,:]
+
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]
 					#self.arraySequence[:,:,index] = img-sub+uint16(lrsub.mean())
 					
 				else:
 					if self.options['rotate']:
-						img = imrotate(img,self.options['angle'])
+						if self.options['angle'] == 0:
+							pass
+						elif self.options['angle'] == 90:
+							img = img.T[:,::-1]
+						elif self.options['angle'] == 180:
+							img = img[::-1,::-1]
+						elif self.options['angle'] == 270:
+							img = img.T[::-1,:]
+
 					if self.options['crop']:
 						img = img[tm:bm,lm:rm]	
 						
@@ -460,7 +494,13 @@ class TiffSequence(Sequence):
 		if self.options['crop']:
 			width = self.options['rightMargin'] - self.options['leftMargin']
 			height = self.options['bottomMargin'] - self.options['topMargin']
-		
+		if self.options['rotate']:
+			if self.options['angle']==90 or self.options['angle']==270:
+				w2 = width
+				width = height
+				height =w2
+
+
 		return width, height, frames
 		
 	def getFileIndexes(self, n):
@@ -586,7 +626,12 @@ class HDF5Sequence(Sequence):
 		if self.options['crop']:
 			width = self.options['rightMargin'] - self.options['leftMargin']
 			height = self.options['bottomMargin'] - self.options['topMargin']
-		
+		if self.options['rotate']:
+			if self.options['angle']==90 or self.options['angle']==270:
+				w2 = width
+				width = height
+				height =w2		
+
 		self.width=width
 		self.height=height
 		self.frames=frames 
@@ -728,7 +773,11 @@ class RawSequence(Sequence):
 		if self.options['crop']:
 			width = self.options['rightMargin'] - self.options['leftMargin']
 			height = self.options['bottomMargin'] - self.options['topMargin']
-		
+		if self.options['rotate']:
+			if self.options['angle']==90 or self.options['angle']==270:
+				w2 = width
+				width = height
+				height =w2
 		self.width=width
 		self.height=height
 		self.frames=frames 

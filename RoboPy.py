@@ -76,9 +76,9 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 
 	def rotateStateChanged(self):
 		if self.rotateCheckBox.isChecked():
-			self.rotateSpinBox.setEnabled(True)
+			self.rotateComboBox.setEnabled(True)
 		else:
-			self.rotateSpinBox.setEnabled(False)
+			self.rotateComboBox.setEnabled(False)
 
 	def updateCropLimits(self,a,b,c,d):
 		if (b-a)%2 != 0:
@@ -126,7 +126,7 @@ class RawSequenceOptions(Ui_Dialog,PyQt4.QtGui.QDialog):
 			
 		if self.rotateCheckBox.isChecked():
 			options['rotate'] = True
-			options['angle'] = self.rotateSpinBox.value()
+			options['angle'] = int(str(self.rotateComboBox.currentText()))
 		else:
 			options['rotate'] = False
 			options['angle'] = 0

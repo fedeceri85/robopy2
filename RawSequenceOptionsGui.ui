@@ -269,16 +269,30 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="rotateSpinBox">
+      <widget class="QComboBox" name="rotateComboBox">
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>180</number>
-       </property>
+       <item>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>90</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>180</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>270</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
