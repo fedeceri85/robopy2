@@ -821,3 +821,25 @@ class ImageDisplayWidget(QGLWidget):
 		self.updateGL()
 		
 		self.emit(QtCore.SIGNAL("roiDeleted(long)"), id(self))
+
+	def sortRois(self,roisList):
+		if roisList<len(self.rois):
+			print("Not enough rois")
+			return
+		newrois = []
+
+		for i in self.rois:
+			newrois.append(i)
+
+		self.rois = []
+		self.SequenceDisplay.tiffSequence.rois = []
+		self.SequenceDisplay.processedWidget.rois = []
+		for i in roisList:
+			self.addRoi(newrois[i],False)
+		del newrois
+		self.emit(QtCore.SIGNAL("roiRecomputeNeeded(bool)"), True)
+
+		for i in self.rois:
+			self.SequenceDisplay.tiffSequence.rois.append(i)
+		
+		self.updateGL()

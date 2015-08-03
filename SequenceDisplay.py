@@ -237,6 +237,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.connect(self.actionAll_Rois_same_color, SIGNAL("triggered()"), self.allRoisSameColor)
 		self.connect(self.actionMake_all_rois_rectangular, SIGNAL("triggered()"), self.rectifyRois)
 		self.connect(self.actionDownsample_Roi_Ponts, SIGNAL("triggered()"), self.downSampleRois)
+		self.connect(self.actionRearrange_Rois, SIGNAL("triggered()"), self.rearrangeRois)
 
 		##DATABASE
 		self.connect(self.actionNew_Database,SIGNAL("triggered()"),self.createNewDatabase)
@@ -1302,7 +1303,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 
 		self.dataset['stereociliaLine'] = np.empty((1,1))
 		self.dataset['Linescale'] = np.empty((1,1))
-		self.dataset['admittedPeakPercentage'] = np.array([[0.1]])
+		self.dataset['admittedPeakPercentage'] = np.array([[0.01]])
 		self.dataset['highPassFreq'] = np.array([[0.2]])
 		self.dataset['highPassFilterOnOff'] = np.array([[0]])
 		self.dataset['dataThresholdOnOff'] = np.array([[0]])
@@ -1321,7 +1322,7 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 			rdata, times = SequenceProcessor.applyRoiComputationOptions(self.displayParameters.roiProfile, self.tiffSequence.times(), self.optionsDlg.frameOptions, self.tiffSequence.rois)
 			self.dataset['vecData'][0,0] = rdata.T
 			self.dataset['oldVecData'][0,0] = rdata.T
-			self.dataset['t'][0,0] = times
+			self.dataset['t'][0,0] = np.double(times)
 			self.dataset['activeRois'][0,0] = np.ones(rdata.shape[1])
 			roiArea = np.array([r.mapSize for r in self.tiffSequence.rois])
 			roiArea = roiArea.reshape((1,roiArea.size))
@@ -1465,6 +1466,25 @@ class SequenceDisplay(Ui_SequenceDisplayWnd, PyQt4.QtGui.QMainWindow):
 		self.processedWidget.updateGL()		
 		self.roiRecomputeNeeded(True)
 					
+	def rearrangeRois(self):
+		inStr, ok = QInputDialog.getText(self,'Select rois order','Comma separated, insert interval as start:end')
+		inStr = str(inStr)
+		pieces = inStr.split(',')
+		out = []
+		for piece in pieces:
+
+			if piece.rfind(':') != -1:
+				tbegin,tend = map(int, piece.split(':'))
+				out.extend(range(tbegin-1,tend-1))
+			else:
+				piece = [piece,]
+				out.append(map(int,piece)[0]-1)
+
+		self.imWidget.sortRois(out)
+
+
+
+
 if __name__== "__main__":
 	app = PyQt4.QtGui.QApplication(sys.argv)
 	window = RoboPy()

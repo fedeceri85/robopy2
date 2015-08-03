@@ -227,6 +227,7 @@
     <addaction name="actionDownsample_Roi_Ponts"/>
     <addaction name="separator"/>
     <addaction name="actionMake_all_rois_rectangular"/>
+    <addaction name="actionRearrange_Rois"/>
    </widget>
    <widget class="QMenu" name="menuStacks">
     <property name="title">
@@ -485,7 +486,12 @@
   </action>
   <action name="actionDownsample_Roi_Ponts">
    <property name="text">
-    <string>Downsample Roi Ponts</string>
+    <string>Downsample Roi &amp;Ponts</string>
+   </property>
+  </action>
+  <action name="actionRearrange_Rois">
+   <property name="text">
+    <string>Rearrange Rois</string>
    </property>
   </action>
  </widget>
