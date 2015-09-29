@@ -557,8 +557,8 @@ class TiffSequence(Sequence):
 			framesInd = range(sequence.frames)
 		if showProgress:
 			for i in progress(framesInd,"Saving...","Cancel"):
-				th.SetField(256, sequence.width)
-				th.SetField(257, sequence.height)
+				th.SetField(256, int(sequence.width))
+				th.SetField(257, int(sequence.height))
 				th.SetField(277, 1) #phtometric interpretation black is minimum
 				th.SetField(258, 16) #bits per sample
 				th.SetField(262, 1) #samples per pixel
@@ -571,8 +571,8 @@ class TiffSequence(Sequence):
 					th = TIFF.open(f,'w')
 		else:
 			for i in framesInd:
-				th.SetField(256, sequence.width)
-				th.SetField(257, sequence.height)
+				th.SetField(256, int(sequence.width))
+				th.SetField(257, int(sequence.height))
 				th.SetField(277, 1) #phtometric interpretation black is minimum
 				th.SetField(258, 16) #bits per sample
 				th.SetField(262, 1) #samples per pixel

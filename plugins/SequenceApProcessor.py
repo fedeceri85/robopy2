@@ -38,7 +38,7 @@ class calciumApDialog(Ui_Dialog, QDialog):
 			fo.add('xoff', 0, self.xSpinBox)
 			fo.add('yoff', 400, self.ySpinBox)
 			fo.add('lineWidth', 1, self.lwSpinBox)
-			fo.add('frameSpan', 25, self.frameSpanSpinBox)
+			fo.add('frameSpan', 40, self.frameSpanSpinBox)
 		self.options = fo
 			
 class calciumAPProcessor(ProcessedSequence):
@@ -75,8 +75,11 @@ class calciumAPProcessor(ProcessedSequence):
 		#self.times = np.arange(time_start,time_end,record.dt)*time_scale_factor
 		#print self.times.size
 		section_idx = xrange(len(record[0]))
-		self.vTrace=np.concatenate(list(record[0][j].asarray() for j in section_idx))
-		self.cameraExp=np.concatenate(list(record[1][j].asarray() for j in section_idx))
+        self.vTrace=np.concatenate(list(record[0][j].asarray() for j in section_idx))
+        self.cameraExp=np.concatenate(list(record[1][j].asarray() for j in section_idx))
+
+#		self.vTrace=np.concatenate(list(record[1][j].asarray() for j in section_idx))
+#		self.cameraExp=np.concatenate(list(record[2][j].asarray() for j in section_idx))
 		try:
 			self.cameraTrigger=np.concatenate(list(record[2][j].asarray() for j in section_idx))
 		except:
@@ -86,7 +89,10 @@ class calciumAPProcessor(ProcessedSequence):
 	def alignTraces(self):
 		#self.decimateTraces()
 		self.expStartingIndexes = np.where(np.logical_and(np.diff(self.cameraExp)>1 , (self.times[1:]>=self.time0)))[0]
+		#self.expStartingTimes = [0,]
 		self.expStartingTimes = self.times[self.expStartingIndexes]
+
+		#self.expStartingTimes.extend(self.times[self.expStartingIndexes])
 		print('0 time (s):'+str(self.expStartingTimes[0]))
 		#startingIndex = self.expStartingIndexes[0]
 		#startingIndex2 = np.where(self.cameraTrigger>1)[0]
