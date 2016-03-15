@@ -1,0 +1,22 @@
+•	Installare miniconda http://conda.pydata.org/miniconda.html
+•	Aprire un terminale windows e creare un environment prova con numpy 
+conda create --name prova numpy
+•	Attivare environment a
+activate prova
+
+•	Nell’environment, installare i pacchetti necessari: scipy, scikit-image, matplotlib, pyqtgraph, pyqt, pyopengl, ipython, libtiff, pytables e forse altri con
+conda install nomepacchetto
+•	Installare opencv da qui con
+conda install -c https://conda.anaconda.org/menpo opencv
+•	Scaricare freeglut MSVC a qui http://www.transmissionzero.co.uk/software/freeglut-devel/
+•	Copiare freeglut.dll (64 o 32 bit)  in C:\\Users\\NAME\ Miniconda2\envs\prova\Library\bin
+•	Rinominare libtiff.dll in C:\\Users\\NAME\ Miniconda2\envs\prova\Library\bin in “libtiff3.dll” (zio can!)
+•	pip install libtiff
+•	modificare il file
+C:\Miniconda2\envs\prova\Lib\site-packages\OpenGL\raw\GL\VERSION\GL_1_1.py,
+(magari se l'hai installato come user l'inizio del path e' diverso)
+aggiungendo la una riga GL_TEXTURE_DEPTH=_C('GL_TEXTURE_DEPTH',0x8071)
+
+la riga la metti nel suo posto (le costanti sono definite in ordine alfabetico).
+•	Sempre dentro all’environment prova, andare in cartella robopy e dare 
+python RoboPy.py
